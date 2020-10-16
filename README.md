@@ -12,7 +12,7 @@ We use the question mark operator to support static typing in R.
 We use it for 3 different things here :
 
   - set variable types in a script or the body of a function
-  - set argument typesin a function definition
+  - set argument types in a function definition
   - set return type of a function
 
 We detail those below.
