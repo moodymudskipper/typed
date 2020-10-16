@@ -5,6 +5,18 @@
 
 Experiment on static typing in R. Largely untested\!
 
+We use the question mark operator to support static typing in R.
+
+3 features are proposed :
+
+We use it for 3 different things here :
+
+  - set variable types in a script or the body of a function
+  - set argument typesin a function definition
+  - set return type of a function
+
+We detail those below.
+
 ## Installation
 
 Install with:
@@ -13,163 +25,156 @@ Install with:
 remotes::install_github("moodymudskipper/typed")
 ```
 
-## Example
-
-We define a function below, the question mark is used to introduce
-static typing, `numeric` here is a prototyping function as understood by
-*{vctrs}*, (we could have written `numeric()` with the same effect, and
-we could use *{vctrs}* functions such as `new_date()` too).
-
-We use it for 3 different things here :
-
-  - set a return type to the function `add2` : if the first `?` has a
-    lhs, the function should only return a variable `res`, and *{typed}*
-    will make sure that `res` is always of the right type.
-  - set argument type : the arguments for which we want to set a type
-    are suffixed with `?`, in the case below we don’t have a default
-    value so `?` has no lhs
-  - set variable type : we initiate the variable `y` as numeric in this
-    example and assigning any non numeric to it will fail.
-
-<!-- end list -->
+And attach with :
 
 ``` r
-library(typed)
+# masking warning about overriding `?`
+library(typed, warn.conflicts = FALSE) 
+```
+
+## set variable type
+
+We can set a variable type explicitly or implicitly. The following are
+equivalent.
+
+``` r
+# implicit
+? x <- 1
+```
+
+``` r
+# explicit
+numeric ? x <- 1
+```
+
+``` r
+# explicit without assignment on declaration
+numeric ? x
+x <- 1
+```
+
+Let’s test it
+
+``` r
+numeric ? x
+x
+#> numeric(0)
+x <- 1
+x
+#> [1] 1
+x <- "a"
+#> Error: assigned value should have same prototype as `x`: numeric(0)
+```
+
+To assess if assignments are allowed we compare
+`vctrs::vec_ptype(assigne_value)` to the prototype given on the left
+hand side, which we can give as a function or value. in the latter for
+instance `vctrs::vec_ptype(1)` and `numeric()` return the same thing so
+the assignment is allowed.
+
+Using *{vctrs}* allows us more flexibility than working with `class()`
+or `type_of()`.
+
+``` r
+library(vctrs)
+new_date ? my_date <- "2020-10-16"
+#> Error: assigned value should have same prototype as `my_date`: structure(numeric(0), class = "Date")
+new_date ? my_date <- as.Date("2020-10-16")
+
+val <- new_list_of(list(1, 2), numeric())
+val
+#> <list_of<double>[2]>
+#> [[1]]
+#> [1] 1
 #> 
-#> Attaching package: 'typed'
-#> The following object is masked from 'package:utils':
-#> 
-#>     ?
-numeric ? add2 <- function (x = ?numeric) {
-  numeric ? y
-  y <- 2
-  res <- x + y
-  res
+#> [[2]]
+#> [1] 2
+new_list_of(list(), numeric()) ? new_val <- list(1, 2)
+#> Error: assigned value should have same prototype as `new_val`: structure(list(), ptype = numeric(0), class = c("vctrs_list_of", "vctrs_vctr", "list"))
+new_list_of(list(), numeric()) ? new_val <- val
+```
+
+We can also define constants:
+
+``` r
+character ? chr1 <- const(1) 
+#> Error: assigned value should have same prototype as `chr1`: character(0)
+character ? chr1 <- const("a") 
+chr1
+#> [1] "a"
+chr1 <- "b"
+#> Error in eval(expr, envir, enclos): impossible de changer la valeur d'un lien verrouillé pour 'chr1'
+```
+
+## set argument type
+
+We can set argument types this way :
+
+``` r
+? add <- function (x = ?numeric, y = 1 ?numeric) {
+  x + y
 }
 ```
 
-This creates a function `add2()`, with attributes and a call
-`assert_types()` at the start of the body.
+Note that we started the definition with a `?`, and that we gave a
+default to `y`, but not `x`
+
+This created the following function :
 
 ``` r
-add2
-#> function (x) 
+add
+#> function (x, y = 1) 
 #> {
 #>     assert_types()
-#>     `?`(numeric, y)
-#>     y <- 2
-#>     res <- x + y
-#>     res
+#>     x + y
 #> }
-#> attr(,"arg_ptypes")
-#> attr(,"arg_ptypes")$x
-#> numeric(0)
-#> 
-#> attr(,"output_ptype")
-#> numeric(0)
+#> # Arg types:
+#> x: numeric(0)
+#> y: numeric(0)
 ```
 
-The call `assert_types()` will check that all parameters are right, and
-will make sure they can’t be overridden by a value having another
-prototype.
+You can see a call to `assert_types()`, it ensures arguments passed have
+the right type, and that they won’t be overridden by a different type.
 
-We can call it :
+Let’s test it.
 
 ``` r
-add2(3)
+add(2, 3)
 #> [1] 5
-```
-
-It fails early if fed the wrong arg type :
-
-``` r
-add2("a")
+add(2)
+#> [1] 3
+add("a")
 #> Error: `x`'s prototype should be numeric(0)
 ```
 
-if we had changed the value of x, by assigning a char in the body it
-would have failed too, right when we’d try to assign it:
+Let’s create a function that tried to modify `y` and assign the wrong
+type
 
 ``` r
-numeric ? add2 <- function (x = ?numeric) {
-  message("we get up to here")
-  x <- as.character(x)
-  message("but not there")
-  numeric ? y
-  y <- 2
-  res <- x + y
-  res
+? add_wrong <- function (x = ?numeric, y = 1 ?numeric) {
+  y <- as.character(y)
+  x + y
 }
-
-add2(3)
-#> we get up to here
-#> Error: assigned value should have same prototype as `x`: numeric(0)
-```
-
-Same thing if we try to modify `y` using an illegal type:
-
-``` r
-numeric ? add2 <- function (x = ?numeric) {
-  numeric ? y
-  y <- 2
-  message("we get up to here")
-  y <- "2"
-  message("but not there")
-  res <- x + y
-  res
-}
-
-add2(3)
-#> we get up to here
+add_wrong(2)
 #> Error: assigned value should have same prototype as `y`: numeric(0)
 ```
 
-instead of :
+## set function return type
+
+Setting a function return type is similar to setting variable types, but
+the function should only return an object named `res`, which cannot ever
+have another type than the one we set.
+
+Putting it all together we have :
 
 ``` r
-  numeric ? y
-  y <- 2
-```
-
-We can write on one line :
-
-``` r
-  numeric ? y <- 2
-```
-
-It will test the value of y just like with the former syntax.
-
-We can also set the prototype implicitly by simply typing :
-
-``` r
-  ? y <- 2
-```
-
-Let’s write a variant, we might decide not to set a return type, not to
-declare our y variable, and just set argument types, setting a default
-this time.
-
-``` r
-? add2 <- function (x = 1 ?numeric) {
-  y <- 2
-  x + y
+numeric ? add10 <- function (x = ?numeric) {
+  ? y <- 10
+  res <- x + y
+  res
 }
-
-add2()
-#> [1] 3
-```
-
-It fails if we try to override the argument with a different type:
-
-``` r
-? add2 <- function (x = 1 ?numeric) {
-  y <- 2
-  x <- as.character(x)
-  x + y
-}
-
-add2()
-#> Error: assigned value should have same prototype as `x`: numeric(0)
+add10(20)
+#> [1] 30
 ```
 
 ## Notes
@@ -181,9 +186,14 @@ add2()
     user, they will see it in the code but will be able to use `?` just
     as before.
   - It might be slow
-  - I’d like to be more flexible than just asserting prototypes,
-    supporting at least length would be nice, but more complex
-    conditions too.
+  - We use `vctrs::vec_ptype` on the given prototype and the object to
+    ensure their compatible, it’s not always satisfactory. expressions
+    or functions ar not supported, the prototype of a factor necessarily
+    contains the levels, the prototype of a dataframe necessarily
+    contains the column names. I’d like to be more flexible (suggestions
+    welcome).
+  - In particular, setting length as part of the type would be great, so
+    we could define scalars for instance.
   - A class and printing method for these functions would be nice, to
     print the attributes in a prettier way, and to print the `?` better,
     maybe some fancy *{crayon}* stuff to highlight types.

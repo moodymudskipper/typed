@@ -18,6 +18,19 @@ knitr::opts_chunk$set(
 
 Experiment on static typing in R. Largely untested!
 
+We use the question mark operator to support static typing in R.
+
+3 features are proposed :
+
+We use it for 3 different things here :
+
+* set variable types in a script or the body of a function
+* set argument typesin a function definition
+* set return type of a function
+
+We detail those below.
+
+
 ## Installation
 
 Install with:
@@ -26,136 +39,129 @@ Install with:
 remotes::install_github("moodymudskipper/typed")
 ```
 
-## Example
-
-We define a function below, the question mark is used to introduce static typing,
-`numeric` here is a prototyping function as understood by *{vctrs}*, 
-(we could have written `numeric()` with the same effect, and we could use *{vctrs}*
-functions such as `new_date()` too).
-
-We use it for 3 different things here :
-
-* set a return type to the function `add2` : if the first `?` has a lhs, the function
-  should only return a variable `res`, and *{typed}* will make sure that `res`
-  is always of the right type.
-* set argument type : the arguments for which we want to set a type are suffixed
-  with `?`, in the case below we don't have a default value so `?` has no lhs
-* set variable type : we initiate the variable `y` as numeric in this example
-  and assigning any non numeric to it will fail.
+And attach with : 
 
 ```{r}
-library(typed)
-numeric ? add2 <- function (x = ?numeric) {
-  numeric ? y
-  y <- 2
-  res <- x + y
-  res
-}
+# masking warning about overriding `?`
+library(typed, warn.conflicts = FALSE) 
 ```
 
-This creates a function `add2()`, with attributes and a call `assert_types()` at
-the start of the body.
+## set variable type
 
-```{r}
-add2
-```
-
-The call `assert_types()` will check that all parameters are right, and will
-make sure they can't be overridden by a value having another prototype.
-
-We can call it :
-
-```{r}
-add2(3)
-```
-
-It fails early if fed the wrong arg type :
-
-```{r}
-add2("a")
-```
-
-if we had changed the value of x, by assigning a char in the body it would
-have failed too, right when we'd try to assign it:
-
-```{r}
-numeric ? add2 <- function (x = ?numeric) {
-  message("we get up to here")
-  x <- as.character(x)
-  message("but not there")
-  numeric ? y
-  y <- 2
-  res <- x + y
-  res
-}
-
-add2(3)
-```
-
-
-Same thing if we try to modify `y` using an illegal type:
-
-```{r}
-numeric ? add2 <- function (x = ?numeric) {
-  numeric ? y
-  y <- 2
-  message("we get up to here")
-  y <- "2"
-  message("but not there")
-  res <- x + y
-  res
-}
-
-add2(3)
-```
-
-instead of : 
+We can set a variable type explicitly or implicitly. The following are equivalent.
 
 ```{r, eval = FALSE}
-  numeric ? y
-  y <- 2
+# implicit
+? x <- 1
 ```
-
-We can write on one line : 
 
 ```{r, eval = FALSE}
-  numeric ? y <- 2
+# explicit
+numeric ? x <- 1
 ```
-
-It will test the value of y just like with the former syntax.
-
-We can also set the prototype implicitly by simply typing : 
 
 ```{r, eval = FALSE}
-  ? y <- 2
+# explicit without assignment on declaration
+numeric ? x
+x <- 1
 ```
 
+Let's test it
 
-Let's write a variant, we might decide not to set a return type, 
-not to declare our y variable, and just set argument types, setting a default
-this time.
+```{r}
+numeric ? x
+x
+x <- 1
+x
+x <- "a"
+```
+
+To assess if assignments are allowed we compare `vctrs::vec_ptype(assigne_value)`
+to the prototype given on the left hand side, which we can give as a function
+or value. in the latter for instance `vctrs::vec_ptype(1)` and `numeric()` return
+the same thing so the assignment is allowed.
+
+Using *{vctrs}* allows us more flexibility than working with `class()` or `type_of()`.
+
+```{r}
+library(vctrs)
+new_date ? my_date <- "2020-10-16"
+new_date ? my_date <- as.Date("2020-10-16")
+
+val <- new_list_of(list(1, 2), numeric())
+val
+new_list_of(list(), numeric()) ? new_val <- list(1, 2)
+new_list_of(list(), numeric()) ? new_val <- val
+```
+
+We can also define constants:
+
+```{r}
+character ? chr1 <- const(1) 
+character ? chr1 <- const("a") 
+chr1
+chr1 <- "b"
+```
+
+## set argument type
+
+We can set argument types this way : 
 
 
 ```{r}
-? add2 <- function (x = 1 ?numeric) {
-  y <- 2
+? add <- function (x = ?numeric, y = 1 ?numeric) {
   x + y
 }
-
-add2()
 ```
 
-It fails if we try to override the argument with a different type:
+Note that we started the definition with a `?`, and that we gave a default to
+`y`, but not `x`
+
+This created the following function :
 
 ```{r}
-? add2 <- function (x = 1 ?numeric) {
-  y <- 2
-  x <- as.character(x)
+add
+```
+
+You can see a call to `assert_types()`, it ensures arguments passed have
+the right type, and that they won't be overridden by a different type.
+
+Let's test it.
+
+```{r}
+add(2, 3)
+add(2)
+add("a")
+```
+
+Let's create a function that tried to modify `y` and assign the wrong type
+
+```{r}
+? add_wrong <- function (x = ?numeric, y = 1 ?numeric) {
+  y <- as.character(y)
   x + y
 }
-
-add2()
+add_wrong(2)
 ```
+
+## set function return type
+
+Setting a function return type is similar to setting variable types, but the function
+should only return an object named `res`, which cannot ever have another type than
+the one we set.
+
+Putting it all together we have :
+
+```{r}
+numeric ? add10 <- function (x = ?numeric) {
+  ? y <- 10
+  res <- x + y
+  res
+}
+add10
+add10(20)
+```
+
 
 ## Notes
 
@@ -168,9 +174,6 @@ they will see it in the code but will be able to use `?` just as before.
 * We use `vctrs::vec_ptype` on the given prototype and the object to ensure their
   compatible, it's not always satisfactory. expressions or functions ar not
   supported, the prototype of a factor necessarily contains the levels, the prototype
-  of a dataframe necessarily contains the column names. I'd like to be more flexible.
+  of a dataframe necessarily contains the column names. I'd like to be more flexible (suggestions welcome).
 * In particular, setting length as part of the type would be great, so we could
   define scalars for instance.
-* A class and printing method for these functions would be nice, to print the
-attributes in a prettier way, and to print the `?` better, maybe some fancy
-*{crayon}* stuff to highlight types.
