@@ -1,13 +1,13 @@
 Package: typed
-Title: What the Package Does (One Line, Title Case)
+Title: Static Typing for R
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Antoine",
            family = "Fabri",
            role = c("aut", "cre"),
            email = "antoine.fabri@gmail.com")
-Description: What the package does (one paragraph).
-License: GPL3
+Description: Static Typing for R.
+License: GPL-3
 Encoding: UTF-8
 Language: en
 LazyData: true
