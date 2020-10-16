@@ -7,6 +7,7 @@
 #' @param rhs rhs
 #'
 #' @export
+#' @importFrom utils help
 #' @examples
 #' numeric ? add2 <- function (x= ?numeric) {
 #'   numeric ? y <- 2
@@ -97,6 +98,7 @@
     f <- as.function(c(fmls, body), envir =  pf)
     attr(f, "arg_ptypes")   <- arg_ptypes
     attr(f, "output_ptype") <- output_ptype
+    class(f) <- c("typed", "function")
     assign(fun_nm, f, envir = pf)
     return(invisible(f))
   }
