@@ -165,8 +165,12 @@ add2()
 * Your package would import *{typed}* but `?` won't be exposed to the user,
 they will see it in the code but will be able to use `?` just as before.
 * It might be slow
-* I'd like to be more flexible than just asserting prototypes, supporting at least
- length would be nice, but more complex conditions too.
+* We use `vctrs::vec_ptype` on the given prototype and the object to ensure their
+  compatible, it's not always satisfactory. expressions or functions ar not
+  supported, the prototype of a factor necessarily contains the levels, the prototype
+  of a dataframe necessarily contains the column names. I'd like to be more flexible.
+* In particular, setting length as part of the type would be great, so we could
+  define scalars for instance.
 * A class and printing method for these functions would be nice, to print the
 attributes in a prettier way, and to print the `?` better, maybe some fancy
 *{crayon}* stuff to highlight types.

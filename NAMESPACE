@@ -2,3 +2,4 @@
 
 export("?")
 export(assert_types)
+export(const)
