@@ -1,3 +1,9 @@
+#' Assert Types
+#'
+#' This function shouldn't be called by the user, it will be inserted in the
+#' body of a function to check the arguments and convert them to active bindings
+#' if relevant.
+#'
 #' @export
 assert_types <- function() {
   f <- eval.parent(eval.parent(quote(match.call()))[[1]], 2)
