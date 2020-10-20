@@ -81,7 +81,7 @@ declare <- function(x, assertion_fun, value) {
   promise_lgl <- is_promise2(as.name(x), pf)
   if(promise_lgl && missing(value)) {
     value <- get(x, envir = pf, inherits = FALSE)
-    rm(x, pf)
+    rm(list = x, envir = pf)
   }
 
   if(missing(assertion_fun)) {

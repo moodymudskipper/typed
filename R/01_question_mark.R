@@ -118,7 +118,9 @@ allNames <- function (x) {
       call <- call("declare", as.character(rhs[[2]]), value = rhs[[3]])
       return(eval.parent(call))
     } else {
-      call <- call("declare", as.character(rhs), quote(Any()))
+      # use regular help
+      # we might tweak this to use devtools help if it's in the search path
+      call <- call("help", as.character(rhs))
       return(eval.parent(call))
     }
   } else {
@@ -129,7 +131,7 @@ allNames <- function (x) {
     } else {
       # use regular help
       # we might tweak this to use devtools help if it's in the search path
-      call <- call("help", as.character(rhs))
+      call <- call("declare", as.character(rhs), lhs)
       return(eval.parent(call))
     }
   }
