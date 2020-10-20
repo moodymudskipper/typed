@@ -1,3 +1,5 @@
+# kept just in case but should probably be removed
+
 #' Define Constants
 #'
 #' `const()` is meant to be used using the syntax `? x <- const(3)` or `? x <- const(3)`.
