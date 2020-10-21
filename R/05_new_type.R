@@ -68,11 +68,6 @@ process_type_checker_dots <- function(...) {
   as.call(c(quote(`{`), exprs))
 }
 
-
-is_promise2 <- function(name, env) {
-  .Call("is_promise", name, env)
-}
-
 #' @param x variable name as a string
 #' @param assertion a function
 #' @param value an optional value
