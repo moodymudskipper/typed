@@ -1,3 +1,6 @@
+
+
+
 allNames <- function (x) {
   value <- names(x)
   if (is.null(value))
@@ -38,7 +41,7 @@ allNames <- function (x) {
     rhs <- substitute(rhs)
   }
 
-  ## is rhs is a function definition ?
+  ## is rhs a function definition ?
   if(is.call(rhs) && identical(rhs[[1]], quote(`function`))) {
     ## fetch formals and formal types
     value <- eval.parent(rhs)
@@ -56,7 +59,6 @@ allNames <- function (x) {
     fmls[tmp_lgl] <- lapply(fmls[tmp_lgl], function(x)
             if(length(x) == 2) quote(expr=) else x[[2]])
 
-    ## edit body to add call to `assert_types()`
     if(is.call(body) && identical(body[[1]], quote(`{`)))
       body <- as.list(body)[-1]
     body <- as.call(c(quote(`{`), arg_type_checker_calls, body))
@@ -79,7 +81,8 @@ allNames <- function (x) {
       modify_return_calls <- function(x) {
         if(!is.call(x)) return(x)
         if(identical(x[[1]], quote(`return`))) {
-          x[[2]] <- as.call(c(return_type_checker, x[[2]]))
+          x <- call("?", return_type_checker, x)
+          #x[[2]] <- as.call(c(return_type_checker, x[[2]]))
           return(x)
         }
         x[] <- lapply(x, modify_return_calls)
@@ -91,7 +94,9 @@ allNames <- function (x) {
       ## modify last call if it's not a return call
       last_call <- body[[length(body)]]
       if(!is.call(last_call) || !identical(last_call[[1]], quote(return)))
-        body[[length(body)]] <- as.call(c(return_type_checker, last_call))
+        body[[length(body)]] <-
+        call("?", return_type_checker, call("return", last_call))
+        #body[[length(body)]] <- as.call(c(return_type_checker, last_call))
 
     }
 
@@ -112,6 +117,13 @@ allNames <- function (x) {
     } else {
       return(f)
     }
+  }
+
+  ## is rhs a return call ?
+  if(is.call(rhs) && identical(rhs[[1]], quote(`return`))) {
+    assertion_call <- as.call(c(lhs, rhs[[2]]))
+    value <- eval.parent(assertion_call)
+    eval_bare(call("return", assertion_call), pf)
   }
 
   ## do we set the variable type implicitly (no lhs to `?`)

@@ -22,7 +22,7 @@ that would not respect these restrictions.
 Install with:
 
 ``` r
-remotes::install_github("moodymudskipper/typed")
+remotes::install_github("moodymudskipper/typed@iteration2")
 ```
 
 And attach with :
@@ -225,8 +225,28 @@ the rest of the body of the function.
 
 ## Set function return type
 
-To set a return type, we give a left hand side to the `?` that precedes
-the function definition.
+To set a return type one way is to manually use the `type_checker() ?
+return(value)` syntax with every return value, as we do here (note that
+we need the `?` or the precedence of `?` will cause issues) :
+
+``` r
+add_or_substract <- function (x, y, substract = FALSE) {
+  if(substract) {Double() ? return(x - y)}
+  Double() ? return(x + y)
+}
+add_or_substract(1, 2)
+#> [1] 3
+add_or_substract(1L, 2L)
+#> `expected`:      "double" 
+#> `typeof(value)`: "integer"
+#> Error: type mismatch
+```
+
+A simpler way is to use `?` before the function definition as in the
+previous section, but to give it a type checker on the left hand side.
+It will ultimately create the same function code, but the source code is
+more readable to read, we don’t need to worry about precedence, and the
+function will get a class “type” and attributes.
 
 ``` r
 add_or_substract <- Double() ? function (x, y, substract = FALSE) {
@@ -238,26 +258,11 @@ add_or_substract
 #> function (x, y, substract = FALSE) 
 #> {
 #>     if (substract) 
-#>         return(Double()(x - y))
-#>     Double()(x + y)
+#>         `?`(Double(), return(x - y))
+#>     `?`(Double(), return(x + y))
 #> }
 #> # Return type: Double()
 ```
-
-We see that the last call and the return call were edited to call the
-appropriate assertion on the output :
-
-``` r
-add_or_substract(1, 2)
-#> [1] 3
-add_or_substract(1L, 2L)
-#> `expected`:      "double" 
-#> `typeof(value)`: "integer"
-#> Error: type mismatch
-```
-
-Due to `?`’s precedence, when defining the function in a package, in
-order
 
 These can be defined in a package and documented with *{roxygen2}* like
 regular functions, except that you’ll need to make sure to add the
