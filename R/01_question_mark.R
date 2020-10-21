@@ -1,4 +1,3 @@
-
 allNames <- function (x) {
   value <- names(x)
   if (is.null(value))
@@ -41,13 +40,6 @@ allNames <- function (x) {
 
   ## is rhs is a function definition ?
   if(is.call(rhs) && identical(rhs[[1]], quote(`function`))) {
-    # here we handled so far
-    # Integer ? function(x = ? Integer, y = ? Integer) {res <- x + y; res}
-    # but we need to handle
-    # foo <- Integer ? function(x = ? Integer, y = ? Integer) ) {res <- x + y; res}
-    # and
-    # Function ? foo <- Integer ? function(x = ? Integer, y = ? Integer) {res <- x + y; res}
-
     ## fetch formals and formal types
     value <- eval.parent(rhs)
     body <- body(value)
@@ -69,7 +61,18 @@ allNames <- function (x) {
       body <- as.list(body)[-1]
     body <- as.call(c(quote(`{`), arg_type_checker_calls, body))
 
-    return_type_checker <- lhs
+
+    ## is the lhs a call to `<-`
+    if(lhs_is_assignment <- is.call(lhs) && identical(lhs[[1]], quote(`<-`))) {
+      return_type_checker <- lhs[[3]]
+    } else if(lhs_is_qm <- is.call(lhs) && identical(lhs[[1]], quote(`?`))) {
+      if(!is.call(lhs[[3]]) || !identical(lhs[[c(3,1)]], quote(`<-`)))
+        stop("wrong syntax")
+      return_type_checker <- lhs[[c(3, 3)]]
+    } else {
+      return_type_checker <- lhs
+    }
+
     ## did we set a return type ?
     if(!identical(return_type_checker, NA)) {
       # rather than stopping, we could just make sure than function ends with
@@ -108,7 +111,18 @@ allNames <- function (x) {
     attr(f, "arg_types")   <- arg_type_checkers
     attr(f, "return_type") <- return_type_checker
     class(f) <- c("typed", "function")
-    return(f)
+    if(lhs_is_assignment) {
+      var_nm <- as.character(lhs[[2]])
+      assign(x = var_nm, value = f, envir = pf)
+      return(invisible(f))
+    } else if (lhs_is_qm){
+      var_nm <- as.character(lhs[[c(3,2)]])
+      fun_checker <- lhs[[2]]
+      eval.parent(substitute(declare(var_nm, fun_checker, f), environment()))
+      return(invisible(f))
+    } else {
+      return(f)
+    }
   }
 
   ## do we set the variable type implicitly (no lhs to `?`)
