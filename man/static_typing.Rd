@@ -7,7 +7,7 @@
 \usage{
 `?`(lhs, rhs)
 
-declare(x, assertion_fun, value)
+declare(x, assertion, value)
 }
 \arguments{
 \item{lhs}{lhs}
@@ -16,7 +16,7 @@ declare(x, assertion_fun, value)
 
 \item{x}{variable name as a string}
 
-\item{assertion_fun}{a function}
+\item{assertion}{a function}
 
 \item{value}{an optional value}
 }

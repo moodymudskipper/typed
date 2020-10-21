@@ -19,7 +19,7 @@ new_type_checker <- function(f) {
       )
 
     # the footer is made of additional assertions derived from `...`
-    footer <- process_assertions(...)
+    footer <- process_type_checker_dots(...)
     if(is.null(footer)) {
       body <- call("{", header, quote(x))
     } else {
@@ -32,13 +32,13 @@ new_type_checker <- function(f) {
   res
 }
 
-#' Process assertions
+#' Process type checker dots
 #'
 #' This needs to be exported, but shouldn't be called by the user
 #'
-#' @param ... additional assertions
+#' @param ... dots
 #' @export
-process_assertions <- function(...) {
+process_type_checker_dots <- function(...) {
   args <- list(...)
   if(!length(args)) return(NULL)
   nms <- allNames(args)
@@ -60,8 +60,8 @@ process_assertions <- function(...) {
         stop("assertions should be either named function, or unnamed formulas")
       }
       assertion <- do.call(substitute, list(args[[i]][[3]], list(. = quote(x))))
-      error <-args[[i]][[2]]
-      exprs[[i]] <- bquote(if(!.(assertion)) stop(.(error)))
+      error <- args[[i]][[2]]
+      exprs[[i]] <- bquote(if(!.(assertion)) stop(.(error), call. = FALSE))
     }
   }
   exprs
@@ -74,12 +74,12 @@ is_promise2 <- function(name, env) {
 }
 
 #' @param x variable name as a string
-#' @param assertion_fun a function
+#' @param assertion a function
 #' @param value an optional value
 #'
 #' @export
 #' @rdname static_typing
-declare <- function(x, assertion_fun, value) {
+declare <- function(x, assertion, value) {
   pf<- parent.frame()
   promise_lgl <- is_promise2(as.name(x), pf)
   if(promise_lgl && missing(value)) {
@@ -87,23 +87,23 @@ declare <- function(x, assertion_fun, value) {
     rm(list = x, envir = pf)
   }
 
-  if(missing(assertion_fun)) {
-    assertion_fun_call <- bquote(Any(class = .(class(value))))
-    assertion_fun <- eval(assertion_fun_call)
+  if(missing(assertion)) {
+    assertion_call <- bquote(Any(class = .(class(value))))
+    assertion <- eval(assertion_call)
   } else {
-    ## is assertion_fun a type_checker ?
-    assertion_fun_call <- substitute(assertion_fun)
-    if("type_checker" %in% class(assertion_fun)) {
+    ## is assertion a type_checker ?
+    assertion_call <- substitute(assertion)
+    if("type_checker" %in% class(assertion)) {
       ## overwrite it with a call to itself with no arg
       # this is so we can use `Integer` in place of `Integer()` for instance
-      assertion_fun <- assertion_fun()
-      assertion_fun_call <- as.call(list(assertion_fun_call))
+      assertion <- assertion()
+      assertion_call <- as.call(list(assertion_call))
     }
   }
 
   ## is value provided ?
   if(!missing(value) || promise_lgl) {
-    value <- assertion_fun(value)
+    value <- assertion(value)
   } else {
     # NULL is accepted as a first value even if it doesn't pass the check
     # this is because we're very flexible with types, the alternative would be
@@ -115,11 +115,11 @@ declare <- function(x, assertion_fun, value) {
     val <- value
     function(v) {
       if (!missing(v)) {
-        val <<- assertion_fun(v)
+        val <<- assertion(v)
       }
       val
     }
-  }), list (assertion_fun = assertion_fun_call)))
+  }), list (assertion = assertion_call)))
 
   attr(f, "srcref") <- NULL # so it's not set to old definition
   makeActiveBinding(x, f, pf)
@@ -128,10 +128,10 @@ declare <- function(x, assertion_fun, value) {
 }
 
 
-#' Fetch assertion function from active binding function
+#' Fetch assertion from active binding function
 #'
 #' @param x obect
-get_assertion_fun <- function(x) {
+get_assertion <- function(x) {
   x <- as.character(substitute(x))
   fun <- activeBindingFunction(x, parent.frame())
   body(fun)[[c(2, 3, 2, 3, 1)]]

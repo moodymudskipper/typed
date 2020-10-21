@@ -130,7 +130,7 @@ Time(length, ...)
 \item{dim}{dimensions}
 }
 \description{
-These functions are type checkers, they produce assertion functions,
+These functions are type checkers, they produce assertions,
 which take an object, verify assertions, and
 returns the input, possibly modified (though never modified with native types).
 }
