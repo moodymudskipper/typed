@@ -278,7 +278,7 @@ Null <- new_type_checker(function(value) {
 #' @export
 #' @rdname native_types
 Closure <- new_type_checker(function(value) {
-  if(typeof(value) == "closure") {
+  if(typeof(value) != "closure") {
     print(waldo::compare(
       "closure",
       typeof(value),
