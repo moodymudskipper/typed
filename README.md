@@ -3,19 +3,19 @@
 
 # typed
 
-Experiment on static typing in R. Largely untested\!
-
-We use the question mark operator to support static typing in R.
-
-3 features are proposed :
-
-We use it for 3 different things here :
+*{typed}* implements static typing in R, it has 3 main features:
 
   - set variable types in a script or the body of a function
-  - set argument typesin a function definition
+  - set argument types in a function definition
   - set return type of a function
 
-We detail those below.
+The user can define their own types, or leverage check functions from
+other packages such as assertions from Richie Cotton’s *{assertive}*
+package.
+
+Under the hood we use active bindings, so once a variable is restricted
+to a type, or by any other condition, it cannot be modified in a way
+that would not respect these restrictions.
 
 ## Installation
 
@@ -32,86 +32,155 @@ And attach with :
 library(typed, warn.conflicts = FALSE) 
 ```
 
-## set variable type
+## Set variable type
 
-We can set a variable type explicitly or implicitly. The following are
-equivalent.
+### Question mark notation and `declare`
 
-``` r
-# implicit
-? x <- 1
-```
+Here are examples on how we would set types
 
 ``` r
-# explicit
-numeric ? x <- 1
-```
-
-``` r
-# explicit without assignment on declaration
-numeric ? x
-x <- 1
-```
-
-Let’s test it
-
-``` r
-numeric ? x
-x
-#> numeric(0)
-x <- 1
-x
-#> [1] 1
+Character() ? x # restrict x to "character" type
 x <- "a"
-#> Error: assigned value should have same prototype as `x`: numeric(0)
-```
-
-To assess if assignments are allowed we compare
-`vctrs::vec_ptype(assigne_value)` to the prototype given on the left
-hand side, which we can give as a function or value. in the latter for
-instance `vctrs::vec_ptype(1)` and `numeric()` return the same thing so
-the assignment is allowed.
-
-Using *{vctrs}* allows us more flexibility than working with `class()`
-or `type_of()`.
-
-``` r
-library(vctrs)
-new_date ? my_date <- "2020-10-16"
-#> Error: assigned value should have same prototype as `my_date`: structure(numeric(0), class = "Date")
-new_date ? my_date <- as.Date("2020-10-16")
-
-val <- new_list_of(list(1, 2), numeric())
-val
-#> <list_of<double>[2]>
-#> [[1]]
-#> [1] 1
-#> 
-#> [[2]]
-#> [1] 2
-new_list_of(list(), numeric()) ? new_val <- list(1, 2)
-#> Error: assigned value should have same prototype as `new_val`: structure(list(), ptype = numeric(0), class = c("vctrs_list_of", "vctrs_vctr", "list"))
-new_list_of(list(), numeric()) ? new_val <- val
-```
-
-We can also define constants:
-
-``` r
-character ? chr1 <- const(1) 
-#> Error: assigned value should have same prototype as `chr1`: character(0)
-character ? chr1 <- const("a") 
-chr1
+x
 #> [1] "a"
-chr1 <- "b"
-#> Error in eval(expr, envir, enclos): impossible de changer la valeur d'un lien verrouillé pour 'chr1'
+Integer(3) ? y <- 1:3 # restrict y to "integer" type of length 3
+y
+#> [1] 1 2 3
 ```
 
-## set argument type
+We cannot assign values of the wrong type to `x` and `y` anymore.
+
+``` r
+x <- 2
+#> `expected`:      "character"
+#> `typeof(value)`: "double"
+#> Error: type mismatch
+y <- 4:5
+#>      `expected`: 3
+#> `length(value)`: 2
+#> Error: length mismatch
+y[1] <- 10
+#> `expected`:      "integer"
+#> `typeof(value)`: "double"
+#> Error: type mismatch
+```
+
+But the right type will work.
+
+``` r
+x <- c("b", "c")
+y <- c(1L, 10L, 100L)
+```
+
+If you dislike the `?` operator you can use `declare`, it’s a strict
+equivalent, slightly more efficient, which looks like `base::assign`.
+
+``` r
+declare("x", Character())
+x <- "a"
+x
+#> [1] "a"
+declare("y", Integer(3), 1:3)
+y
+#> [1] 1 2 3
+```
+
+### Type checkers and assertions
+
+`Integer` and `Character` are called type checkers.
+
+The package contains many of those (see `?native_types`), the main ones
+are:
+
+  - `Any` (No default restriction)
+  - `Logical`
+  - `Integer`
+  - `Double`
+  - `Character`
+  - `List`
+  - `Environment`
+  - `Factor`
+  - `Matrix`
+  - `Data.frame`
+  - `Date`
+  - `Time` (POSIXct)
+
+They are function factories (functions that return functions), thus
+`Integer(3)` and `Character()` are functions.
+
+In particular these functions operate checks on a value and in case of
+success return this value, generally unmodified. For instance :
+
+``` r
+Data.frame()(letters)
+#> `expected to contain`: "data.frame"
+#> `class(value)`:        "character"
+#> Error: class mismatch
+Data.frame(ncol = 5)(cars)
+#>    `expected`: 5
+#> `ncol(value)`: 2
+#> Error: Column number mismatch
+```
+
+We use the denomination used by the *{assertive}* package and call these
+functions assertions.
+
+### Custom types
+
+As we’ve seen with `Integer(3)`, `Data.frame(ncol = 5)`, passing
+arguments to a type checker restricts the type. For instance `Integer`
+has arguments `length` and `...`, in the dots we can use arguments named
+as functions and with the value of the expected result.
+
+``` r
+Integer(anyNA = FALSE) ? x <- c(1L, 2L, NA)
+#> `expected`:     FALSE
+#> `anyNA(value)`: TRUE
+#> Error: `anyNA` mismatch
+```
+
+That makes type checkers very flexible\! If it is still not flexible
+enough, one can provide conditions using formulas.
+
+``` r
+fruit <- Character(1, "`value` is not a fruit!" ~ . %in% c("apple", "pear", "cherry"))
+fruit ? x <- "potatoe"
+#> Error: `value` is not a fruit!
+```
+
+We can also use assertions from other packages. For instance
+
+``` r
+library(assertive)
+
+# used without type definition
+assert_is_monotonic_increasing(1:3)
+assert_is_monotonic_increasing(3:1)
+#> Error in eval(expr, envir, enclos): is_monotonic_increasing : The values of 3:1 are not monotonic increasing.
+#>   Position ValueBefore ValueAfter
+#> 1      1/2           3          2
+#> 2      2/3           2          1
+
+# used with type definition
+assert_is_monotonic_increasing ? z
+z <- 1:3 # works
+z <- 3:1 # fails
+#> Error in (function (v) : is_monotonic_increasing : The values of v are not monotonic increasing.
+#>   Position ValueBefore ValueAfter
+#> 1      1/2           3          2
+#> 2      2/3           2          1
+```
+
+Finally, custom type checkers can be defined using the function
+`new_type_checker`, [check my code on github to understand how to create
+them](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_native_types.R)
+
+## Set argument type
 
 We can set argument types this way :
 
 ``` r
-? add <- function (x = ?numeric, y = 1 ?numeric) {
+add <- ? function (x= ? Double(), y= 1 ? Double()) {
   x + y
 }
 ```
@@ -119,62 +188,91 @@ We can set argument types this way :
 Note that we started the definition with a `?`, and that we gave a
 default to `y`, but not `x`
 
-This created the following function :
+This created the following function, by adding declarations at the top
+of the function.
 
 ``` r
 add
+#> # typed function
 #> function (x, y = 1) 
 #> {
-#>     assert_types()
+#>     `?`(Double(), x)
+#>     `?`(Double(), y)
 #>     x + y
 #> }
 #> # Arg types:
-#> x: numeric(0)
-#> y: numeric(0)
+#> # x: Double()
+#> # y: Double()
 ```
 
-You can see a call to `assert_types()`, it ensures arguments passed have
-the right type, and that they won’t be overridden by a different type.
+Note that a declaration will fail if the variable already exists in the
+environment, but an exception is made for unevaluated function
+arguments.
 
-Let’s test it.
+Let’s test it by assigning a right and wrong type
 
 ``` r
 add(2, 3)
 #> [1] 5
-add(2)
-#> [1] 3
-add("a")
-#> Error: `x`'s prototype should be numeric(0)
+add(2, 3L)
+#> `expected`:      "double" 
+#> `typeof(value)`: "integer"
+#> Error: type mismatch
 ```
 
-Let’s create a function that tried to modify `y` and assign the wrong
-type
+Arguments `x` and `y` will also be restricted to the type “integer” in
+the rest of the body of the function.
+
+## Set function return type
+
+To set a return type, we give a left hand side to the `?` that precedes
+the function definition.
 
 ``` r
-? add_wrong <- function (x = ?numeric, y = 1 ?numeric) {
-  y <- as.character(y)
+add_or_substract <- Double() ? function (x, y, substract = FALSE) {
+  if(substract) return(x - y)
   x + y
 }
-add_wrong(2)
-#> Error: assigned value should have same prototype as `y`: numeric(0)
+add_or_substract
+#> # typed function
+#> function (x, y, substract = FALSE) 
+#> {
+#>     if (substract) 
+#>         return(Double()(x - y))
+#>     Double()(x + y)
+#> }
+#> # Return type: Double()
 ```
 
-## set function return type
-
-Setting a function return type is similar to setting variable types, but
-the function should only return an object named `res`, which cannot ever
-have another type than the one we set.
-
-Putting it all together we have :
+We see that the last call and the return call were edited to call the
+appropriate assertion on the output :
 
 ``` r
-numeric ? add10 <- function (x = ?numeric) {
-  ? y <- 10
-  res <- x + y
-  res
+add_or_substract(1, 2)
+#> [1] 3
+add_or_substract(1L, 2L)
+#> `expected`:      "double" 
+#> `typeof(value)`: "integer"
+#> Error: type mismatch
+```
+
+Due to `?`’s precedence, when defining the function in a package, in
+order
+
+These can be defined in a package and documented with *{roxygen2}* like
+regular functions, except that you’ll need to make sure to add the
+`@name` tag (it’s due to `?`’s precedence). for instance :
+
+``` r
+#' add
+#'
+#' @param x double
+#' @param y double
+#' @export
+#' @name add
+add <- Double() ? function (x = ? Double(), y = 1 ? Double()) {
+  x + y
 }
-add10(20)
-#> [1] 30
 ```
 
 ## Notes
@@ -184,16 +282,5 @@ add10(20)
     active bindings, using a variation of the last example of `?bindenv`
   - Your package would import *{typed}* but `?` won’t be exposed to the
     user, they will see it in the code but will be able to use `?` just
-    as before.
-  - It might be slow
-  - We use `vctrs::vec_ptype` on the given prototype and the object to
-    ensure their compatible, it’s not always satisfactory. expressions
-    or functions ar not supported, the prototype of a factor necessarily
-    contains the levels, the prototype of a dataframe necessarily
-    contains the column names. I’d like to be more flexible (suggestions
-    welcome).
-  - In particular, setting length as part of the type would be great, so
-    we could define scalars for instance.
-  - A class and printing method for these functions would be nice, to
-    print the attributes in a prettier way, and to print the `?` better,
-    maybe some fancy *{crayon}* stuff to highlight types.
+    as before. In fact the most common standard use `?mean` still works
+    even when *{typed}* is attached.
