@@ -60,6 +60,7 @@ allNames <- function (x) {
     if(is.call(body) && identical(body[[1]], quote(`{`)))
       body <- as.list(body)[-1]
     body <- as.call(c(quote(`{`), arg_type_checker_calls, body))
+    # from there on, body starts with `{` in any case
 
 
     ## is the lhs a call to `<-`
@@ -75,36 +76,24 @@ allNames <- function (x) {
 
     ## did we set a return type ?
     if(!identical(return_type_checker, NA)) {
-      # rather than stopping, we could just make sure than function ends with
-      # `(res <- last_value)`
-      # and that we return `return((res <- returned_value))`
-
-      ## does the body end with other than `res` ?
-      if(!identical(body[[length(body)]], quote(res))) {
-        ## fail explicitly
-        stop("The last call of the function should be `res`", call. = FALSE)
-      }
-
-      ## fail if we use `return` in other way than `return(res)`
-      fail_on_wrong_return <- function(x) {
+      modify_return_calls <- function(x) {
         if(!is.call(x)) return(x)
         if(identical(x[[1]], quote(`return`))) {
-          if(!identical(x[[2]], quote(`res`))) {
-            stop("The function should only return `res`", call. = FALSE)
-          }
+          x[[2]] <- as.call(c(return_type_checker, x[[2]]))
           return(x)
         }
-        x[] <- lapply(x, fail_on_wrong_return)
+        x[] <- lapply(x, modify_return_calls)
         x
       }
-      fail_on_wrong_return(body)
-      return_type_checker_call <- bquote(.(return_type_checker) ? res)
-      if(is.call(body) && identical(body[[1]], quote(`{`)))
-        body <- as.list(body)[-1]
-      body <- as.call(c(quote(`{`), return_type_checker_call, body))
+
+      body <- modify_return_calls(body)
+
+      ## modify last call if it's not a return call
+      last_call <- body[[length(body)]]
+      if(!is.call(last_call) || !identical(last_call[[1]], quote(return)))
+        body[[length(body)]] <- as.call(c(return_type_checker, last_call))
+
     }
-
-
 
     ## build function from formals, body, and type attributes
     f <- as.function(c(fmls, body), envir =  pf)
