@@ -16,5 +16,4 @@ RoxygenNote: 7.1.1
 URL: https://github.com/moodymudskipper/typed
 BugReports: https://github.com/moodymudskipper/typed/issues
 Imports: 
-    waldo,
-    pryr
+    waldo

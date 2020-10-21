@@ -68,7 +68,10 @@ process_assertions <- function(...) {
   as.call(c(quote(`{`), exprs))
 }
 
-is_promise2 <- getFromNamespace("is_promise2", "pryr")
+
+is_promise2 <- function(name, env) {
+  .Call("is_promise", name, env)
+}
 
 #' @param x variable name as a string
 #' @param assertion_fun a function
