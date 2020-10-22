@@ -8,7 +8,6 @@ new_type_checker <- function(f) {
   f_call <- as.call(c(quote(f), quote(x), sapply(names(formals(f)[-1]), as.name)))
 
   res <- as.function(c(formals(f)[-1],alist(...=), bquote({
-    #browser()
     f_call <- substitute(.(f_call))
     # remove if empty
     f_call <- Filter(function(x) !identical(x, quote(expr=)), f_call)
@@ -140,7 +139,28 @@ declare <- function(x, assertion, value, const = FALSE) {
 
   ## is value provided ?
   if(!missing(value) || promise_lgl) {
-    value <- assertion(value)
+    val <<- try(assertion(value), silent = TRUE)
+    if(inherits(val, "try-error")) {
+      e <- attr(val, "condition")$message
+      declare_call <- sys.call()
+
+      sc4 <- if(length(sys.calls()) >=4) sys.call(-4)    # the potential `?` call
+      if (is.call(sc4) && identical(sc4[[1]], quote(`?`))) {
+        declare_call <- sc4
+        fun_call <- sys.call(-5)
+      } else {
+        fun_call <- sys.call(-1)
+      }
+      fun_call <- deparse1(fun_call)
+      # here the srcref will sometimes print the `?` call better
+      declare_call <- as.character(attr(declare_call,"srcref"))
+      if (promise_lgl) {
+        e <- sprintf("In `%s` at `%s`: wrong argument to function, %s", fun_call, declare_call, e)
+      } else {
+        e <- sprintf("In `%s` at `%s`: %s", fun_call, declare_call, e)
+      }
+      stop(e, call. = FALSE)
+    }
   } else {
     # NULL is accepted as a first value even if it doesn't pass the check
     # this is because we're very flexible with types, the alternative would be
@@ -151,21 +171,45 @@ declare <- function(x, assertion, value, const = FALSE) {
   if(const) {
     # we could use `lockBinding()` but we'd lose flexibility on the error message
     # so we use an active binding here as well
-    f <- eval(substitute(local({
+    f <- local({
+      nm <- x
       val <- value
-      function(v) {
-        if (!missing(v)) {
-          stop("`", X, "` is a constant, can't assign a new value.", call.=FALSE)
+      function(assigned_value) {
+        if (!missing(assigned_value)) {
+          e <- paste0("Can't assign to a constant")
+          fun_call <- sys.call(-1)
+          if(!is.null(fun_call)) {
+            fun_call <- deparse1(fun_call)
+            assign_call <- sys.call()
+            # for some reason we want the srcref, not the actual call
+            assign_call <- as.character(attr(assign_call,"srcref"))
+            e <- sprintf("In `%s` at `%s`: %s", fun_call, assign_call, e)
+          }
+          stop(e, call. = FALSE)
         }
         val
       }
-    }), list (X = x)))
+    })
   } else {
     f <- eval(substitute(local({
       val <- value
-      function(v) {
-        if (!missing(v)) {
-          val <<- assertion(v)
+      # use long name`assigned_value` so trace is more intuitive
+      function(assigned_value) {
+        if (!missing(assigned_value)) {
+          # we should catch this error and use `sys.call()` to enrich it
+          val <<- try(assertion(assigned_value), silent = TRUE)
+          if(inherits(val, "try-error")) {
+            e <- attr(val, "condition")$message
+            fun_call <- sys.call(-1)
+            if(!is.null(fun_call)) {
+              fun_call <- deparse1(fun_call)
+              assign_call <- sys.call()
+              # for some reason we want the srcref, not the actual call
+              assign_call <- as.character(attr(assign_call,"srcref"))
+              e <- sprintf("In `%s` at `%s`: %s", fun_call, assign_call, e)
+            }
+            stop(e, call. = FALSE)
+          }
         }
         val
       }
