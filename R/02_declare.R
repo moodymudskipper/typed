@@ -37,12 +37,18 @@ declare <- function(x, assertion, value, const = FALSE) {
       if (is.call(sc4) && identical(sc4[[1]], quote(`?`))) {
         declare_call <- sc4
         fun_call <- sys.call(-5)
+        if(length(declare_call) == 3) {
+          declare_call <- paste(deparse1(declare_call[[2]]),"?", deparse1(declare_call[[3]]))
+        } else {
+          # not sure if we ever go there, that's an error on a `? x <- value` call
+          declare_call <- paste("?", deparse1(declare_call[[3]]))
+        }
       } else {
         fun_call <- sys.call(-1)
+        declare_call <- deparse1(declare_call,"srcref")
       }
       fun_call <- deparse1(fun_call)
-      # here the srcref will sometimes print the `?` call better
-      declare_call <- as.character(attr(declare_call,"srcref"))
+
       if (promise_lgl) {
         e <- sprintf("In `%s` at `%s`: wrong argument to function, %s", fun_call, declare_call, e)
       } else {
@@ -60,7 +66,7 @@ declare <- function(x, assertion, value, const = FALSE) {
   if(const) {
     # we could use `lockBinding()` but we'd lose flexibility on the error message
     # so we use an active binding here as well
-    f <- local({
+    f <- eval(substitute(local({
       nm <- x
       val <- value
       function(assigned_value) {
@@ -69,21 +75,19 @@ declare <- function(x, assertion, value, const = FALSE) {
           fun_call <- sys.call(-1)
           if(!is.null(fun_call)) {
             fun_call <- deparse1(fun_call)
-            assign_call <- sys.call()
-            # for some reason we want the srcref, not the actual call
-            assign_call <- as.character(attr(assign_call,"srcref"))
-            e <- sprintf("In `%s` at `%s`: %s", fun_call, assign_call, e)
+            e <- sprintf("In `%s` at `%s <- ...`: %s", fun_call, var_nm, e)
           }
           stop(e, call. = FALSE)
         }
         val
       }
-    })
+    }), list (var_nm = x)))
   } else {
     f <- eval(substitute(local({
       val <- value
       # use long name`assigned_value` so trace is more intuitive
       function(assigned_value) {
+        # browser()
         if (!missing(assigned_value)) {
           # we should catch this error and use `sys.call()` to enrich it
           val <<- try(assertion(assigned_value), silent = TRUE)
@@ -92,17 +96,14 @@ declare <- function(x, assertion, value, const = FALSE) {
             fun_call <- sys.call(-1)
             if(!is.null(fun_call)) {
               fun_call <- deparse1(fun_call)
-              assign_call <- sys.call()
-              # for some reason we want the srcref, not the actual call
-              assign_call <- as.character(attr(assign_call,"srcref"))
-              e <- sprintf("In `%s` at `%s`: %s", fun_call, assign_call, e)
+              e <- sprintf("In `%s` at `%s <- ...`: %s", fun_call, var_nm, e)
             }
             stop(e, call. = FALSE)
           }
         }
         val
       }
-    }), list (assertion = assertion_call)))
+    }), list (assertion = assertion_call, var_nm = x)))
   }
 
   attr(f, "srcref") <- NULL # so it's not set to old definition
