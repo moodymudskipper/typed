@@ -22,8 +22,8 @@ knitr::opts_chunk$set(
 * set argument types in a function definition
 * set return type of a function
 
-The user can define their own types, or leverage check functions from
-other packages such as assertions from Richie Cotton's *{assertive}* package.
+The user can define their own types, or leverage assertions from
+other packages.
 
 Under the hood we use active bindings, so once a variable is restricted to
 a type, or by any other condition, it cannot be modified in a way that would
@@ -114,10 +114,9 @@ Data.frame()(letters)
 Data.frame(ncol = 5)(cars)
 ```
 
-We use the denomination used by the *{assertive}* package and call these functions
-assertions.
+These functions are called assertions.
 
-### Custom types 
+### Custom types
 
 As we've seen with `Integer(3)`, `Data.frame(ncol = 5)`, passing arguments to a
 type checker restricts the type. For instance `Integer` has arguments `length` and
@@ -136,7 +135,12 @@ fruit <- Character(1, "`value` is not a fruit!" ~ . %in% c("apple", "pear", "che
 fruit ? x <- "potatoe"
 ```
 
-We can also use assertions from other packages. For instance
+### Leverage assertions from other packages
+
+Some great packages provide assertions, and they can be used with `typed`
+provided that they take the object as a first input and return the object
+if no failure. Richie Cotton's *{assertive}* and Michel Lang's *{checkmate}* 
+both qualify and we'll use them as examples.
 
 ```{r}
 library(assertive)
@@ -151,9 +155,31 @@ z <- 1:3 # works
 z <- 3:1 # fails
 ```
 
+If we want to use more than the first argument, we can use `purrr::partial()` :
+
+```{r}
+library(checkmate)
+library(purrr)
+partial(assert_string, pattern ="^t") ? x <- "tomato"
+partial(assert_string, pattern ="^t") ? x <- "potato"
+```
+
+### Custom type checkers
+
 Finally, custom type checkers can be defined using the function `new_type_checker`, 
 [check my code on github to understand how to create them](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_native_types.R)
 
+### Constants
+
+To define a constant, we just surround the variable by parentheses (think of 
+them as a protection)
+
+```{r}
+Double() ? (x) <- 1
+x <- 2
+? (y) <- 1
+y <- 2
+```
 
 ## Set argument type
 
@@ -189,7 +215,6 @@ add(2, 3L)
 Arguments `x` and `y` will also be restricted to the type "integer" in the rest of
 the body of the function.
 
-
 ## Set function return type
 
 To set a return type one way is to manually use the `type_checker() ? return(value)`
@@ -219,8 +244,7 @@ add_or_substract
 ```
 
 These can be defined in a package and documented with *{roxygen2}* like regular
-functions, except that you'll need to make sure to add the `@name` tag (it's due
-to `?`'s precedence). for instance :
+functions, except that you'll need to make sure to add the `@name` tag.
 
 ```{r, eval = FALSE}
 #' add

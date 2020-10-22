@@ -74,7 +74,7 @@ process_type_checker_dots <- function(...) {
 #'
 #' @export
 #' @rdname static_typing
-declare <- function(x, assertion, value) {
+declare <- function(x, assertion, value, const = FALSE) {
   pf<- parent.frame()
   promise_lgl <- is_promise2(as.name(x), pf)
   if(promise_lgl && missing(value)) {
@@ -106,15 +106,31 @@ declare <- function(x, assertion, value) {
     value <- NULL
   }
 
-  f <- eval(substitute(local({
-    val <- value
-    function(v) {
-      if (!missing(v)) {
-        val <<- assertion(v)
+  if(const) {
+    # we could use `lockBinding()` but we'd lose flexibility on the error message
+    # so we use an active binding here as well
+    f <- eval(substitute(local({
+      val <- value
+      function(v) {
+        if (!missing(v)) {
+          stop("`", X, "` is a constant, can't assign a new value!", call.=FALSE)
+        }
+        val
       }
-      val
-    }
-  }), list (assertion = assertion_call)))
+    }), list (X = x)))
+  } else {
+    f <- eval(substitute(local({
+      val <- value
+      function(v) {
+        if (!missing(v)) {
+          val <<- assertion(v)
+        }
+        val
+      }
+    }), list (assertion = assertion_call)))
+  }
+
+
 
   attr(f, "srcref") <- NULL # so it's not set to old definition
   makeActiveBinding(x, f, pf)

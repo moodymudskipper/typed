@@ -31,7 +31,7 @@ allNames <- function (x) {
   pf <- parent.frame()
 
   ## did we use unary `?` ?
-  if(missing(rhs)) {
+  if(unary_qm_lgl <- missing(rhs)) {
     ## assign the value to quoted rhs and define lhs as `NA`
     rhs <- substitute(lhs)
     lhs <- NA
@@ -77,7 +77,7 @@ allNames <- function (x) {
     }
 
     ## did we set a return type ?
-    if(!identical(return_type_checker, NA)) {
+    if(!unary_qm_lgl) {
       modify_return_calls <- function(x) {
         if(!is.call(x)) return(x)
         if(identical(x[[1]], quote(`return`))) {
@@ -127,27 +127,41 @@ allNames <- function (x) {
   }
 
   ## do we set the variable type implicitly (no lhs to `?`)
-  if(identical(lhs, NA)) {
+  if(unary_qm_lgl) {
     ## is the rhs an assignment ?
     if(is.call(rhs) && identical(rhs[[1]], quote(`<-`))) {
+      ## is it a constant, using syntax `? (x) <- value` ?
+      if(is.call(rhs[[2]]) && identical(rhs[[c(2,1)]], quote(`(`))) {
+        call <- call(
+          "declare", as.character(rhs[[c(2,2)]]), value = rhs[[3]], const = TRUE)
+        return(eval.parent(call))
+      }
+
       call <- call("declare", as.character(rhs[[2]]), value = rhs[[3]])
       return(eval.parent(call))
-    } else {
-      # use regular help
-      # we might tweak this to use devtools help if it's in the search path
-      call <- call("help", as.character(rhs))
-      return(eval.parent(call))
     }
-  } else {
-    ## is the rhs an assignment ?
-    if(is.call(rhs) && identical(rhs[[1]], quote(`<-`))) {
-      call <- call("declare", as.character(rhs[[2]]), lhs, rhs[[3]])
-      return(eval.parent(call))
-    } else {
-      # use regular help
-      # we might tweak this to use devtools help if it's in the search path
-      call <- call("declare", as.character(rhs), lhs)
-      return(eval.parent(call))
-    }
+
+    # use regular help
+    # we might tweak this to use devtools help if it's in the search path
+    call <- call("help", as.character(rhs))
+    return(eval.parent(call))
   }
+
+  ## is the rhs an assignment ?
+  if(is.call(rhs) && identical(rhs[[1]], quote(`<-`))) {
+    ## is it a constant, using syntax `assertion ? (x) <- value` ?
+    if(is.call(rhs[[2]]) && identical(rhs[[c(2,1)]], quote(`(`))) {
+      call <- call(
+        "declare", as.character(rhs[[c(2,2)]]), lhs, rhs[[3]], const = TRUE)
+      return(eval.parent(call))
+    }
+
+    call <- call("declare", as.character(rhs[[2]]), lhs, rhs[[3]])
+    return(eval.parent(call))
+  }
+
+  # use regular help
+  # we might tweak this to use devtools help if it's in the search path
+  call <- call("declare", as.character(rhs), lhs)
+  return(eval.parent(call))
 }
