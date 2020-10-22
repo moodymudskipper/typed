@@ -68,6 +68,48 @@ process_type_checker_dots <- function(...) {
   as.call(c(quote(`{`), exprs))
 }
 
+infer_implicit_assignment_call <- function(value) {
+  # note : attr(, "class") is different from class()
+  if(is.atomic(value) && is.null(attr(value, "class"))) {
+    assertion_call <- switch(
+      typeof(value),
+      "logical" = quote(Logical()),
+      "integer" = quote(Integer()),
+      "double" = quote(Double()),
+      "complex" = bquote(Any(typeof = "complex")),
+      "character" = quote(Character()),
+      "raw" = quote(Raw())
+    )
+    return(assertion_call)
+  }
+  cl <- class(value)
+  if(length(cl) == 1) {
+    assertion_call <- switch(
+      cl,
+      "list" = quote(List()),
+      "NULL" = quote(Null()),
+      "function" = quote(Function()),
+      "environment" = quote(Environment()),
+      "name" = quote(Symbol()),
+      "pairlist" = quote(Pairlist()),
+      "language" = quote(Language()),
+      "expression" = quote(Expression()),
+      "factor" = quote(Factor()),
+      "data.frame" = quote(Data.frame()),
+      "matrix" = quote(Matrix()),
+      "array" = quote(Array()),
+      "date" = quote(Date()),
+      "matrix" = quote(Matrix()),
+      call("Any", class = cl)
+    )
+    return(assertion_call)
+  }
+  if (identical(cl, c("POSIXct", "POSIXt"))) {
+    return(quote(Time()))
+  }
+  call("Any", class = cl)
+}
+
 #' @param x variable name as a string
 #' @param assertion a function
 #' @param value an optional value
@@ -83,7 +125,7 @@ declare <- function(x, assertion, value, const = FALSE) {
   }
 
   if(missing(assertion)) {
-    assertion_call <- bquote(Any(class = .(class(value))))
+    assertion_call <- infer_implicit_assignment_call(value)
     assertion <- eval(assertion_call)
   } else {
     ## is assertion a type_checker ?
@@ -113,7 +155,7 @@ declare <- function(x, assertion, value, const = FALSE) {
       val <- value
       function(v) {
         if (!missing(v)) {
-          stop("`", X, "` is a constant, can't assign a new value!", call.=FALSE)
+          stop("`", X, "` is a constant, can't assign a new value.", call.=FALSE)
         }
         val
       }
@@ -129,8 +171,6 @@ declare <- function(x, assertion, value, const = FALSE) {
       }
     }), list (assertion = assertion_call)))
   }
-
-
 
   attr(f, "srcref") <- NULL # so it's not set to old definition
   makeActiveBinding(x, f, pf)
