@@ -1,6 +1,8 @@
+
 #' @param x variable name as a string
 #' @param assertion a function
 #' @param value an optional value
+#' @param const whether to declare `x` as a constant
 #'
 #' @export
 #' @rdname static_typing
