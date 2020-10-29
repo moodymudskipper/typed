@@ -41,29 +41,111 @@ allNames <- function (x) {
     rhs <- substitute(rhs)
   }
 
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # `?` TO REFACTOR FUNCTION CODE
+
   ## is rhs a function definition ?
   if(is.call(rhs) && identical(rhs[[1]], quote(`function`))) {
     ## fetch formals and formal types
     value <- eval.parent(rhs)
     body <- body(value)
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # EDIT BODY TO REPLACE CALLS TO `?` USING DECLARE
+
+    modify_qm_calls <- function(x) {
+      if(!is.call(x)) return(x)
+      if(identical(x[[1]], quote(`?`))) {
+        ## do we set the variable type implicitly (no lhs to `?`)
+        unary_qm_lgl <- length(x) == 2
+        if(unary_qm_lgl) {
+          rhs <- x[[2]]
+          ## is the rhs an assignment ?
+          if(is.call(rhs) && identical(rhs[[1]], quote(`<-`))) {
+            ## is it a constant, using syntax `? (x) <- value` ?
+            if(is.call(rhs[[2]]) && identical(rhs[[c(2,1)]], quote(`(`))) {
+              call <- call(
+                "declare", as.character(rhs[[c(2,2)]]), value = rhs[[3]], const = TRUE)
+              return(call)
+            }
+
+            call <- call("declare", as.character(rhs[[2]]), value = rhs[[3]])
+            return(call)
+          }
+
+          # use regular help
+          call <- call("help", as.character(rhs))
+          return(call)
+        }
+
+        lhs <- x[[2]]
+        rhs <- x[[3]]
+
+        ## is the rhs an assignment ?
+        if(is.call(rhs) && identical(rhs[[1]], quote(`<-`))) {
+          ## is it a constant, using syntax `assertion ? (x) <- value` ?
+          if(is.call(rhs[[2]]) && identical(rhs[[c(2,1)]], quote(`(`))) {
+            call <- call(
+              "declare", as.character(rhs[[c(2,2)]]), lhs, value = rhs[[3]], const = TRUE)
+            return(call)
+          }
+
+          call <- call("declare", as.character(rhs[[2]]), lhs, value = rhs[[3]])
+          return(call)
+        }
+
+        call <- call("declare", as.character(rhs), lhs)
+        return(call)
+      }
+      x[] <- lapply(x, modify_qm_calls)
+      x
+    }
+
+    body <- modify_qm_calls(body)
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # EDIT BODY TO INSERT CALLS TO `check_arg` MATCHING ANNOTATED ARGS
+
+
     fmls <- formals(value)
     nms <- names(fmls)
-    tmp_lgl <- sapply(fmls, function(x) is.call(x) && identical(x[[1]], quote(`?`)))
+    annotated_fmls_lgl <-
+      sapply(fmls, function(x) is.call(x) && identical(x[[1]], quote(`?`)))
 
-    arg_assertion_factories <- lapply(fmls[tmp_lgl], function(x) x[[length(x)]])
-    arg_assertion_factory_calls <- Map(function(x, y) {
-      bquote(.(y) ? .(as.symbol(x)))
-    }, nms[tmp_lgl], arg_assertion_factories)
+    args_are_annotated <- any(annotated_fmls_lgl)
+    if(args_are_annotated) {
+
+      annotations <-
+        lapply(fmls[annotated_fmls_lgl], function(x) x[[length(x)]])
+
+      bind_lgl <- sapply(annotations, function(x) {
+        is.call(x) && identical(x[[1]], quote(`+`))
+      })
+
+      annotations[bind_lgl] <- lapply(annotations[bind_lgl], `[[`, 2)
+
+      arg_assertion_factory_calls <- Map(function(x, y, bind) {
+        if (bind) {
+          bquote(check_arg(.(as.symbol(x)), .(y), .bind = TRUE))
+        } else {
+          bquote(check_arg(.(as.symbol(x)), .(y)))
+        }
+      }, nms[annotated_fmls_lgl], annotations, bind_lgl)
 
 
-    fmls[tmp_lgl] <- lapply(fmls[tmp_lgl], function(x)
-            if(length(x) == 2) quote(expr=) else x[[2]])
+      fmls[annotated_fmls_lgl] <- lapply(fmls[annotated_fmls_lgl], function(x)
+        if(length(x) == 2) quote(expr=) else x[[2]])
 
-    if(is.call(body) && identical(body[[1]], quote(`{`)))
-      body <- as.list(body)[-1]
-    body <- as.call(c(quote(`{`), arg_assertion_factory_calls, body))
-    # from there on, body starts with `{` in any case
+      if(is.call(body) && identical(body[[1]], quote(`{`)))
+        body <- as.list(body)[-1]
+      body <- as.call(c(quote(`{`), arg_assertion_factory_calls, body))
+      # from there on, body starts with `{` in any case
 
+    }
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # EDIT BODY TO INSERT CALLS TO `check_output` MATCHING ANNOTATED FUNCTION
 
     ## is the lhs a call to `<-`
     if(lhs_is_assignment <- is.call(lhs) && identical(lhs[[1]], quote(`<-`))) {
@@ -81,8 +163,7 @@ allNames <- function (x) {
       modify_return_calls <- function(x) {
         if(!is.call(x)) return(x)
         if(identical(x[[1]], quote(`return`))) {
-          x <- call("?", return_assertion_factory, x)
-          #x[[2]] <- as.call(c(return_assertion_factory, x[[2]]))
+          x[[2]] <- bquote(check_output(x[[2]], .(return_assertion_factory)))
           return(x)
         }
         x[] <- lapply(x, modify_return_calls)
@@ -95,14 +176,19 @@ allNames <- function (x) {
       last_call <- body[[length(body)]]
       if(!is.call(last_call) || !identical(last_call[[1]], quote(return)))
         body[[length(body)]] <-
-        call("?", return_assertion_factory, call("return", last_call))
-        #body[[length(body)]] <- as.call(c(return_assertion_factory, last_call))
+          bquote(check_output(.(last_call), .(return_assertion_factory)))
 
     }
 
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # BUILD FUNCTION
+
+
     ## build function from formals, body, and type attributes
     f <- as.function(c(fmls, body), envir =  pf)
-    attr(f, "arg_types")   <- arg_assertion_factories
+    if(args_are_annotated)
+      attr(f, "arg_types")   <- annotations
     attr(f, "return_type") <- return_assertion_factory
     class(f) <- c("typed", "function")
     if(lhs_is_assignment) {
@@ -119,24 +205,27 @@ allNames <- function (x) {
     }
   }
 
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # `?` TO MAP TO `declare`
+
   ## is rhs a return call ?
-  if(is.call(rhs) && identical(rhs[[1]], quote(`return`))) {
-    assertion_call <- as.call(c(lhs, rhs[[2]]))
-    value <- try(eval.parent(assertion_call), silent = TRUE)
-    if(inherits(value, "try-error")) {
-      e <- attr(value, "condition")$message
-      fun_call <- sys.call(-1)
-      if(!is.null(fun_call)) {
-        fun_call <- deparse1(fun_call)
-        return_call <- sys.call()
-        return_call <- paste(
-          deparse1(return_call[[2]]), "?", deparse1(return_call[[3]]))
-        e <- sprintf("In `%s` at `%s`:\nwrong return value, %s", fun_call, return_call, e)
-      }
-      stop(e, call. = FALSE)
-    }
-    eval_bare(call("return", assertion_call), pf)
-  }
+  # if(is.call(rhs) && identical(rhs[[1]], quote(`return`))) {
+  #   assertion_call <- as.call(c(lhs, rhs[[2]]))
+  #   value <- try(eval.parent(assertion_call), silent = TRUE)
+  #   if(inherits(value, "try-error")) {
+  #     e <- attr(value, "condition")$message
+  #     fun_call <- sys.call(-1)
+  #     if(!is.null(fun_call)) {
+  #       fun_call <- deparse1(fun_call)
+  #       return_call <- sys.call()
+  #       return_call <- paste(
+  #         deparse1(return_call[[2]]), "?", deparse1(return_call[[3]]))
+  #       e <- sprintf("In `%s` at `%s`:\nwrong return value, %s", fun_call, return_call, e)
+  #     }
+  #     stop(e, call. = FALSE)
+  #   }
+  #   eval_bare(call("return", assertion_call), pf)
+  # }
 
   ## do we set the variable type implicitly (no lhs to `?`)
   if(unary_qm_lgl) {
@@ -164,16 +253,14 @@ allNames <- function (x) {
     ## is it a constant, using syntax `assertion ? (x) <- value` ?
     if(is.call(rhs[[2]]) && identical(rhs[[c(2,1)]], quote(`(`))) {
       call <- call(
-        "declare", as.character(rhs[[c(2,2)]]), lhs, rhs[[3]], const = TRUE)
+        "declare", as.character(rhs[[c(2,2)]]), lhs, value = rhs[[3]], const = TRUE)
       return(eval.parent(call))
     }
 
-    call <- call("declare", as.character(rhs[[2]]), lhs, rhs[[3]])
+    call <- call("declare", as.character(rhs[[2]]), lhs, value = rhs[[3]])
     return(eval.parent(call))
   }
 
-  # use regular help
-  # we might tweak this to use devtools help if it's in the search path
   call <- call("declare", as.character(rhs), lhs)
   return(eval.parent(call))
 }
