@@ -163,7 +163,7 @@ allNames <- function (x) {
       modify_return_calls <- function(x) {
         if(!is.call(x)) return(x)
         if(identical(x[[1]], quote(`return`))) {
-          x[[2]] <- bquote(check_output(x[[2]], .(return_assertion_factory)))
+          x[[2]] <- bquote(check_output(.(x[[2]]), .(return_assertion_factory)))
           return(x)
         }
         x[] <- lapply(x, modify_return_calls)
