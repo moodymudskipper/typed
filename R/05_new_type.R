@@ -31,6 +31,7 @@ new_type_checker <- function(f) {
   res
 }
 
+
 #' Process type checker dots
 #'
 #' This needs to be exported, but shouldn't be called by the user
@@ -47,13 +48,15 @@ process_type_checker_dots <- function(...) {
     if(nms[[i]] != "") {
       exprs[[i]] <- bquote(
         if(!identical(.(as.name(nms[[i]]))(value), .(args[[i]]))) {
-          print(waldo::compare(
-            .(args[[i]]),
-            .(as.name(nms[[i]]))(value),
-            x_arg = "expected",
-            y_arg = .(paste0(nms[[i]], "(value)"))
-          ))
-          stop(.(paste0("`", nms[[i]], "` mismatch")), call. = FALSE)
+          stop(sprintf(
+            "%s\n%s",
+            .(paste0("`", nms[[i]], "` mismatch")),
+            waldo::compare(
+              .(as.name(nms[[i]]))(value),
+              .(args[[i]]),
+              x_arg = .(paste0(nms[[i]], "(value)")),
+              y_arg = "expected"))
+            , call. = FALSE)
         })
     } else {
       ## is it not a formula ?
