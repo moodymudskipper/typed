@@ -5,8 +5,6 @@
 #' @export
 #' @rdname static_typing
 check_output <- function(.output, .assertion, ...) {
-  pf     <- parent.frame()
-  var_nm <- as.character(substitute(.output))
   val <- try(.assertion(.output, ...), silent = TRUE)
   if(inherits(val, "try-error")) {
     e <- attr(val, "condition")$message
@@ -27,19 +25,10 @@ check_output <- function(.output, .assertion, ...) {
 #' @export
 #' @rdname static_typing
 check_arg <- function(.arg, .assertion, ..., .bind = FALSE) {
-  pf <- parent.frame()
-  var_nm <- as.character(substitute(.arg))
-  assertion_quoted <- substitute(.assertion)
-  val <- try(.assertion(.arg, ...), silent = TRUE)
-  if(inherits(val, "try-error")) {
-    e <- attr(val, "condition")$message
-    check_arg_call <- deparse1(sys.call())
-    fun_call <- deparse1(sys.call(-1))
-    e <- sprintf("In `%s` at `%s`:\nwrong argument to function, %s", fun_call, check_arg_call, e)
-    stop(e, call. = FALSE)
-  }
-
   if(.bind) {
+    var_nm <- as.character(substitute(.arg))
+    assertion_quoted <- substitute(.assertion)
+    pf <- parent.frame()
     dots <- eval(substitute(alist(...)))
     f <- eval(substitute(local({
       val <- .arg
@@ -64,15 +53,22 @@ check_arg <- function(.arg, .assertion, ..., .bind = FALSE) {
     }), list (
       assertion_call = as.call(c(assertion_quoted, quote(assigned_value), dots)),
       var_nm = var_nm)))
-
     attr(f, "srcref") <- NULL # so it's not set to old definition*
     rm(list = var_nm, envir = pf)
     makeActiveBinding(var_nm, f, pf)
   }
-  return(invisible(.arg))
+
+  val <- tryCatch(.assertion(.arg, ...), error = function(e) e)
+  if(class(val)[[1]]  == "simpleError") { # faster than inherits
+    e <- val$message
+    check_arg_call <- deparse1(sys.call())
+    fun_call <- deparse1(sys.call(-1))
+    e <- sprintf("In `%s` at `%s`:\nwrong argument to function, %s", fun_call, check_arg_call, e)
+    stop(e, call. = FALSE)
+  }
+
+  invisible(NULL)
 }
-
-
 
 #' @param x variable name as a string
 #' @param assertion a function
