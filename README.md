@@ -1,5 +1,9 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- badges: start -->
+
+[![Travis build
+status](https://travis-ci.com/moodymudskipper/typed.svg?branch=master)](https://travis-ci.com/moodymudskipper/typed)
+<!-- badges: end -->
 
 # typed
 
@@ -9,9 +13,8 @@
   - set argument types in a function definition
   - set return type of a function
 
-The user can define their own types, or leverage check functions from
-other packages such as assertions from Richie Cotton’s *{assertive}*
-package.
+The user can define their own types, or leverage assertions from other
+packages.
 
 Under the hood we use active bindings, so once a variable is restricted
 to a type, or by any other condition, it cannot be modified in a way
@@ -41,10 +44,14 @@ Here are examples on how we would set types
 ``` r
 Character() ? x # restrict x to "character" type
 x <- "a"
+#> [1] "entering"
+#> [1] "if"
 x
+#> [1] "entering"
 #> [1] "a"
 Integer(3) ? y <- 1:3 # restrict y to "integer" type of length 3
 y
+#> [1] "entering"
 #> [1] 1 2 3
 ```
 
@@ -52,24 +59,42 @@ We cannot assign values of the wrong type to `x` and `y` anymore.
 
 ``` r
 x <- 2
+#> [1] "entering"
+#> [1] "if"
 #> `expected`:      "character"
-#> `typeof(value)`: "double"
-#> Error: type mismatch
+#> `typeof(value)`: "double"   
+#> [1] "hello"
+#> [1] "world"
+#> Error: type mismatch in `eval(expr, envir, enclos)` at ``
 y <- 4:5
+#> [1] "entering"
+#> [1] "if"
 #>      `expected`: 3
 #> `length(value)`: 2
-#> Error: length mismatch
+#> [1] "hello"
+#> [1] "world"
+#> Error: length mismatch in `eval(expr, envir, enclos)` at ``
 y[1] <- 10
-#> `expected`:      "integer"
-#> `typeof(value)`: "double"
-#> Error: type mismatch
+#> [1] "entering"
+#> [1] "entering"
+#> [1] "entering"
+#> [1] "if"
+#> `expected`:      "integer"  
+#> `typeof(value)`: "character"
+#> [1] "hello"
+#> [1] "world"
+#> Error: type mismatch in `eval(expr, envir, enclos)` at ``
 ```
 
 But the right type will work.
 
 ``` r
 x <- c("b", "c")
+#> [1] "entering"
+#> [1] "if"
 y <- c(1L, 10L, 100L)
+#> [1] "entering"
+#> [1] "if"
 ```
 
 If you dislike the `?` operator you can use `declare`, it’s a strict
@@ -77,11 +102,17 @@ equivalent, slightly more efficient, which looks like `base::assign`.
 
 ``` r
 declare("x", Character())
+#> [1] "entering"
 x <- "a"
+#> [1] "entering"
+#> [1] "if"
 x
+#> [1] "entering"
 #> [1] "a"
 declare("y", Integer(3), 1:3)
+#> [1] "entering"
 y
+#> [1] "entering"
 #> [1] 1 2 3
 ```
 
@@ -122,8 +153,7 @@ Data.frame(ncol = 5)(cars)
 #> Error: Column number mismatch
 ```
 
-We use the denomination used by the *{assertive}* package and call these
-functions assertions.
+These functions are called assertions.
 
 ### Custom types
 
@@ -134,6 +164,7 @@ as functions and with the value of the expected result.
 
 ``` r
 Integer(anyNA = FALSE) ? x <- c(1L, 2L, NA)
+#> [1] "entering"
 #> `expected`:     FALSE
 #> `anyNA(value)`: TRUE
 #> Error: `anyNA` mismatch
@@ -145,10 +176,16 @@ enough, one can provide conditions using formulas.
 ``` r
 fruit <- Character(1, "`value` is not a fruit!" ~ . %in% c("apple", "pear", "cherry"))
 fruit ? x <- "potatoe"
+#> [1] "entering"
 #> Error: `value` is not a fruit!
 ```
 
-We can also use assertions from other packages. For instance
+### Leverage assertions from other packages
+
+Some great packages provide assertions, and they can be used with
+`typed` provided that they take the object as a first input and return
+the object if no failure. Richie Cotton’s *{assertive}* and Michel
+Lang’s *{checkmate}* both qualify and we’ll use them as examples.
 
 ``` r
 library(assertive)
@@ -164,16 +201,61 @@ assert_is_monotonic_increasing(3:1)
 # used with type definition
 assert_is_monotonic_increasing ? z
 z <- 1:3 # works
+#> [1] "entering"
+#> [1] "if"
 z <- 3:1 # fails
-#> Error in (function (v) : is_monotonic_increasing : The values of v are not monotonic increasing.
+#> [1] "entering"
+#> [1] "if"
+#> [1] "hello"
+#> [1] "world"
+#> Error: is_monotonic_increasing : The values of assigned_value are not monotonic increasing.
 #>   Position ValueBefore ValueAfter
 #> 1      1/2           3          2
-#> 2      2/3           2          1
+#> 2      2/3           2          1 in `eval(expr, envir, enclos)` at ``
 ```
+
+If we want to use more than the first argument, we can use
+`purrr::partial()` :
+
+``` r
+library(checkmate)
+#> Warning: package 'checkmate' was built under R version 4.0.3
+library(purrr)
+#> 
+#> Attaching package: 'purrr'
+#> The following objects are masked from 'package:assertive':
+#> 
+#>     is_atomic, is_character, is_double, is_empty, is_formula,
+#>     is_function, is_integer, is_list, is_logical, is_null, is_numeric,
+#>     is_vector
+partial(assert_string, pattern ="^t") ? x <- "tomato"
+#> [1] "entering"
+partial(assert_string, pattern ="^t") ? x <- "potato"
+#> [1] "entering"
+#> Error in eval_tidy(call, mask): Assertion on 'value' failed: Must comply to pattern '^t'.
+```
+
+### Custom type checkers
 
 Finally, custom type checkers can be defined using the function
 `new_type_checker`, [check my code on github to understand how to create
 them](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_native_types.R)
+
+### Constants
+
+To define a constant, we just surround the variable by parentheses
+(think of them as a protection)
+
+``` r
+Double() ? (x) <- 1
+#> [1] "entering"
+x <- 2
+#> Error: `x` is a constant, can't assign a new value. in `eval(expr, envir, enclos)` at ``
+? (y) <- 1
+#> [1] "entering"
+y <- 2
+#> Error: `y` is a constant, can't assign a new value. in `eval(expr, envir, enclos)` at ``
+```
 
 ## Set argument type
 
@@ -213,6 +295,8 @@ Let’s test it by assigning a right and wrong type
 
 ``` r
 add(2, 3)
+#> [1] "entering"
+#> [1] "entering"
 #> [1] 5
 add(2, 3L)
 #> `expected`:      "double" 
@@ -266,7 +350,7 @@ add_or_substract
 
 These can be defined in a package and documented with *{roxygen2}* like
 regular functions, except that you’ll need to make sure to add the
-`@name` tag (it’s due to `?`’s precedence). for instance :
+`@name` tag.
 
 ``` r
 #' add
