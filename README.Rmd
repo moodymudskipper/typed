@@ -80,8 +80,7 @@ x <- c("b", "c")
 y <- c(1L, 10L, 100L)
 ```
 
-If you dislike the `?` operator you can use `declare`, it's a strict equivalent,
-slightly more efficient, which looks like `base::assign`.
+`declare` is a strict equivalent, slightly more efficient, which looks like `base::assign`.
 
 ```{r}
 declare("x", Character())
@@ -125,7 +124,7 @@ the main ones are:
 * `Date`
 * `Time` (POSIXct)
 
-### Custom types
+### Custom assertions
 
 As we've seen with `Integer(3)`, `Data.frame(ncol = 5)`, passing arguments to a
 assertion factory restricts the type. For instance `Integer` has arguments `length` and
@@ -153,7 +152,7 @@ fruit ? x <- "potatoe"
 Some great packages provide assertions, and they can be used with `typed`
 provided that they take the object as a first input and return the object
 if no failure. Richie Cotton's *{assertive}* and Michel Lang's *{checkmate}* 
-both qualify and we'll use them as examples.
+both qualify.
 
 ```{r}
 library(assertive)
@@ -167,10 +166,9 @@ If we want to use more than the first argument, we should create an assertion fa
 Monotonic_incr <- as_assertion_factory(assert_is_monotonic_increasing)
 Monotonic_incr(strictly = TRUE) ? z
 z <- c(1, 1, 2)
-library(checkmate)
 ```
 
-`as_assertion_factory` can be used to create your own assertion factories,
+`as_assertion_factory` can be used to create your own assertion factories from scratch too,
 in fact
 [it's used to build the native assertion factories of this package](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_assertion_factories.R)
 .
@@ -200,47 +198,42 @@ add <- ? function (x= ? Double(), y= 1 ? Double()) {
 ```
 
 Note that we started the definition with a `?`, and that we gave a default to
-`y`, but not `x`
+`y`, but not `x`. Note also the `=` sign next to `x`, necessary even when we
+have no default value. If you forget it you'll have an error "unexpected `?` in ...".
 
-This created the following function, by adding declarations at the top of the
+This created the following function, by adding checks at the top of the
 function.
 
 ```{r}
 add
 ```
 
-Note that a declaration will fail if the variable already exists in the
-environment, but an exception is made for unevaluated function arguments.
-
-Let's test it by assigning a right and wrong type
+Let's test it by providing a right and wrong type.
 
 ```{r}
 add(2, 3)
 add(2, 3L)
 ```
 
-Arguments `x` and `y` will also be restricted to the type "integer" in the rest of
-the body of the function.
+
+If we want to restrict `x` and `y`  to the type "integer" in the rest of
+the body of the function we can use the `?+` notation :
+
+```{r}
+add <- ? function (x= ?+ Double(), y= 1 ?+ Double()) {
+  x + y
+}
+
+add
+```
+
+We see that it is translated into a `check_arg` call containing a `.bind = TRUE`
+argument.
 
 ## Set function return type
 
-To set a return type one way is to manually use the `type_checker() ? return(value)`
-syntax with every return value, as we do here (note that we need the `?` or the
-precedence of `?` will cause issues) :
-
-```{r}
-add_or_substract <- function (x, y, substract = FALSE) {
-  if(substract) {Double() ? return(x - y)}
-  Double() ? return(x + y)
-}
-add_or_substract(1, 2)
-add_or_substract(1L, 2L)
-```
-
-A simpler way is to use `?` before the function definition as in the previous section, 
-but to give it a assertion factory on the left hand side. It will ultimately create
-the same function code, but the source code is more readable to read, we don't
-need to worry about precedence, and the function will get a class "type" and attributes.
+To set a return type we use `?` before the function definition as in the previous section, 
+but we type an assertion on the left hand side.
 
 ```{r}
 add_or_substract <- Double() ? function (x, y, substract = FALSE) {
@@ -250,27 +243,50 @@ add_or_substract <- Double() ? function (x, y, substract = FALSE) {
 add_or_substract
 ```
 
-These can be defined in a package and documented with *{roxygen2}* like regular
-functions, except that you'll need to make sure to add the `@name` tag.
+We see that the returned values have been wrapped inside `check_output` calls.
 
-```{r, eval = FALSE}
+## Putting it all together, write packages using {typed}
+
+Let's define our function for our package and document it with *{roxygen2}*.
+It is documented as usual,except that you'll need to make sure to add the `@name` tag.
+
+We declare types for the return value, for all arguments, and we declare a string `msg`.
+
+```{r}
 #' add
 #'
-#' @param x double
-#' @param y double
+#' @param x double of length 1
+#' @param y double of length 1
+#' @param substract whether to substract instead of adding
 #' @export
-#' @name add
-add <- Double() ? function (x = ? Double(), y = 1 ? Double()) {
-  x + y
-}
+#' @name add_or_substract
+add_or_substract <- 
+  Double(1) ? function (
+    x= ? Double(1), 
+    y= ? Double(1), 
+    substract = FALSE ? Logical(1, anyNA = FALSE)) 
+  {
+    Character(1) ? msg
+    msg <- "Working hard"
+    message(msg)
+    if(substract) return(x - y)
+    x + y
+  }
 ```
 
+The created function will be the following, we see that `Character(1) ? msg <- "Working hard"`
+was changed into a `declare` call too, this is both for efficiency and readability.
+Unfamiliar users might be intimidated by `?` and calls to `?` don't print nicely,
+`declare` calls however are very explicit.
 
-## Notes
-
-* This is inspired in good part by Jim Hester and Gabor Csardi's work.
-* The magic comes from the fact that apparent variables are made into active
-  bindings, using a variation of the last example of `?bindenv`
-* Your package would import *{typed}* but `?` won't be exposed to the user,
+```{r}
+add_or_substract
+```
+Note that your package would import *{typed}* but `?` won't be exposed to the user,
 they will see it in the code but will be able to use `?` just as before. In fact
 the most common standard use `?mean` still works even when *{typed}* is attached.
+
+## Aknowledgements
+
+This is inspired in good part by Jim Hester and Gabor Csardi's work and many
+great efforts on static typing, assertions, or annotations in R.

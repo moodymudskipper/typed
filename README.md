@@ -81,8 +81,8 @@ x <- c("b", "c")
 y <- c(1L, 10L, 100L)
 ```
 
-If you dislike the `?` operator you can use `declare`, it’s a strict
-equivalent, slightly more efficient, which looks like `base::assign`.
+`declare` is a strict equivalent, slightly more efficient, which looks
+like `base::assign`.
 
 ``` r
 declare("x", Character())
@@ -118,8 +118,8 @@ Character()(3)
 We call `Integer(3)` and `Character()` assertions, and we call `Integer`
 and `Character` assertion factories.
 
-The package contains many assertion factories (see `?native_types`), the
-main ones are:
+The package contains many assertion factories (see
+`?assertion_factories`), the main ones are:
 
   - `Any` (No default restriction)
   - `Logical`
@@ -134,7 +134,7 @@ main ones are:
   - `Date`
   - `Time` (POSIXct)
 
-### Custom types
+### Custom assertions
 
 As we’ve seen with `Integer(3)`, `Data.frame(ncol = 5)`, passing
 arguments to a assertion factory restricts the type. For instance
@@ -160,9 +160,7 @@ fruit <- Character(1, "`value` is not a fruit!" ~ . %in% c("apple", "pear", "che
 
 fruit ? x <- "potatoe"
 #> Error: In `eval(expr, envir, enclos)` at `fruit ? x <- "potatoe"`:
-#> `value` is not a fruit!
-#> `value %in% c("apple", "pear", "cherry")`: FALSE
-#> `expected`:                                TRUE
+#> type 'x' incorrect dans 'x && y'
 ```
 
 ### Leverage assertions from other packages, build your own assertion factories
@@ -170,7 +168,7 @@ fruit ? x <- "potatoe"
 Some great packages provide assertions, and they can be used with
 `typed` provided that they take the object as a first input and return
 the object if no failure. Richie Cotton’s *{assertive}* and Michel
-Lang’s *{checkmate}* both qualify and we’ll use them as examples.
+Lang’s *{checkmate}* both qualify.
 
 ``` r
 library(assertive)
@@ -194,14 +192,12 @@ z <- c(1, 1, 2)
 #> is_monotonic_increasing : The values of value are not strictly monotonic increasing.
 #>   Position ValueBefore ValueAfter
 #> 1      1/2           1          1
-library(checkmate)
-#> Warning: package 'checkmate' was built under R version 4.0.3
 ```
 
 `as_assertion_factory` can be used to create your own assertion
-factories, in fact [it’s used to build the native assertion factories of
-this
-package](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_native_types.R)
+factories from scratch too, in fact [it’s used to build the native
+assertion factories of this
+package](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_assertion_factories.R)
 .
 
 ### Constants
@@ -232,18 +228,20 @@ add <- ? function (x= ? Double(), y= 1 ? Double()) {
 ```
 
 Note that we started the definition with a `?`, and that we gave a
-default to `y`, but not `x`
+default to `y`, but not `x`. Note also the `=` sign next to `x`,
+necessary even when we have no default value. If you forget it you’ll
+have an error “unexpected `?` in …”.
 
-This created the following function, by adding declarations at the top
-of the function.
+This created the following function, by adding checks at the top of the
+function.
 
 ``` r
 add
 #> # typed function
 #> function (x, y = 1) 
 #> {
-#>     `?`(Double(), x)
-#>     `?`(Double(), y)
+#>     check_arg(x, Double())
+#>     check_arg(y, Double())
 #>     x + y
 #> }
 #> # Arg types:
@@ -251,50 +249,46 @@ add
 #> # y: Double()
 ```
 
-Note that a declaration will fail if the variable already exists in the
-environment, but an exception is made for unevaluated function
-arguments.
-
-Let’s test it by assigning a right and wrong type
+Let’s test it by providing a right and wrong type.
 
 ``` r
 add(2, 3)
 #> [1] 5
 add(2, 3L)
-#> Error: In `add(2, 3L)` at `Double() ? y`:
+#> Error: In `add(2, 3L)` at `check_arg(y, Double())`:
 #> wrong argument to function, type mismatch
 #> `typeof(value)`: "integer"
 #> `expected`:      "double"
 ```
 
-Arguments `x` and `y` will also be restricted to the type “integer” in
-the rest of the body of the function.
+If we want to restrict `x` and `y` to the type “integer” in the rest of
+the body of the function we can use the `?+` notation :
+
+``` r
+add <- ? function (x= ?+ Double(), y= 1 ?+ Double()) {
+  x + y
+}
+
+add
+#> # typed function
+#> function (x, y = 1) 
+#> {
+#>     check_arg(x, Double(), .bind = TRUE)
+#>     check_arg(y, Double(), .bind = TRUE)
+#>     x + y
+#> }
+#> # Arg types:
+#> # x: Double()
+#> # y: Double()
+```
+
+We see that it is translated into a `check_arg` call containing a `.bind
+= TRUE` argument.
 
 ## Set function return type
 
-To set a return type one way is to manually use the `type_checker() ?
-return(value)` syntax with every return value, as we do here (note that
-we need the `?` or the precedence of `?` will cause issues) :
-
-``` r
-add_or_substract <- function (x, y, substract = FALSE) {
-  if(substract) {Double() ? return(x - y)}
-  Double() ? return(x + y)
-}
-add_or_substract(1, 2)
-#> [1] 3
-add_or_substract(1L, 2L)
-#> Error: In `add_or_substract(1L, 2L)` at `Double() ? return(x + y)`:
-#> wrong return value, type mismatch
-#> `typeof(value)`: "integer"
-#> `expected`:      "double"
-```
-
-A simpler way is to use `?` before the function definition as in the
-previous section, but to give it a assertion factory on the left hand
-side. It will ultimately create the same function code, but the source
-code is more readable to read, we don’t need to worry about precedence,
-and the function will get a class “type” and attributes.
+To set a return type we use `?` before the function definition as in the
+previous section, but we type an assertion on the left hand side.
 
 ``` r
 add_or_substract <- Double() ? function (x, y, substract = FALSE) {
@@ -306,34 +300,80 @@ add_or_substract
 #> function (x, y, substract = FALSE) 
 #> {
 #>     if (substract) 
-#>         `?`(Double(), return(x - y))
-#>     `?`(Double(), return(x + y))
+#>         return(check_output(x - y, Double()))
+#>     check_output(x + y, Double())
 #> }
 #> # Return type: Double()
 ```
 
-These can be defined in a package and documented with *{roxygen2}* like
-regular functions, except that you’ll need to make sure to add the
-`@name` tag.
+We see that the returned values have been wrapped inside `check_output`
+calls.
+
+## Putting it all together, write packages using {typed}
+
+Let’s define our function for our package and document it with
+*{roxygen2}*. It is documented as usual,except that you’ll need to make
+sure to add the `@name` tag.
+
+We declare types for the return value, for all arguments, and we declare
+a string `msg`.
 
 ``` r
 #' add
 #'
-#' @param x double
-#' @param y double
+#' @param x double of length 1
+#' @param y double of length 1
+#' @param substract whether to substract instead of adding
 #' @export
-#' @name add
-add <- Double() ? function (x = ? Double(), y = 1 ? Double()) {
-  x + y
-}
+#' @name add_or_substract
+add_or_substract <- 
+  Double(1) ? function (
+    x= ? Double(1), 
+    y= ? Double(1), 
+    substract = FALSE ? Logical(1, anyNA = FALSE)) 
+  {
+    Character(1) ? msg
+    msg <- "Working hard"
+    message(msg)
+    if(substract) return(x - y)
+    x + y
+  }
 ```
 
-## Notes
+The created function will be the following, we see that `Character(1) ?
+msg <- "Working hard"` was changed into a `declare` call too, this is
+both for efficiency and readability. Unfamiliar users might be
+intimidated by `?` and calls to `?` don’t print nicely, `declare` calls
+however are very explicit.
 
-  - This is inspired in good part by Jim Hester and Gabor Csardi’s work.
-  - The magic comes from the fact that apparent variables are made into
-    active bindings, using a variation of the last example of `?bindenv`
-  - Your package would import *{typed}* but `?` won’t be exposed to the
-    user, they will see it in the code but will be able to use `?` just
-    as before. In fact the most common standard use `?mean` still works
-    even when *{typed}* is attached.
+``` r
+add_or_substract
+#> # typed function
+#> function (x, y, substract = FALSE) 
+#> {
+#>     check_arg(x, Double(1))
+#>     check_arg(y, Double(1))
+#>     check_arg(substract, Logical(1, anyNA = FALSE))
+#>     declare("msg", Character(1))
+#>     msg <- "Working hard"
+#>     message(msg)
+#>     if (substract) 
+#>         return(check_output(x - y, Double(1)))
+#>     check_output(x + y, Double(1))
+#> }
+#> # Return type: Double(1)
+#> # Arg types:
+#> # x: Double(1)
+#> # y: Double(1)
+#> # substract: Logical(1, anyNA = FALSE)
+```
+
+Note that your package would import *{typed}* but `?` won’t be exposed
+to the user, they will see it in the code but will be able to use `?`
+just as before. In fact the most common standard use `?mean` still works
+even when *{typed}* is attached.
+
+## Aknowledgements
+
+This is inspired in good part by Jim Hester and Gabor Csardi’s work and
+many great efforts on static typing, assertions, or annotations in R.
