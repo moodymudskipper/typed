@@ -5,26 +5,26 @@
 #' @export
 new_type_checker <- function(f) {
   # create a function with arguments being the additional args to f and dots
-  f_call <- as.call(c(quote(f), quote(x), sapply(names(formals(f)[-1]), as.name)))
+  f_call <- as.call(c(quote(f), quote(value), sapply(names(formals(f)[-1]), as.name)))
 
   res <- as.function(c(formals(f)[-1],alist(...=), bquote({
     f_call <- substitute(.(f_call))
     # remove if empty
-    f_call <- Filter(function(x) !identical(x, quote(expr=)), f_call)
+    f_call <- Filter(function(value) !identical(value, quote(expr=)), f_call)
 
     header <- call("{",
       quote(f <- .(f)), # so the substituted definition is readable
-      substitute(x <- F_CALL, list(F_CALL = f_call))
+      substitute(value <- F_CALL, list(F_CALL = f_call))
       )
 
     # the footer is made of additional assertions derived from `...`
     footer <- process_type_checker_dots(...)
     if(is.null(footer)) {
-      body <- call("{", header, quote(x))
+      body <- call("{", header, quote(value))
     } else {
-      body <- call("{", header, footer, quote(x))
+      body <- call("{", header, footer, quote(value))
     }
-    as.function(c(alist(x=), body), envir = parent.frame())
+    as.function(c(alist(value=), body), envir = parent.frame())
   })))
   class(res) <- "type_checker"
   environment(res) <- parent.frame()
@@ -43,24 +43,42 @@ process_type_checker_dots <- function(...) {
   nms <- allNames(args)
   exprs <- vector("list", length(args))
   for (i in seq_along(args)) {
+    ## is the ith argument named ?
     if(nms[[i]] != "") {
       exprs[[i]] <- bquote(
-        if(!identical(.(as.name(nms[[i]]))(x), .(args[[i]]))) {
+        if(!identical(.(as.name(nms[[i]]))(value), .(args[[i]]))) {
           print(waldo::compare(
             .(args[[i]]),
-            .(as.name(nms[[i]]))(x),
+            .(as.name(nms[[i]]))(value),
             x_arg = "expected",
             y_arg = .(paste0(nms[[i]], "(value)"))
           ))
           stop(.(paste0("`", nms[[i]], "` mismatch")), call. = FALSE)
         })
     } else {
+      ## is it not a formula ?
       if(!is.call(args[[i]]) || !identical(args[[i]][[1]], as.name("~"))) {
         stop("assertions should be either named function, or unnamed formulas")
       }
-      assertion <- do.call(substitute, list(args[[i]][[3]], list(. = quote(x))))
-      error <- args[[i]][[2]]
-      exprs[[i]] <- bquote(if(!.(assertion)) stop(.(error), call. = FALSE))
+      ## is it a 2 sided formula ?
+      if (length(args[[i]]) == 3) {
+        error <- args[[i]][[2]]
+        assertion <- do.call(substitute, list(args[[i]][[3]], list(. = quote(value))))
+      } else  {
+        error <- "mismatch"
+        assertion <- do.call(substitute, list(args[[i]][[2]], list(. = quote(value))))
+      }
+
+      exprs[[i]] <- bquote(if(!.(assertion)) stop(
+        sprintf(
+          "%s\n%s",
+          .(error),
+          waldo::compare(
+            FALSE,
+            TRUE,
+            x_arg = .(deparse1(assertion)),
+            y_arg = "expected"))
+      , call. = FALSE))
     }
   }
   exprs

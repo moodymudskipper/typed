@@ -80,12 +80,15 @@
 Any <- new_type_checker(function(value, length) {
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
-    print(waldo::compare(
-      length,
-      length(value),
-      x_arg = "expected",
-      y_arg = "length(value)"))
-    stop("length mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "length mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -94,21 +97,27 @@ Any <- new_type_checker(function(value, length) {
 #' @rdname native_types
 Logical <- new_type_checker(function(value, length) {
   if(!is.logical(value)) {
-    print(waldo::compare(
-      "logical",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "logical",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
-    print(waldo::compare(
-      length,
-      length(value),
-      x_arg = "expected",
-      y_arg = "length(value)"))
-    stop("length mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -117,21 +126,27 @@ Logical <- new_type_checker(function(value, length) {
 #' @rdname native_types
 Integer <- new_type_checker(function(value, length) {
   if(!is.integer(value)) {
-    print(waldo::compare(
-      "integer",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "integer",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
-    print(waldo::compare(
-      length,
-      length(value),
-      x_arg = "expected",
-      y_arg = "length(value)"))
-    stop("length mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -140,21 +155,27 @@ Integer <- new_type_checker(function(value, length) {
 #' @rdname native_types
 Double <- new_type_checker(function(value, length) {
   if(!is.double(value)) {
-    print(waldo::compare(
-      "double",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "double",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
-    print(waldo::compare(
-      length,
-      length(value),
-      x_arg = "expected",
-      y_arg = "length(value)"))
-    stop("length mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -188,21 +209,27 @@ Double <- new_type_checker(function(value, length) {
 #' @rdname native_types
 Character <- new_type_checker(function(value, length) {
   if(!is.character(value)) {
-    print(waldo::compare(
-      "character",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "character",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
-    print(waldo::compare(
-      length,
-      length(value),
-      x_arg = "expected",
-      y_arg = "length(value)"))
-    stop("length mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -211,21 +238,27 @@ Character <- new_type_checker(function(value, length) {
 #' @rdname native_types
 Raw <- new_type_checker(function(value, length) {
   if(!is.raw(value)) {
-    print(waldo::compare(
-      "raw",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "raw",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
-    print(waldo::compare(
-      length,
-      length(value),
-      x_arg = "expected",
-      y_arg = "length(value)"))
-    stop("length mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -234,29 +267,38 @@ Raw <- new_type_checker(function(value, length) {
 #' @rdname native_types
 List <- new_type_checker(function(value, length, data_frame_ok = TRUE) {
   if(!is.list(value)) {
-    print(waldo::compare(
-      "list",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "list",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
-    print(waldo::compare(
-      length,
-      length(value),
-      x_arg = "expected",
-      y_arg = "length(value)"))
-    stop("length mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!data_frame_ok && is.data.frame(value)) {
-    print(waldo::compare(
-      FALSE,
-      is.data.frame(value),
-      x_arg = "expected",
-      y_arg = "is.data.frame(value)"))
-    stop("`value` can't be a data frame.", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        is.data.frame(value),
+        FALSE,
+        x_arg = "is.data.frame(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -265,12 +307,15 @@ List <- new_type_checker(function(value, length, data_frame_ok = TRUE) {
 #' @rdname native_types
 Null <- new_type_checker(function(value) {
   if(!is.null(value)) {
-    print(waldo::compare(
-      "NULL",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "NULL",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -279,12 +324,15 @@ Null <- new_type_checker(function(value) {
 #' @rdname native_types
 Closure <- new_type_checker(function(value) {
   if(typeof(value) != "closure") {
-    print(waldo::compare(
-      "closure",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "closure",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -293,12 +341,15 @@ Closure <- new_type_checker(function(value) {
 #' @rdname native_types
 Special <- new_type_checker(function(value) {
   if(typeof(value) != "special") {
-    print(waldo::compare(
-      "special",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "special",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -307,12 +358,15 @@ Special <- new_type_checker(function(value) {
 #' @rdname native_types
 Builtin <- new_type_checker(function(value) {
   if(typeof(value) != "builtin") {
-    print(waldo::compare(
-      "builtin",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "builtin",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -321,12 +375,15 @@ Builtin <- new_type_checker(function(value) {
 #' @rdname native_types
 Environment <- new_type_checker(function(value) {
   if(!is.environment(value)) {
-    print(waldo::compare(
-      "environment",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "environment",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -335,12 +392,15 @@ Environment <- new_type_checker(function(value) {
 #' @rdname native_types
 Symbol <- new_type_checker(function(value) {
   if(is.symbol(value)) {
-    print(waldo::compare(
-      "symbol",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "symbol",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -349,21 +409,27 @@ Symbol <- new_type_checker(function(value) {
 #' @rdname native_types
 Pairlist <- new_type_checker(function(value, length) {
   if(!is.pairlist(value)) {
-    print(waldo::compare(
-      "pairlist",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "pairlist",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
-    print(waldo::compare(
-      length,
-      length(value),
-      x_arg = "expected",
-      y_arg = "length(value)"))
-    stop("length mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -372,12 +438,15 @@ Pairlist <- new_type_checker(function(value, length) {
 #' @rdname native_types
 Language <- new_type_checker(function(value) {
   if(typeof(value) != "language") {
-    print(waldo::compare(
-      "language",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "language",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -386,21 +455,27 @@ Language <- new_type_checker(function(value) {
 #' @rdname native_types
 Expression <- new_type_checker(function(value, length) {
   if(typeof(value) != "expression") {
-    print(waldo::compare(
-      "expression",
-      typeof(value),
-      x_arg = "expected",
-      y_arg = "typeof(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "expression",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
-    print(waldo::compare(
-      length,
-      length(value),
-      x_arg = "expected",
-      y_arg = "length(value)"))
-    stop("length mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -411,12 +486,15 @@ Expression <- new_type_checker(function(value, length) {
 #' @rdname native_types
 Function <- new_type_checker(function(value) {
   if(!is.function(value)) {
-    print(waldo::compare(
-      TRUE,
-      is.function(value),
-      x_arg = "expected",
-      y_arg = "is.function(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        is.function(value),
+        TRUE,
+        x_arg = "is.function(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -425,29 +503,38 @@ Function <- new_type_checker(function(value) {
 #' @rdname native_types
 Factor <- new_type_checker(function(value, length, levels) {
   if(!is.factor(value)) {
-    print(waldo::compare(
-      TRUE,
-      is.function(value),
-      x_arg = "expected",
-      y_arg = "is.factor(value)"))
-    stop("type mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        is.factor(value),
+        TRUE,
+        x_arg = "is.factor(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
-    print(waldo::compare(
-      length,
-      length(value),
-      x_arg = "expected",
-      y_arg = "length(value)"))
-    stop("length mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(levels) && identical(levels(value), levels)) {
-    print(waldo::compare(
-      levels,
-      levels(value),
-      x_arg = "expected",
-      y_arg = "levels(value)"))
-    stop("levels mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        levels(value),
+        levels,
+        x_arg = "levels(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -456,30 +543,39 @@ Factor <- new_type_checker(function(value, length, levels) {
 #' @rdname native_types
 Data.frame <- new_type_checker(function(value, nrow, ncol) {
   if(!is.data.frame(value)) {
-    print(waldo::compare(
-      "data.frame",
-      class(value),
-      x_arg = "expected to contain",
-      y_arg = "class(value)"))
-    stop("class mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        class(value),
+        "data.frame",
+        x_arg = "class(value)",
+        y_arg = "expected to contain"))
+    stop(e, call. = FALSE)
   }
   if(!missing(nrow) && nrow(value) != nrow) {
     nrow <- as.integer(nrow)
-    print(waldo::compare(
-      nrow,
-      nrow(value),
-      x_arg = "expected",
-      y_arg = "nrow(value)"))
-    stop("Row number mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "Row number mismatch",
+      waldo::compare(
+        nrow(value),
+        nrow,
+        x_arg = "nrow(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(ncol) && ncol(value) != ncol) {
     ncol <- as.integer(ncol)
-    print(waldo::compare(
-      ncol,
-      ncol(value),
-      x_arg = "expected",
-      y_arg = "ncol(value)"))
-    stop("Column number mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "Column number mismatch",
+      waldo::compare(
+        ncol(value),
+        ncol,
+        x_arg = "ncol(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -488,30 +584,39 @@ Data.frame <- new_type_checker(function(value, nrow, ncol) {
 #' @rdname native_types
 Matrix <- new_type_checker(function(value, nrow, ncol) {
   if(!is.matrix(value)) {
-    print(waldo::compare(
-      "matrix",
-      class(value),
-      x_arg = "expected to contain",
-      y_arg = "class(value)"))
-    stop("class mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        class(value),
+        "matrix",
+        x_arg = "class(value)",
+        y_arg = "expected to contain"))
+    stop(e, call. = FALSE)
   }
   if(!missing(nrow) && nrow(value) != nrow) {
     nrow <- as.integer(nrow)
-    print(waldo::compare(
-      nrow,
-      nrow(value),
-      x_arg = "expected",
-      y_arg = "nrow(value)"))
-    stop("Row number mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "Row number mismatch",
+      waldo::compare(
+        nrow(value),
+        nrow,
+        x_arg = "nrow(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(ncol) && ncol(value) != ncol) {
     ncol <- as.integer(ncol)
-    print(waldo::compare(
-      ncol,
-      ncol(value),
-      x_arg = "expected",
-      y_arg = "ncol(value)"))
-    stop("Column number mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "Column number mismatch",
+      waldo::compare(
+        ncol(value),
+        ncol,
+        x_arg = "ncol(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -520,21 +625,27 @@ Matrix <- new_type_checker(function(value, nrow, ncol) {
 #' @rdname native_types
 Array <- new_type_checker(function(value, dim) {
   if(!is.array(value)) {
-    print(waldo::compare(
-      TRUE,
-      is.array(value),
-      x_arg = "expected",
-      y_arg = "is.array(value)"))
-    stop("class mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        is.array(value),
+        TRUE,
+        x_arg = "is.array(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   if(!missing(dim) && !identical(dim(value), as.integer(dim))) {
     dim <- as.integer(dim)
-    print(waldo::compare(
-      dim,
-      dim(value),
-      x_arg = "expected",
-      y_arg = "dim(value)"))
-    stop("Dimension mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "dimension mismatch",
+      waldo::compare(
+        dim(value),
+        dim,
+        x_arg = "dim(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -543,22 +654,28 @@ Array <- new_type_checker(function(value, dim) {
 #' @rdname native_types
 Date <- new_type_checker(function(value, length) {
   if(!"Date" %in% class(value)) {
-    print(waldo::compare(
-      "Date",
-      class(value),
-      x_arg = "expected to contain",
-      y_arg = "class(value)"))
-    stop("class mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        class(value),
+        "Date",
+        x_arg = "class(value)",
+        y_arg = "expected to contain"))
+    stop(e, call. = FALSE)
   }
 
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
-    print(waldo::compare(
-      length,
-      length(value),
-      x_arg = "expected",
-      y_arg = "length(value)"))
-    stop("length mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
@@ -567,22 +684,28 @@ Date <- new_type_checker(function(value, length) {
 #' @rdname native_types
 Time <- new_type_checker(function(value, length) {
   if(!"POSIXct" %in% class(value)) {
-    print(waldo::compare(
-      c("POSIXct", "POSIXt"),
-      class(value),
-      x_arg = "expected to contain",
-      y_arg = "class(value)"))
-    stop("class mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        class(value),
+        "POSIXct",
+        x_arg = "class(value)",
+        y_arg = "expected to contain"))
+    stop(e, call. = FALSE)
   }
 
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
-    print(waldo::compare(
-      length,
-      length(value),
-      x_arg = "expected",
-      y_arg = "length(value)"))
-    stop("length mismatch", call. = FALSE)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
   }
   value
 })
