@@ -1,8 +1,9 @@
-#' Native types of package 'typed'
+#' Assertion factories of package 'typed'
 #'
 #' These functions are assertion factories, they produce assertions,
-#' which take an object, verify assertions, and
-#' returns the input, possibly modified (though never modified with native types).
+#' which take an object, check conditions, and
+#' returns the input, usually unmodified (never modified with the functions
+#' documented on this page).
 #'
 #' Additional conditions can be provided :
 #'
@@ -24,33 +25,35 @@
 #' @param dim dimensions
 #' @param levels factor levels
 #' @param data_frame_ok whether data frames are to be considered as lists
+#' @param null_ok whether `NULL` values should be accepted, and not subjected to
+#'   any further check.
 #' @param ... additional conditions, see details.
 #'
-#' @usage Any(length, ...)
-#' @usage Logical(length, ...)
-#' @usage Integer(length, ...)
-#' @usage Double(length, ...)
-#' @usage Character(length, ...)
-#' @usage List(length, data_frame_ok, ...)
+#' @usage Any(length, null_ok = FALSE, ...)
+#' @usage Logical(length, null_ok = FALSE, ...)
+#' @usage Integer(length, null_ok = FALSE, ...)
+#' @usage Double(length, null_ok = FALSE, ...)
+#' @usage Character(length, null_ok = FALSE, ...)
+#' @usage List(length, data_frame_ok, null_ok = FALSE, ...)
 #' @usage Null(...)
-#' @usage Closure(...)
-#' @usage Special(...)
-#' @usage Builtin(...)
-#' @usage Environment(...)
-#' @usage Symbol(...)
-#' @usage Pairlist(length, ...)
-#' @usage Language(...)
-#' @usage Expression(length, ...)
-#' @usage Function(...)
-#' @usage Factor(length, levels, ...)
-#' @usage Matrix(nrow, ncol, ...)
-#' @usage Array(dim, ...)
-#' @usage Data.frame(nrow, ncol, ...)
-#' @usage Date(length, ...)
-#' @usage Time(length, ...)
+#' @usage Closure(null_ok = FALSE, ...)
+#' @usage Special(null_ok = FALSE, ...)
+#' @usage Builtin(null_ok = FALSE, ...)
+#' @usage Environment(null_ok = FALSE, ...)
+#' @usage Symbol(null_ok = FALSE, ...)
+#' @usage Pairlist(length, null_ok = FALSE, ...)
+#' @usage Language(null_ok = FALSE, ...)
+#' @usage Expression(length, null_ok = FALSE, ...)
+#' @usage Function(null_ok = FALSE, ...)
+#' @usage Factor(length, levels, null_ok = FALSE, ...)
+#' @usage Matrix(nrow, ncol, null_ok = FALSE, ...)
+#' @usage Array(dim, null_ok = FALSE, ...)
+#' @usage Data.frame(nrow, ncol, null_ok = FALSE, ...)
+#' @usage Date(length, null_ok = FALSE, ...)
+#' @usage Time(length, null_ok = FALSE, ...)
 #'
 #' @export
-#' @rdname native_types
+#' @rdname assertion_factories
 #' @examples
 #'
 #' \dontrun{
@@ -77,7 +80,8 @@
 #' Integer(2) ? x <- 1L
 #' }
 #'
-Any <- as_assertion_factory(function(value, length) {
+Any <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
@@ -94,8 +98,9 @@ Any <- as_assertion_factory(function(value, length) {
 })
 
 #' @export
-#' @rdname native_types
-Logical <- as_assertion_factory(function(value, length) {
+#' @rdname assertion_factories
+Logical <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.logical(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -123,8 +128,9 @@ Logical <- as_assertion_factory(function(value, length) {
 })
 
 #' @export
-#' @rdname native_types
-Integer <- as_assertion_factory(function(value, length) {
+#' @rdname assertion_factories
+Integer <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.integer(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -152,8 +158,9 @@ Integer <- as_assertion_factory(function(value, length) {
 })
 
 #' @export
-#' @rdname native_types
-Double <- as_assertion_factory(function(value, length) {
+#' @rdname assertion_factories
+Double <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.double(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -183,7 +190,7 @@ Double <- as_assertion_factory(function(value, length) {
 # would override methods::Complex, of no consequence probably by annoying red ink
 
 # #' @export
-# #' @rdname native_types
+# #' @rdname assertion_factories
 # Complex <- as_assertion_factory(function(value, length) {
 #   if(!is.complex(value)) {
 #     print(waldo::compare(
@@ -206,8 +213,9 @@ Double <- as_assertion_factory(function(value, length) {
 # })
 
 #' @export
-#' @rdname native_types
-Character <- as_assertion_factory(function(value, length) {
+#' @rdname assertion_factories
+Character <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.character(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -235,8 +243,9 @@ Character <- as_assertion_factory(function(value, length) {
 })
 
 #' @export
-#' @rdname native_types
-Raw <- as_assertion_factory(function(value, length) {
+#' @rdname assertion_factories
+Raw <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.raw(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -264,8 +273,9 @@ Raw <- as_assertion_factory(function(value, length) {
 })
 
 #' @export
-#' @rdname native_types
-List <- as_assertion_factory(function(value, length, data_frame_ok = TRUE) {
+#' @rdname assertion_factories
+List <- as_assertion_factory(function(value, length, data_frame_ok = TRUE, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.list(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -304,7 +314,7 @@ List <- as_assertion_factory(function(value, length, data_frame_ok = TRUE) {
 })
 
 #' @export
-#' @rdname native_types
+#' @rdname assertion_factories
 Null <- as_assertion_factory(function(value) {
   if(!is.null(value)) {
     e <- sprintf(
@@ -321,8 +331,9 @@ Null <- as_assertion_factory(function(value) {
 })
 
 #' @export
-#' @rdname native_types
-Closure <- as_assertion_factory(function(value) {
+#' @rdname assertion_factories
+Closure <- as_assertion_factory(function(value, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(typeof(value) != "closure") {
     e <- sprintf(
       "%s\n%s",
@@ -338,8 +349,9 @@ Closure <- as_assertion_factory(function(value) {
 })
 
 #' @export
-#' @rdname native_types
-Special <- as_assertion_factory(function(value) {
+#' @rdname assertion_factories
+Special <- as_assertion_factory(function(value, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(typeof(value) != "special") {
     e <- sprintf(
       "%s\n%s",
@@ -355,8 +367,9 @@ Special <- as_assertion_factory(function(value) {
 })
 
 #' @export
-#' @rdname native_types
-Builtin <- as_assertion_factory(function(value) {
+#' @rdname assertion_factories
+Builtin <- as_assertion_factory(function(value, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(typeof(value) != "builtin") {
     e <- sprintf(
       "%s\n%s",
@@ -372,8 +385,9 @@ Builtin <- as_assertion_factory(function(value) {
 })
 
 #' @export
-#' @rdname native_types
-Environment <- as_assertion_factory(function(value) {
+#' @rdname assertion_factories
+Environment <- as_assertion_factory(function(value, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.environment(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -389,8 +403,9 @@ Environment <- as_assertion_factory(function(value) {
 })
 
 #' @export
-#' @rdname native_types
-Symbol <- as_assertion_factory(function(value) {
+#' @rdname assertion_factories
+Symbol <- as_assertion_factory(function(value, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(is.symbol(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -406,8 +421,9 @@ Symbol <- as_assertion_factory(function(value) {
 })
 
 #' @export
-#' @rdname native_types
-Pairlist <- as_assertion_factory(function(value, length) {
+#' @rdname assertion_factories
+Pairlist <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.pairlist(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -435,8 +451,9 @@ Pairlist <- as_assertion_factory(function(value, length) {
 })
 
 #' @export
-#' @rdname native_types
-Language <- as_assertion_factory(function(value) {
+#' @rdname assertion_factories
+Language <- as_assertion_factory(function(value, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(typeof(value) != "language") {
     e <- sprintf(
       "%s\n%s",
@@ -452,8 +469,9 @@ Language <- as_assertion_factory(function(value) {
 })
 
 #' @export
-#' @rdname native_types
-Expression <- as_assertion_factory(function(value, length) {
+#' @rdname assertion_factories
+Expression <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(typeof(value) != "expression") {
     e <- sprintf(
       "%s\n%s",
@@ -483,8 +501,9 @@ Expression <- as_assertion_factory(function(value, length) {
 # function, factor, matrix, array, data.frame, date, time
 
 #' @export
-#' @rdname native_types
-Function <- as_assertion_factory(function(value) {
+#' @rdname assertion_factories
+Function <- as_assertion_factory(function(value, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.function(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -500,8 +519,9 @@ Function <- as_assertion_factory(function(value) {
 })
 
 #' @export
-#' @rdname native_types
-Factor <- as_assertion_factory(function(value, length, levels) {
+#' @rdname assertion_factories
+Factor <- as_assertion_factory(function(value, length, levels, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.factor(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -540,8 +560,9 @@ Factor <- as_assertion_factory(function(value, length, levels) {
 })
 
 #' @export
-#' @rdname native_types
-Data.frame <- as_assertion_factory(function(value, nrow, ncol) {
+#' @rdname assertion_factories
+Data.frame <- as_assertion_factory(function(value, nrow, ncol, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.data.frame(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -581,8 +602,9 @@ Data.frame <- as_assertion_factory(function(value, nrow, ncol) {
 })
 
 #' @export
-#' @rdname native_types
-Matrix <- as_assertion_factory(function(value, nrow, ncol) {
+#' @rdname assertion_factories
+Matrix <- as_assertion_factory(function(value, nrow, ncol, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.matrix(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -622,8 +644,9 @@ Matrix <- as_assertion_factory(function(value, nrow, ncol) {
 })
 
 #' @export
-#' @rdname native_types
-Array <- as_assertion_factory(function(value, dim) {
+#' @rdname assertion_factories
+Array <- as_assertion_factory(function(value, dim, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!is.array(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -651,8 +674,9 @@ Array <- as_assertion_factory(function(value, dim) {
 })
 
 #' @export
-#' @rdname native_types
-Date <- as_assertion_factory(function(value, length) {
+#' @rdname assertion_factories
+Date <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!"Date" %in% class(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -681,8 +705,9 @@ Date <- as_assertion_factory(function(value, length) {
 })
 
 #' @export
-#' @rdname native_types
-Time <- as_assertion_factory(function(value, length) {
+#' @rdname assertion_factories
+Time <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
   if(!"POSIXct" %in% class(value)) {
     e <- sprintf(
       "%s\n%s",

@@ -24,98 +24,101 @@
 \alias{Array}
 \alias{Date}
 \alias{Time}
-\title{Native types of package 'typed'}
+\title{Assertion factories of package 'typed'}
 \usage{
-Any(length, ...)
+Any(length, null_ok = FALSE, ...)
 
-Logical(length, ...)
+Logical(length, null_ok = FALSE, ...)
 
-Integer(length, ...)
+Integer(length, null_ok = FALSE, ...)
 
-Double(length, ...)
+Double(length, null_ok = FALSE, ...)
 
-Character(length, ...)
+Character(length, null_ok = FALSE, ...)
 
-List(length, data_frame_ok, ...)
-
-Null(...)
-
-Closure(...)
-
-Special(...)
-
-Builtin(...)
-
-Environment(...)
-
-Symbol(...)
-
-Pairlist(length, ...)
-
-Language(...)
-
-Expression(length, ...)
-
-Function(...)
-
-Factor(length, levels, ...)
-
-Matrix(nrow, ncol, ...)
-
-Array(dim, ...)
-
-Data.frame(nrow, ncol, ...)
-
-Date(length, ...)
-
-Time(length, ...)
-
-Logical(length, ...)
-
-Integer(length, ...)
-
-Double(length, ...)
-
-Character(length, ...)
-
-Raw(length, ...)
-
-List(length, data_frame_ok = TRUE, ...)
+List(length, data_frame_ok, null_ok = FALSE, ...)
 
 Null(...)
 
-Closure(...)
+Closure(null_ok = FALSE, ...)
 
-Special(...)
+Special(null_ok = FALSE, ...)
 
-Builtin(...)
+Builtin(null_ok = FALSE, ...)
 
-Environment(...)
+Environment(null_ok = FALSE, ...)
 
-Symbol(...)
+Symbol(null_ok = FALSE, ...)
 
-Pairlist(length, ...)
+Pairlist(length, null_ok = FALSE, ...)
 
-Language(...)
+Language(null_ok = FALSE, ...)
 
-Expression(length, ...)
+Expression(length, null_ok = FALSE, ...)
 
-Function(...)
+Function(null_ok = FALSE, ...)
 
-Factor(length, levels, ...)
+Factor(length, levels, null_ok = FALSE, ...)
 
-Data.frame(nrow, ncol, ...)
+Matrix(nrow, ncol, null_ok = FALSE, ...)
 
-Matrix(nrow, ncol, ...)
+Array(dim, null_ok = FALSE, ...)
 
-Array(dim, ...)
+Data.frame(nrow, ncol, null_ok = FALSE, ...)
 
-Date(length, ...)
+Date(length, null_ok = FALSE, ...)
 
-Time(length, ...)
+Time(length, null_ok = FALSE, ...)
+
+Logical(length, null_ok = FALSE, ...)
+
+Integer(length, null_ok = FALSE, ...)
+
+Double(length, null_ok = FALSE, ...)
+
+Character(length, null_ok = FALSE, ...)
+
+Raw(length, null_ok = FALSE, ...)
+
+List(length, data_frame_ok = TRUE, null_ok = FALSE, ...)
+
+Null(...)
+
+Closure(null_ok = FALSE, ...)
+
+Special(null_ok = FALSE, ...)
+
+Builtin(null_ok = FALSE, ...)
+
+Environment(null_ok = FALSE, ...)
+
+Symbol(null_ok = FALSE, ...)
+
+Pairlist(length, null_ok = FALSE, ...)
+
+Language(null_ok = FALSE, ...)
+
+Expression(length, null_ok = FALSE, ...)
+
+Function(null_ok = FALSE, ...)
+
+Factor(length, levels, null_ok = FALSE, ...)
+
+Data.frame(nrow, ncol, null_ok = FALSE, ...)
+
+Matrix(nrow, ncol, null_ok = FALSE, ...)
+
+Array(dim, null_ok = FALSE, ...)
+
+Date(length, null_ok = FALSE, ...)
+
+Time(length, null_ok = FALSE, ...)
 }
 \arguments{
 \item{length}{length of the object}
+
+\item{null_ok}{whether \code{NULL} values should be accepted, and not subjected to
+any further check.}
 
 \item{...}{additional conditions, see details.}
 
@@ -131,8 +134,9 @@ Time(length, ...)
 }
 \description{
 These functions are assertion factories, they produce assertions,
-which take an object, verify assertions, and
-returns the input, possibly modified (though never modified with native types).
+which take an object, check conditions, and
+returns the input, usually unmodified (never modified with the functions
+documented on this page).
 }
 \details{
 Additional conditions can be provided :

@@ -109,7 +109,7 @@ Character()(3)
 We call `Integer(3)` and `Character()` assertions, and we call
 `Integer` and `Character` assertion factories.
 
-The package contains many assertion factories (see `?native_types`), 
+The package contains many assertion factories (see `?assertion_factories`), 
 the main ones are: 
 
 * `Any` (No default restriction)
@@ -172,7 +172,7 @@ library(checkmate)
 
 `as_assertion_factory` can be used to create your own assertion factories,
 in fact
-[it's used to build the native assertion factories of this package](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_native_types.R)
+[it's used to build the native assertion factories of this package](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_assertion_factories.R)
 .
 
 ### Constants
