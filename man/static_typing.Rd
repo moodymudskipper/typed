@@ -2,10 +2,16 @@
 % Please edit documentation in R/01_question_mark.R, R/02_declare.R
 \name{?}
 \alias{?}
+\alias{check_output}
+\alias{check_arg}
 \alias{declare}
 \title{Static typing}
 \usage{
 `?`(lhs, rhs)
+
+check_output(.output, .assertion, ...)
+
+check_arg(.arg, .assertion, ..., .bind = FALSE)
 
 declare(x, assertion, value, const = FALSE)
 }
@@ -13,6 +19,17 @@ declare(x, assertion, value, const = FALSE)
 \item{lhs}{lhs}
 
 \item{rhs}{rhs}
+
+\item{.output}{function output}
+
+\item{.assertion}{an assertion}
+
+\item{...}{additional arguments passed to assertion}
+
+\item{.arg}{function argument}
+
+\item{.bind}{whether to actively bind the argument so it cannot be modified
+unless it satisfies the assertion}
 
 \item{x}{variable name as a string}
 

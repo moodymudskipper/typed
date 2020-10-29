@@ -1,3 +1,78 @@
+#' @param .output function output
+#' @param .assertion an assertion
+#' @param ... additional arguments passed to assertion
+#'
+#' @export
+#' @rdname static_typing
+check_output <- function(.output, .assertion, ...) {
+  pf     <- parent.frame()
+  var_nm <- as.character(substitute(.output))
+  val <- try(.assertion(.output, ...), silent = TRUE)
+  if(inherits(val, "try-error")) {
+    e <- attr(val, "condition")$message
+    check_arg_call <- deparse1(sys.call())
+    fun_call <- deparse1(sys.call(-1))
+    e <- sprintf("In `%s` at `%s`:\nwrong return value, %s", fun_call, check_arg_call, e)
+    stop(e, call. = FALSE)
+  }
+  return(invisible(.output))
+}
+
+#' @param .arg function argument
+#' @param .assertion an assertion
+#' @param ... additional arguments passed to assertion
+#' @param .bind whether to actively bind the argument so it cannot be modified
+#'   unless it satisfies the assertion
+#'
+#' @export
+#' @rdname static_typing
+check_arg <- function(.arg, .assertion, ..., .bind = FALSE) {
+  pf <- parent.frame()
+  var_nm <- as.character(substitute(.arg))
+  assertion_quoted <- substitute(.assertion)
+  val <- try(.assertion(.arg, ...), silent = TRUE)
+  if(inherits(val, "try-error")) {
+    e <- attr(val, "condition")$message
+    check_arg_call <- deparse1(sys.call())
+    fun_call <- deparse1(sys.call(-1))
+    e <- sprintf("In `%s` at `%s`:\nwrong argument to function, %s", fun_call, check_arg_call, e)
+    stop(e, call. = FALSE)
+  }
+
+  if(.bind) {
+    dots <- eval(substitute(alist(...)))
+    f <- eval(substitute(local({
+      val <- .arg
+      # use long name`assigned_value` so trace is more intuitive
+      function(assigned_value) {
+        # browser()
+        if (!missing(assigned_value)) {
+          # we should catch this error and use `sys.call()` to enrich it
+          val <<- try(assertion_call, silent = TRUE)
+          if(inherits(val, "try-error")) {
+            e <- attr(val, "condition")$message
+            fun_call <- sys.call(-1)
+            if(!is.null(fun_call)) {
+              fun_call <- deparse1(fun_call)
+              e <- sprintf("In `%s` at `%s <- ...`:\n%s", fun_call, var_nm, e)
+            }
+            stop(e, call. = FALSE)
+          }
+        }
+        val
+      }
+    }), list (
+      assertion_call = as.call(c(assertion_quoted, quote(assigned_value), dots)),
+      var_nm = var_nm)))
+
+    attr(f, "srcref") <- NULL # so it's not set to old definition*
+    rm(list = var_nm, envir = pf)
+    makeActiveBinding(var_nm, f, pf)
+  }
+  return(invisible(.arg))
+}
+
+
 
 #' @param x variable name as a string
 #' @param assertion a function
@@ -8,28 +83,23 @@
 #' @rdname static_typing
 declare <- function(x, assertion, value, const = FALSE) {
   pf<- parent.frame()
-  promise_lgl <- is_promise2(as.name(x), pf)
-  if(promise_lgl && missing(value)) {
-    value <- get(x, envir = pf, inherits = FALSE)
-    rm(list = x, envir = pf)
-  }
 
   if(missing(assertion)) {
-    assertion_call <- infer_implicit_assignment_call(value)
-    assertion <- eval(assertion_call)
+    assertion_quoted <- infer_implicit_assignment_call(value)
+    assertion <- eval(assertion_quoted)
   } else {
     ## is assertion a assertion_ factory ?
-    assertion_call <- substitute(assertion)
+    assertion_quoted <- substitute(assertion)
     if("assertion_ factory" %in% class(assertion)) {
       ## overwrite it with a call to itself with no arg
       # this is so we can use `Integer` in place of `Integer()` for instance
       assertion <- assertion()
-      assertion_call <- as.call(list(assertion_call))
+      assertion_quoted <- as.call(list(assertion_quoted))
     }
   }
 
   ## is value provided ?
-  if(!missing(value) || promise_lgl) {
+  if(!missing(value)) {
     val <- try(assertion(value), silent = TRUE)
     if(inherits(val, "try-error")) {
       e <- attr(val, "condition")$message
@@ -47,15 +117,11 @@ declare <- function(x, assertion, value, const = FALSE) {
         }
       } else {
         fun_call <- sys.call(-1)
-        declare_call <- deparse1(declare_call,"srcref")
+        declare_call <- deparse1(declare_call)
       }
       fun_call <- deparse1(fun_call)
 
-      if (promise_lgl) {
-        e <- sprintf("In `%s` at `%s`:\nwrong argument to function, %s", fun_call, declare_call, e)
-      } else {
-        e <- sprintf("In `%s` at `%s`:\n%s", fun_call, declare_call, e)
-      }
+      e <- sprintf("In `%s` at `%s`:\n%s", fun_call, declare_call, e)
       stop(e, call. = FALSE)
     }
   } else {
@@ -105,7 +171,7 @@ declare <- function(x, assertion, value, const = FALSE) {
         }
         val
       }
-    }), list (assertion = assertion_call, var_nm = x)))
+    }), list (assertion = assertion_quoted, var_nm = x)))
   }
 
   attr(f, "srcref") <- NULL # so it's not set to old definition
