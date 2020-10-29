@@ -18,9 +18,9 @@ declare <- function(x, assertion, value, const = FALSE) {
     assertion_call <- infer_implicit_assignment_call(value)
     assertion <- eval(assertion_call)
   } else {
-    ## is assertion a type_checker ?
+    ## is assertion a assertion_ factory ?
     assertion_call <- substitute(assertion)
-    if("type_checker" %in% class(assertion)) {
+    if("assertion_ factory" %in% class(assertion)) {
       ## overwrite it with a call to itself with no arg
       # this is so we can use `Integer` in place of `Integer()` for instance
       assertion <- assertion()
@@ -30,7 +30,7 @@ declare <- function(x, assertion, value, const = FALSE) {
 
   ## is value provided ?
   if(!missing(value) || promise_lgl) {
-    val <<- try(assertion(value), silent = TRUE)
+    val <- try(assertion(value), silent = TRUE)
     if(inherits(val, "try-error")) {
       e <- attr(val, "condition")$message
       declare_call <- sys.call()
@@ -52,16 +52,16 @@ declare <- function(x, assertion, value, const = FALSE) {
       fun_call <- deparse1(fun_call)
 
       if (promise_lgl) {
-        e <- sprintf("In `%s` at `%s`: wrong argument to function, %s", fun_call, declare_call, e)
+        e <- sprintf("In `%s` at `%s`:\nwrong argument to function, %s", fun_call, declare_call, e)
       } else {
-        e <- sprintf("In `%s` at `%s`: %s", fun_call, declare_call, e)
+        e <- sprintf("In `%s` at `%s`:\n%s", fun_call, declare_call, e)
       }
       stop(e, call. = FALSE)
     }
   } else {
     # NULL is accepted as a first value even if it doesn't pass the check
     # this is because we're very flexible with types, the alternative would be
-    # to force the user to define a default object when value is missing in the type checker
+    # to force the user to define a default object when value is missing in the assertion factory
     value <- NULL
   }
 
@@ -77,7 +77,7 @@ declare <- function(x, assertion, value, const = FALSE) {
           fun_call <- sys.call(-1)
           if(!is.null(fun_call)) {
             fun_call <- deparse1(fun_call)
-            e <- sprintf("In `%s` at `%s <- ...`: %s", fun_call, var_nm, e)
+            e <- sprintf("In `%s` at `%s <- ...`:\n%s", fun_call, var_nm, e)
           }
           stop(e, call. = FALSE)
         }
@@ -98,7 +98,7 @@ declare <- function(x, assertion, value, const = FALSE) {
             fun_call <- sys.call(-1)
             if(!is.null(fun_call)) {
               fun_call <- deparse1(fun_call)
-              e <- sprintf("In `%s` at `%s <- ...`: %s", fun_call, var_nm, e)
+              e <- sprintf("In `%s` at `%s <- ...`:\n%s", fun_call, var_nm, e)
             }
             stop(e, call. = FALSE)
           }

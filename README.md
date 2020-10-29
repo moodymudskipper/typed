@@ -1,8 +1,7 @@
 
 <!-- badges: start -->
 
-[![Travis build
-status](https://travis-ci.com/moodymudskipper/typed.svg?branch=master)](https://travis-ci.com/moodymudskipper/typed)
+<!--[![Travis build status](https://travis-ci.com/moodymudskipper/typed.svg?branch=iteration2)](https://travis-ci.com/moodymudskipper/typed)
 <!-- badges: end -->
 
 # typed
@@ -44,14 +43,11 @@ Here are examples on how we would set types
 ``` r
 Character() ? x # restrict x to "character" type
 x <- "a"
-#> [1] "entering"
-#> [1] "if"
 x
-#> [1] "entering"
 #> [1] "a"
+
 Integer(3) ? y <- 1:3 # restrict y to "integer" type of length 3
 y
-#> [1] "entering"
 #> [1] 1 2 3
 ```
 
@@ -59,42 +55,30 @@ We cannot assign values of the wrong type to `x` and `y` anymore.
 
 ``` r
 x <- 2
-#> [1] "entering"
-#> [1] "if"
-#> `expected`:      "character"
+#> Error: In `eval(expr, envir, enclos)` at `x <- ...`:
+#> type mismatch
 #> `typeof(value)`: "double"   
-#> [1] "hello"
-#> [1] "world"
-#> Error: type mismatch in `eval(expr, envir, enclos)` at ``
+#> `expected`:      "character"
+
 y <- 4:5
-#> [1] "entering"
-#> [1] "if"
-#>      `expected`: 3
+#> Error: In `eval(expr, envir, enclos)` at `y <- ...`:
+#> type mismatch
 #> `length(value)`: 2
-#> [1] "hello"
-#> [1] "world"
-#> Error: length mismatch in `eval(expr, envir, enclos)` at ``
+#>      `expected`: 3
+
 y[1] <- 10
-#> [1] "entering"
-#> [1] "entering"
-#> [1] "entering"
-#> [1] "if"
-#> `expected`:      "integer"  
+#> Error: In `eval(expr, envir, enclos)` at `y <- ...`:
+#> type mismatch
 #> `typeof(value)`: "character"
-#> [1] "hello"
-#> [1] "world"
-#> Error: type mismatch in `eval(expr, envir, enclos)` at ``
+#> `expected`:      "integer"
 ```
 
 But the right type will work.
 
 ``` r
 x <- c("b", "c")
-#> [1] "entering"
-#> [1] "if"
+
 y <- c(1L, 10L, 100L)
-#> [1] "entering"
-#> [1] "if"
 ```
 
 If you dislike the `?` operator you can use `declare`, it’s a strict
@@ -102,26 +86,40 @@ equivalent, slightly more efficient, which looks like `base::assign`.
 
 ``` r
 declare("x", Character())
-#> [1] "entering"
 x <- "a"
-#> [1] "entering"
-#> [1] "if"
 x
-#> [1] "entering"
 #> [1] "a"
+
 declare("y", Integer(3), 1:3)
-#> [1] "entering"
 y
-#> [1] "entering"
 #> [1] 1 2 3
 ```
 
-### Type checkers and assertions
+### assertion factories and assertions
 
-`Integer` and `Character` are called type checkers.
+`Integer` and `Character` are function factories (functions that return
+functions), thus `Integer(3)` and `Character()` are functions.
 
-The package contains many of those (see `?native_types`), the main ones
-are:
+The latter functions operate checks on a value and in case of success
+return this value, generally unmodified. For instance :
+
+``` r
+Integer(3)(1:2)
+#> Error: type mismatch
+#> `length(value)`: 2
+#>      `expected`: 3
+
+Character()(3)
+#> Error: type mismatch
+#> `typeof(value)`: "double"   
+#> `expected`:      "character"
+```
+
+We call `Integer(3)` and `Character()` assertions, and we call `Integer`
+and `Character` assertion factories.
+
+The package contains many assertion factories (see `?native_types`), the
+main ones are:
 
   - `Any` (No default restriction)
   - `Logical`
@@ -136,51 +134,38 @@ are:
   - `Date`
   - `Time` (POSIXct)
 
-They are function factories (functions that return functions), thus
-`Integer(3)` and `Character()` are functions.
-
-In particular these functions operate checks on a value and in case of
-success return this value, generally unmodified. For instance :
-
-``` r
-Data.frame()(letters)
-#> `expected to contain`: "data.frame"
-#> `class(value)`:        "character"
-#> Error: class mismatch
-Data.frame(ncol = 5)(cars)
-#>    `expected`: 5
-#> `ncol(value)`: 2
-#> Error: Column number mismatch
-```
-
-These functions are called assertions.
-
 ### Custom types
 
 As we’ve seen with `Integer(3)`, `Data.frame(ncol = 5)`, passing
-arguments to a type checker restricts the type. For instance `Integer`
-has arguments `length` and `...`, in the dots we can use arguments named
-as functions and with the value of the expected result.
+arguments to a assertion factory restricts the type. For instance
+`Integer` has arguments `length` and `...`, in the dots we can use
+arguments named as functions and with the value of the expected result.
 
 ``` r
 Integer(anyNA = FALSE) ? x <- c(1L, 2L, NA)
-#> [1] "entering"
+#> Error: In `eval(expr, envir, enclos)` at `Integer(anyNA = FALSE) ? x <- c(1L, 2L, NA)`:
+#> `anyNA` mismatch
+#> `anyNA(value)`: TRUE 
 #> `expected`:     FALSE
-#> `anyNA(value)`: TRUE
-#> Error: `anyNA` mismatch
 ```
 
-That makes type checkers very flexible\! If it is still not flexible
-enough, one can provide conditions using formulas.
+Useful arguments might be for instance, `anyDuplicated = 0L`, `names =
+NULL`, `attributes = NULL`… Any available function can be used.
+
+That makes assertion factories very flexible\! If it is still not
+flexible enough, one can provide conditions using formulas.
 
 ``` r
 fruit <- Character(1, "`value` is not a fruit!" ~ . %in% c("apple", "pear", "cherry"))
+
 fruit ? x <- "potatoe"
-#> [1] "entering"
-#> Error: `value` is not a fruit!
+#> Error: In `eval(expr, envir, enclos)` at `fruit ? x <- "potatoe"`:
+#> `value` is not a fruit!
+#> `value %in% c("apple", "pear", "cherry")`: FALSE
+#> `expected`:                                TRUE
 ```
 
-### Leverage assertions from other packages
+### Leverage assertions from other packages, build your own assertion factories
 
 Some great packages provide assertions, and they can be used with
 `typed` provided that they take the object as a first input and return
@@ -189,57 +174,35 @@ Lang’s *{checkmate}* both qualify and we’ll use them as examples.
 
 ``` r
 library(assertive)
-
-# used without type definition
-assert_is_monotonic_increasing(1:3)
-assert_is_monotonic_increasing(3:1)
-#> Error in eval(expr, envir, enclos): is_monotonic_increasing : The values of 3:1 are not monotonic increasing.
+assert_is_monotonic_increasing ? z
+z <- 3:1
+#> Error: In `eval(expr, envir, enclos)` at `z <- ...`:
+#> is_monotonic_increasing : The values of assigned_value are not monotonic increasing.
 #>   Position ValueBefore ValueAfter
 #> 1      1/2           3          2
 #> 2      2/3           2          1
-
-# used with type definition
-assert_is_monotonic_increasing ? z
-z <- 1:3 # works
-#> [1] "entering"
-#> [1] "if"
-z <- 3:1 # fails
-#> [1] "entering"
-#> [1] "if"
-#> [1] "hello"
-#> [1] "world"
-#> Error: is_monotonic_increasing : The values of assigned_value are not monotonic increasing.
-#>   Position ValueBefore ValueAfter
-#> 1      1/2           3          2
-#> 2      2/3           2          1 in `eval(expr, envir, enclos)` at ``
 ```
 
-If we want to use more than the first argument, we can use
-`purrr::partial()` :
+If we want to use more than the first argument, we should create an
+assertion factory :
 
 ``` r
+Monotonic_incr <- as_assertion_factory(assert_is_monotonic_increasing)
+Monotonic_incr(strictly = TRUE) ? z
+z <- c(1, 1, 2)
+#> Error: In `eval(expr, envir, enclos)` at `z <- ...`:
+#> is_monotonic_increasing : The values of value are not strictly monotonic increasing.
+#>   Position ValueBefore ValueAfter
+#> 1      1/2           1          1
 library(checkmate)
 #> Warning: package 'checkmate' was built under R version 4.0.3
-library(purrr)
-#> 
-#> Attaching package: 'purrr'
-#> The following objects are masked from 'package:assertive':
-#> 
-#>     is_atomic, is_character, is_double, is_empty, is_formula,
-#>     is_function, is_integer, is_list, is_logical, is_null, is_numeric,
-#>     is_vector
-partial(assert_string, pattern ="^t") ? x <- "tomato"
-#> [1] "entering"
-partial(assert_string, pattern ="^t") ? x <- "potato"
-#> [1] "entering"
-#> Error in eval_tidy(call, mask): Assertion on 'value' failed: Must comply to pattern '^t'.
 ```
 
-### Custom type checkers
-
-Finally, custom type checkers can be defined using the function
-`new_type_checker`, [check my code on github to understand how to create
-them](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_native_types.R)
+`as_assertion_factory` can be used to create your own assertion
+factories, in fact [it’s used to build the native assertion factories of
+this
+package](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_native_types.R)
+.
 
 ### Constants
 
@@ -248,13 +211,14 @@ To define a constant, we just surround the variable by parentheses
 
 ``` r
 Double() ? (x) <- 1
-#> [1] "entering"
 x <- 2
-#> Error: `x` is a constant, can't assign a new value. in `eval(expr, envir, enclos)` at ``
+#> Error: In `eval(expr, envir, enclos)` at `x <- ...`:
+#> Can't assign to a constant
+
 ? (y) <- 1
-#> [1] "entering"
 y <- 2
-#> Error: `y` is a constant, can't assign a new value. in `eval(expr, envir, enclos)` at ``
+#> Error: In `eval(expr, envir, enclos)` at `y <- ...`:
+#> Can't assign to a constant
 ```
 
 ## Set argument type
@@ -295,13 +259,12 @@ Let’s test it by assigning a right and wrong type
 
 ``` r
 add(2, 3)
-#> [1] "entering"
-#> [1] "entering"
 #> [1] 5
 add(2, 3L)
-#> `expected`:      "double" 
+#> Error: In `add(2, 3L)` at `Double() ? y`:
+#> wrong argument to function, type mismatch
 #> `typeof(value)`: "integer"
-#> Error: type mismatch
+#> `expected`:      "double"
 ```
 
 Arguments `x` and `y` will also be restricted to the type “integer” in
@@ -321,16 +284,17 @@ add_or_substract <- function (x, y, substract = FALSE) {
 add_or_substract(1, 2)
 #> [1] 3
 add_or_substract(1L, 2L)
-#> `expected`:      "double" 
+#> Error: In `add_or_substract(1L, 2L)` at `Double() ? return(x + y)`:
+#> wrong return value, type mismatch
 #> `typeof(value)`: "integer"
-#> Error: type mismatch
+#> `expected`:      "double"
 ```
 
 A simpler way is to use `?` before the function definition as in the
-previous section, but to give it a type checker on the left hand side.
-It will ultimately create the same function code, but the source code is
-more readable to read, we don’t need to worry about precedence, and the
-function will get a class “type” and attributes.
+previous section, but to give it a assertion factory on the left hand
+side. It will ultimately create the same function code, but the source
+code is more readable to read, we don’t need to worry about precedence,
+and the function will get a class “type” and attributes.
 
 ``` r
 add_or_substract <- Double() ? function (x, y, substract = FALSE) {

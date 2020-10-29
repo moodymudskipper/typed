@@ -50,10 +50,10 @@ allNames <- function (x) {
     nms <- names(fmls)
     tmp_lgl <- sapply(fmls, function(x) is.call(x) && identical(x[[1]], quote(`?`)))
 
-    arg_type_checkers <- lapply(fmls[tmp_lgl], function(x) x[[length(x)]])
-    arg_type_checker_calls <- Map(function(x, y) {
+    arg_assertion_factories <- lapply(fmls[tmp_lgl], function(x) x[[length(x)]])
+    arg_assertion_factory_calls <- Map(function(x, y) {
       bquote(.(y) ? .(as.symbol(x)))
-    }, nms[tmp_lgl], arg_type_checkers)
+    }, nms[tmp_lgl], arg_assertion_factories)
 
 
     fmls[tmp_lgl] <- lapply(fmls[tmp_lgl], function(x)
@@ -61,19 +61,19 @@ allNames <- function (x) {
 
     if(is.call(body) && identical(body[[1]], quote(`{`)))
       body <- as.list(body)[-1]
-    body <- as.call(c(quote(`{`), arg_type_checker_calls, body))
+    body <- as.call(c(quote(`{`), arg_assertion_factory_calls, body))
     # from there on, body starts with `{` in any case
 
 
     ## is the lhs a call to `<-`
     if(lhs_is_assignment <- is.call(lhs) && identical(lhs[[1]], quote(`<-`))) {
-      return_type_checker <- lhs[[3]]
+      return_assertion_factory <- lhs[[3]]
     } else if(lhs_is_qm <- is.call(lhs) && identical(lhs[[1]], quote(`?`))) {
       if(!is.call(lhs[[3]]) || !identical(lhs[[c(3,1)]], quote(`<-`)))
         stop("wrong syntax")
-      return_type_checker <- lhs[[c(3, 3)]]
+      return_assertion_factory <- lhs[[c(3, 3)]]
     } else {
-      return_type_checker <- lhs
+      return_assertion_factory <- lhs
     }
 
     ## did we set a return type ?
@@ -81,8 +81,8 @@ allNames <- function (x) {
       modify_return_calls <- function(x) {
         if(!is.call(x)) return(x)
         if(identical(x[[1]], quote(`return`))) {
-          x <- call("?", return_type_checker, x)
-          #x[[2]] <- as.call(c(return_type_checker, x[[2]]))
+          x <- call("?", return_assertion_factory, x)
+          #x[[2]] <- as.call(c(return_assertion_factory, x[[2]]))
           return(x)
         }
         x[] <- lapply(x, modify_return_calls)
@@ -95,15 +95,15 @@ allNames <- function (x) {
       last_call <- body[[length(body)]]
       if(!is.call(last_call) || !identical(last_call[[1]], quote(return)))
         body[[length(body)]] <-
-        call("?", return_type_checker, call("return", last_call))
-        #body[[length(body)]] <- as.call(c(return_type_checker, last_call))
+        call("?", return_assertion_factory, call("return", last_call))
+        #body[[length(body)]] <- as.call(c(return_assertion_factory, last_call))
 
     }
 
     ## build function from formals, body, and type attributes
     f <- as.function(c(fmls, body), envir =  pf)
-    attr(f, "arg_types")   <- arg_type_checkers
-    attr(f, "return_type") <- return_type_checker
+    attr(f, "arg_types")   <- arg_assertion_factories
+    attr(f, "return_type") <- return_assertion_factory
     class(f) <- c("typed", "function")
     if(lhs_is_assignment) {
       var_nm <- as.character(lhs[[2]])
@@ -131,7 +131,7 @@ allNames <- function (x) {
         return_call <- sys.call()
         return_call <- paste(
           deparse1(return_call[[2]]), "?", deparse1(return_call[[3]]))
-        e <- sprintf("In `%s` at `%s`: wrong return value, %s", fun_call, return_call, e)
+        e <- sprintf("In `%s` at `%s`:\nwrong return value, %s", fun_call, return_call, e)
       }
       stop(e, call. = FALSE)
     }

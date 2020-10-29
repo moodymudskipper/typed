@@ -3,7 +3,7 @@ output: github_document
 ---
 
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.com/moodymudskipper/typed.svg?branch=master)](https://travis-ci.com/moodymudskipper/typed)
+<!--[![Travis build status](https://travis-ci.com/moodymudskipper/typed.svg?branch=iteration2)](https://travis-ci.com/moodymudskipper/typed)
 <!-- badges: end -->
 
 
@@ -57,6 +57,7 @@ Here are examples on how we would set types
 Character() ? x # restrict x to "character" type
 x <- "a"
 x
+
 Integer(3) ? y <- 1:3 # restrict y to "integer" type of length 3
 y
 ```
@@ -65,7 +66,9 @@ We cannot assign values of the wrong type to `x` and `y` anymore.
 
 ```{r}
 x <- 2
+
 y <- 4:5
+
 y[1] <- 10
 ```
 
@@ -73,6 +76,7 @@ But the right type will work.
 
 ```{r}
 x <- c("b", "c")
+
 y <- c(1L, 10L, 100L)
 ```
 
@@ -83,15 +87,30 @@ slightly more efficient, which looks like `base::assign`.
 declare("x", Character())
 x <- "a"
 x
+
 declare("y", Integer(3), 1:3)
 y
 ```
 
-### Type checkers and assertions
+### assertion factories and assertions
 
-`Integer` and `Character` are called type checkers.
+`Integer` and `Character` are function factories (functions that return functions),
+thus `Integer(3)` and `Character()` are functions.
 
-The package contains many of those (see `?native_types`), the main ones are: 
+The latter functions operate checks on a value and in case of success 
+return this value, generally unmodified. For instance :
+
+```{r}
+Integer(3)(1:2)
+
+Character()(3)
+```
+
+We call `Integer(3)` and `Character()` assertions, and we call
+`Integer` and `Character` assertion factories.
+
+The package contains many assertion factories (see `?native_types`), 
+the main ones are: 
 
 * `Any` (No default restriction)
 * `Logical`
@@ -106,23 +125,10 @@ The package contains many of those (see `?native_types`), the main ones are:
 * `Date`
 * `Time` (POSIXct)
 
-They are function factories (functions that return functions),
-thus `Integer(3)` and `Character()` are functions. 
-
-In particular these functions operate checks on a value and in case of success 
-return this value, generally unmodified. For instance :
-
-```{r}
-Data.frame()(letters)
-Data.frame(ncol = 5)(cars)
-```
-
-These functions are called assertions.
-
 ### Custom types
 
 As we've seen with `Integer(3)`, `Data.frame(ncol = 5)`, passing arguments to a
-type checker restricts the type. For instance `Integer` has arguments `length` and
+assertion factory restricts the type. For instance `Integer` has arguments `length` and
 `...`, in the dots we can use arguments named as functions and with the value of
 the expected result.
 
@@ -130,15 +136,19 @@ the expected result.
 Integer(anyNA = FALSE) ? x <- c(1L, 2L, NA)
 ```
 
-That makes type checkers very flexible! If it is still not flexible enough, one
+Useful arguments might be for instance, `anyDuplicated = 0L`, `names = NULL`, 
+`attributes = NULL`... Any available function can be used.
+
+That makes assertion factories very flexible! If it is still not flexible enough, one
 can provide conditions using formulas.
 
 ```{r}
 fruit <- Character(1, "`value` is not a fruit!" ~ . %in% c("apple", "pear", "cherry"))
+
 fruit ? x <- "potatoe"
 ```
 
-### Leverage assertions from other packages
+### Leverage assertions from other packages, build your own assertion factories
 
 Some great packages provide assertions, and they can be used with `typed`
 provided that they take the object as a first input and return the object
@@ -147,30 +157,23 @@ both qualify and we'll use them as examples.
 
 ```{r}
 library(assertive)
-
-# used without type definition
-assert_is_monotonic_increasing(1:3)
-assert_is_monotonic_increasing(3:1)
-
-# used with type definition
 assert_is_monotonic_increasing ? z
-z <- 1:3 # works
-z <- 3:1 # fails
+z <- 3:1
 ```
 
-If we want to use more than the first argument, we can use `purrr::partial()` :
+If we want to use more than the first argument, we should create an assertion factory :
 
 ```{r}
+Monotonic_incr <- as_assertion_factory(assert_is_monotonic_increasing)
+Monotonic_incr(strictly = TRUE) ? z
+z <- c(1, 1, 2)
 library(checkmate)
-library(purrr)
-partial(assert_string, pattern ="^t") ? x <- "tomato"
-partial(assert_string, pattern ="^t") ? x <- "potato"
 ```
 
-### Custom type checkers
-
-Finally, custom type checkers can be defined using the function `new_type_checker`, 
-[check my code on github to understand how to create them](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_native_types.R)
+`as_assertion_factory` can be used to create your own assertion factories,
+in fact
+[it's used to build the native assertion factories of this package](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_native_types.R)
+.
 
 ### Constants
 
@@ -180,6 +183,7 @@ them as a protection)
 ```{r}
 Double() ? (x) <- 1
 x <- 2
+
 ? (y) <- 1
 y <- 2
 ```
@@ -234,7 +238,7 @@ add_or_substract(1L, 2L)
 ```
 
 A simpler way is to use `?` before the function definition as in the previous section, 
-but to give it a type checker on the left hand side. It will ultimately create
+but to give it a assertion factory on the left hand side. It will ultimately create
 the same function code, but the source code is more readable to read, we don't
 need to worry about precedence, and the function will get a class "type" and attributes.
 

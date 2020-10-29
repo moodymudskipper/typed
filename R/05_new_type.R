@@ -3,7 +3,7 @@
 #' @param f a function
 #'
 #' @export
-new_type_checker <- function(f) {
+as_assertion_factory <- function(f) {
   # create a function with arguments being the additional args to f and dots
   f_call <- as.call(c(quote(f), quote(value), sapply(names(formals(f)[-1]), as.name)))
 
@@ -18,7 +18,7 @@ new_type_checker <- function(f) {
       )
 
     # the footer is made of additional assertions derived from `...`
-    footer <- process_type_checker_dots(...)
+    footer <- process_assertion_factory_dots(...)
     if(is.null(footer)) {
       body <- call("{", header, quote(value))
     } else {
@@ -26,19 +26,19 @@ new_type_checker <- function(f) {
     }
     as.function(c(alist(value=), body), envir = parent.frame())
   })))
-  class(res) <- "type_checker"
+  class(res) <- "assertion_factory"
   environment(res) <- parent.frame()
   res
 }
 
 
-#' Process type checker dots
+#' Process assertion factory dots
 #'
 #' This needs to be exported, but shouldn't be called by the user
 #'
 #' @param ... dots
 #' @export
-process_type_checker_dots <- function(...) {
+process_assertion_factory_dots <- function(...) {
   args <- list(...)
   if(!length(args)) return(NULL)
   nms <- allNames(args)

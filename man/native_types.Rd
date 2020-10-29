@@ -130,7 +130,7 @@ Time(length, ...)
 \item{dim}{dimensions}
 }
 \description{
-These functions are type checkers, they produce assertions,
+These functions are assertion factories, they produce assertions,
 which take an object, verify assertions, and
 returns the input, possibly modified (though never modified with native types).
 }
@@ -144,7 +144,7 @@ be a condition, using \code{value} or \code{.} as a placeholder for the latter, 
 the optional \code{lhs} an error message.
 }
 
-Any is the most general type checker, it doesn't check anything unless
+Any is the most general assertion factory, it doesn't check anything unless
 provided additional conditions through \code{...}. Others use the base \verb{is.<type>} function
 if available, or check that the object is of the relevant type with \code{typeof}
 for atomic types, or check that the class of the checked value contains

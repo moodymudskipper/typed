@@ -1,6 +1,6 @@
 #' Native types of package 'typed'
 #'
-#' These functions are type checkers, they produce assertions,
+#' These functions are assertion factories, they produce assertions,
 #' which take an object, verify assertions, and
 #' returns the input, possibly modified (though never modified with native types).
 #'
@@ -12,7 +12,7 @@
 #'   be a condition, using `value` or `.` as a placeholder for the latter, and
 #'   the optional `lhs` an error message.
 #'
-#' Any is the most general type checker, it doesn't check anything unless
+#' Any is the most general assertion factory, it doesn't check anything unless
 #' provided additional conditions through `...`. Others use the base `is.<type>` function
 #' if available, or check that the object is of the relevant type with `typeof`
 #' for atomic types, or check that the class of the checked value contains
@@ -77,7 +77,7 @@
 #' Integer(2) ? x <- 1L
 #' }
 #'
-Any <- new_type_checker(function(value, length) {
+Any <- as_assertion_factory(function(value, length) {
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
@@ -95,7 +95,7 @@ Any <- new_type_checker(function(value, length) {
 
 #' @export
 #' @rdname native_types
-Logical <- new_type_checker(function(value, length) {
+Logical <- as_assertion_factory(function(value, length) {
   if(!is.logical(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -124,7 +124,7 @@ Logical <- new_type_checker(function(value, length) {
 
 #' @export
 #' @rdname native_types
-Integer <- new_type_checker(function(value, length) {
+Integer <- as_assertion_factory(function(value, length) {
   if(!is.integer(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -153,7 +153,7 @@ Integer <- new_type_checker(function(value, length) {
 
 #' @export
 #' @rdname native_types
-Double <- new_type_checker(function(value, length) {
+Double <- as_assertion_factory(function(value, length) {
   if(!is.double(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -184,7 +184,7 @@ Double <- new_type_checker(function(value, length) {
 
 # #' @export
 # #' @rdname native_types
-# Complex <- new_type_checker(function(value, length) {
+# Complex <- as_assertion_factory(function(value, length) {
 #   if(!is.complex(value)) {
 #     print(waldo::compare(
 #       "complex",
@@ -207,7 +207,7 @@ Double <- new_type_checker(function(value, length) {
 
 #' @export
 #' @rdname native_types
-Character <- new_type_checker(function(value, length) {
+Character <- as_assertion_factory(function(value, length) {
   if(!is.character(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -236,7 +236,7 @@ Character <- new_type_checker(function(value, length) {
 
 #' @export
 #' @rdname native_types
-Raw <- new_type_checker(function(value, length) {
+Raw <- as_assertion_factory(function(value, length) {
   if(!is.raw(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -265,7 +265,7 @@ Raw <- new_type_checker(function(value, length) {
 
 #' @export
 #' @rdname native_types
-List <- new_type_checker(function(value, length, data_frame_ok = TRUE) {
+List <- as_assertion_factory(function(value, length, data_frame_ok = TRUE) {
   if(!is.list(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -305,7 +305,7 @@ List <- new_type_checker(function(value, length, data_frame_ok = TRUE) {
 
 #' @export
 #' @rdname native_types
-Null <- new_type_checker(function(value) {
+Null <- as_assertion_factory(function(value) {
   if(!is.null(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -322,7 +322,7 @@ Null <- new_type_checker(function(value) {
 
 #' @export
 #' @rdname native_types
-Closure <- new_type_checker(function(value) {
+Closure <- as_assertion_factory(function(value) {
   if(typeof(value) != "closure") {
     e <- sprintf(
       "%s\n%s",
@@ -339,7 +339,7 @@ Closure <- new_type_checker(function(value) {
 
 #' @export
 #' @rdname native_types
-Special <- new_type_checker(function(value) {
+Special <- as_assertion_factory(function(value) {
   if(typeof(value) != "special") {
     e <- sprintf(
       "%s\n%s",
@@ -356,7 +356,7 @@ Special <- new_type_checker(function(value) {
 
 #' @export
 #' @rdname native_types
-Builtin <- new_type_checker(function(value) {
+Builtin <- as_assertion_factory(function(value) {
   if(typeof(value) != "builtin") {
     e <- sprintf(
       "%s\n%s",
@@ -373,7 +373,7 @@ Builtin <- new_type_checker(function(value) {
 
 #' @export
 #' @rdname native_types
-Environment <- new_type_checker(function(value) {
+Environment <- as_assertion_factory(function(value) {
   if(!is.environment(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -390,7 +390,7 @@ Environment <- new_type_checker(function(value) {
 
 #' @export
 #' @rdname native_types
-Symbol <- new_type_checker(function(value) {
+Symbol <- as_assertion_factory(function(value) {
   if(is.symbol(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -407,7 +407,7 @@ Symbol <- new_type_checker(function(value) {
 
 #' @export
 #' @rdname native_types
-Pairlist <- new_type_checker(function(value, length) {
+Pairlist <- as_assertion_factory(function(value, length) {
   if(!is.pairlist(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -436,7 +436,7 @@ Pairlist <- new_type_checker(function(value, length) {
 
 #' @export
 #' @rdname native_types
-Language <- new_type_checker(function(value) {
+Language <- as_assertion_factory(function(value) {
   if(typeof(value) != "language") {
     e <- sprintf(
       "%s\n%s",
@@ -453,7 +453,7 @@ Language <- new_type_checker(function(value) {
 
 #' @export
 #' @rdname native_types
-Expression <- new_type_checker(function(value, length) {
+Expression <- as_assertion_factory(function(value, length) {
   if(typeof(value) != "expression") {
     e <- sprintf(
       "%s\n%s",
@@ -484,7 +484,7 @@ Expression <- new_type_checker(function(value, length) {
 
 #' @export
 #' @rdname native_types
-Function <- new_type_checker(function(value) {
+Function <- as_assertion_factory(function(value) {
   if(!is.function(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -501,7 +501,7 @@ Function <- new_type_checker(function(value) {
 
 #' @export
 #' @rdname native_types
-Factor <- new_type_checker(function(value, length, levels) {
+Factor <- as_assertion_factory(function(value, length, levels) {
   if(!is.factor(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -541,7 +541,7 @@ Factor <- new_type_checker(function(value, length, levels) {
 
 #' @export
 #' @rdname native_types
-Data.frame <- new_type_checker(function(value, nrow, ncol) {
+Data.frame <- as_assertion_factory(function(value, nrow, ncol) {
   if(!is.data.frame(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -582,7 +582,7 @@ Data.frame <- new_type_checker(function(value, nrow, ncol) {
 
 #' @export
 #' @rdname native_types
-Matrix <- new_type_checker(function(value, nrow, ncol) {
+Matrix <- as_assertion_factory(function(value, nrow, ncol) {
   if(!is.matrix(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -623,7 +623,7 @@ Matrix <- new_type_checker(function(value, nrow, ncol) {
 
 #' @export
 #' @rdname native_types
-Array <- new_type_checker(function(value, dim) {
+Array <- as_assertion_factory(function(value, dim) {
   if(!is.array(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -652,7 +652,7 @@ Array <- new_type_checker(function(value, dim) {
 
 #' @export
 #' @rdname native_types
-Date <- new_type_checker(function(value, length) {
+Date <- as_assertion_factory(function(value, length) {
   if(!"Date" %in% class(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -682,7 +682,7 @@ Date <- new_type_checker(function(value, length) {
 
 #' @export
 #' @rdname native_types
-Time <- new_type_checker(function(value, length) {
+Time <- as_assertion_factory(function(value, length) {
   if(!"POSIXct" %in% class(value)) {
     e <- sprintf(
       "%s\n%s",
