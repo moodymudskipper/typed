@@ -13,7 +13,7 @@ check_output <- function(.output, .assertion, ...) {
     e <- sprintf("In `%s` at `%s`:\nwrong return value, %s", fun_call, check_arg_call, e)
     stop(e, call. = FALSE)
   }
-  return(invisible(.output))
+  .output
 }
 
 #' @param .arg function argument
