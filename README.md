@@ -1,7 +1,8 @@
 
 <!-- badges: start -->
 
-<!--[![Travis build status](https://travis-ci.com/moodymudskipper/typed.svg?branch=iteration2)](https://travis-ci.com/moodymudskipper/typed)
+[![Travis build
+status](https://travis-ci.com/moodymudskipper/typed.svg?branch=iteration2)](https://travis-ci.com/moodymudskipper/typed)
 <!-- badges: end -->
 
 # typed
