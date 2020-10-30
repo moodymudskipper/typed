@@ -264,8 +264,8 @@ add_or_substract <-
   Double(1) ? function (
     x= ? Double(1), 
     y= ? Double(1), 
-    substract = FALSE ? Logical(1, anyNA = FALSE)) 
-  {
+    substract = FALSE ? Logical(1, anyNA = FALSE)
+    ) {
     Character(1) ? msg
     msg <- "Working hard"
     message(msg)
