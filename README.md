@@ -24,7 +24,7 @@ that would not respect these restrictions.
 Install with:
 
 ``` r
-remotes::install_github("moodymudskipper/typed@iteration2")
+remotes::install_github("moodymudskipper/typed@iteration3")
 ```
 
 And attach with :
