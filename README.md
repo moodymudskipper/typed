@@ -319,7 +319,7 @@ We declare types for the return value, for all arguments, and we declare
 a string `msg`.
 
 ``` r
-#' add
+#' add_or_substract
 #'
 #' @param x double of length 1
 #' @param y double of length 1
