@@ -7,7 +7,7 @@ status](https://travis-ci.com/moodymudskipper/typed.svg?branch=iteration2)](http
 
 # typed
 
-*{typed}* implements static typing in R, it has 3 main features:
+*{typed}* implements typing in R, it has 3 main features:
 
   - set variable types in a script or the body of a function
   - set argument types in a function definition
@@ -296,27 +296,40 @@ identity_sym_only <- ? function (x= ?~ Symbol()) {
 
 a <- 1
 identity_sym_only(a)
-#> Error: In `identity_sym_only(a)` at `check_arg(x, ~Symbol())`:
-#> wrong argument to function, impossible de trouver la fonction ".assertion"
+#> [1] 1
 identity_sym_only(a + a)
-#> Error: In `identity_sym_only(a + a)` at `check_arg(x, ~Symbol())`:
-#> wrong argument to function, impossible de trouver la fonction ".assertion"
+#> Error: In `identity_sym_only(a + a)` at `check_arg(substitute(x), Symbol())`:
+#> wrong argument to function, type mismatch
+#> `typeof(value)`: "language"
+#> `expected`:      "symbol"
 
 identity_sym_only
 #> # typed function
 #> function (x) 
 #> {
-#>     check_arg(x, ~Symbol())
+#>     check_arg(substitute(x), Symbol())
 #>     x
 #> }
-#> <bytecode: 0x000000001bcb8d08>
+#> <bytecode: 0x000000001bca2b28>
 #> # Arg types:
-#> # x: ~Symbol()
+#> # x: Symbol()
 ```
 
 We see that it is translated into a `check_arg` call containing a call
 to `substitute` as the first argument. The `~` is kept in the attributes
 of the function.
+
+We can also check the `...`, for instance use `function(... = ?
+Integer())` to check that only integers are passed to the dots, and use
+`function(... = ?~ Symbol())` to check that all quoted values passed to
+`...` are symbols.
+
+The special assertion factory `Dots` can also be used, in that case the
+checks will apply to `list(...)` rather than to each element
+individually, for instance `function(... = ? Dots(2))` makes sure the
+dots were fed 2 values. In a similar fashion `function(... = ?~
+Dots(2))` can be used to apply checks to the list of quoted argument
+passed to `...`.
 
 ## Set function return type
 

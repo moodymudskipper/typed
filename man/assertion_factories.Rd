@@ -24,6 +24,7 @@
 \alias{Array}
 \alias{Date}
 \alias{Time}
+\alias{Dots}
 \title{Assertion factories of package 'typed'}
 \usage{
 Any(length, null_ok = FALSE, ...)
@@ -70,6 +71,8 @@ Date(length, null_ok = FALSE, ...)
 
 Time(length, null_ok = FALSE, ...)
 
+Dots(length, each, ...)
+
 Logical(length, null_ok = FALSE, ...)
 
 Integer(length, null_ok = FALSE, ...)
@@ -113,6 +116,8 @@ Array(dim, null_ok = FALSE, ...)
 Date(length, null_ok = FALSE, ...)
 
 Time(length, null_ok = FALSE, ...)
+
+Dots(length, each, ...)
 }
 \arguments{
 \item{length}{length of the object}
@@ -150,11 +155,16 @@ be a condition, using \code{value} or \code{.} as a placeholder for the latter, 
 the optional \code{lhs} an error message.
 }
 
-Any is the most general assertion factory, it doesn't check anything unless
+\code{Any} is the most general assertion factory, it doesn't check anything unless
 provided additional conditions through \code{...}. Others use the base \verb{is.<type>} function
 if available, or check that the object is of the relevant type with \code{typeof}
 for atomic types, or check that the class of the checked value contains
 the relevant class.
+
+\code{Dots} should only be used to check the dots using \code{check_arg} on \code{list(...)}
+or \code{substitute(...())}, which will
+be the case when it's called respectively with \verb{function(... = ? Dots())}
+and \verb{function(... = ?~ Dots())}
 }
 \examples{
 

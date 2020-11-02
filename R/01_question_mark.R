@@ -26,8 +26,6 @@ allNames <- function (x) {
 #' }
 #' @rdname static_typing
 `?` <- function(lhs, rhs) {
-  # commented so can be viewed with
-  # flow::flow_view(`?`, prefix = "##", code = NA, out = "png")
   pf <- parent.frame()
 
   ## did we use unary `?` ?
@@ -130,13 +128,36 @@ allNames <- function (x) {
       annotations[bind_lgl | lazy_lgl] <- lapply(annotations[bind_lgl | lazy_lgl], `[[`, 2)
 
       arg_assertion_factory_calls <- Map(function(x, y, bind, lazy) {
-        if (bind) {
-          bquote(check_arg(.(as.symbol(x)), .(y), .bind = TRUE))
-        } else if (lazy) {
-          bquote(check_arg(substitute(.(as.symbol(x))), .(y)))
-        } else {
-          bquote(check_arg(.(as.symbol(x)), .(y)))
+        if(x == "...") {
+          if (bind) {
+            stop("Can't bind the `...`")
+          }
+          if (lazy) {
+            if(is.call(y) && identical(y[[1]], quote(Dots))) {
+              y[[1]] <- quote(Dots)
+              call <- bquote(check_arg(substitute(...()), .(y)))
+              return(call)
+            }
+            call <- bquote(check_arg(substitute(...()), Pairlist(each = .(y))))
+            return(call)
+          }
+          if(is.call(y) && identical(y[[1]], quote(Dots))) {
+            y[[1]] <- quote(Dots)
+            call <- bquote(check_arg(list(...), .(y)))
+            return(call)
+          }
+          call <- bquote(check_arg(list(...), List(each = .(y))))
+          return(call)
         }
+        if (bind) {
+          call <- bquote(check_arg(.(as.symbol(x)), .(y), .bind = TRUE))
+          return(call)
+        }
+        if (lazy) {
+          call <- bquote(check_arg(substitute(.(as.symbol(x))), .(y)))
+          return(call)
+        }
+        bquote(check_arg(.(as.symbol(x)), .(y)))
       }, nms[annotated_fmls_lgl], annotations, bind_lgl, lazy_lgl)
 
 

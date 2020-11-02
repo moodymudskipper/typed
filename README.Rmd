@@ -126,9 +126,13 @@ the main ones are:
 
 ### Custom assertions
 
-As we've seen with `Integer(3)`, `Data.frame(ncol = 5)`, passing arguments to a
-assertion factory restricts the type. For instance `Integer` has arguments `length` and
-`...`, in the dots we can use arguments named as functions and with the value of
+As we've seen with `Integer(3)`, passing arguments to a
+assertion factory restricts the type.
+
+For instance `Integer` has arguments `length` `null_ok` and
+`...`, we already used `length`, `null_ok` is convenient to allow a default `NULL`
+value in addition to the `"integer"` type.
+In the dots we can use arguments named as functions and with the value of
 the expected result.
 
 ```{r}
@@ -145,6 +149,15 @@ can provide conditions using formulas.
 fruit <- Character(1, "`value` is not a fruit!" ~ . %in% c("apple", "pear", "cherry"))
 
 fruit ? x <- "potatoe"
+```
+
+The arguments can differ between assertion factories, for instance `Data.frame`
+has `nrow`, `ncol`, `each`, `null_ok` and `...`
+
+```{r}
+Data.frame() ? x <- iris
+Data.frame(ncol = 2) ? x <- iris
+Data.frame(each = Double()) ? x <- iris
 ```
 
 ### Leverage assertions from other packages, build your own assertion factories
@@ -247,6 +260,15 @@ identity_sym_only
 
 We see that it is translated into a `check_arg` call containing a call to `substitute`
 as the first argument. The `~` is kept in the attributes of the function.
+
+We can also check the `...`, for instance use `function(... = ? Integer())` to check
+that only integers are passed to the dots, and use `function(... = ?~ Symbol())`
+to check that all quoted values passed to `...` are symbols.
+
+The special assertion factory `Dots` can also be used, in that case the checks will
+apply to `list(...)` rather than to each element individually, for instance `function(... = ? Dots(2))`
+makes sure the dots were fed 2 values. In a similar fashion `function(... = ?~ Dots(2))` can be
+used to apply checks to the list of quoted argument passed to `...`.
 
 ## Set function return type
 

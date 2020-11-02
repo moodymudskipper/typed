@@ -13,11 +13,16 @@
 #'   be a condition, using `value` or `.` as a placeholder for the latter, and
 #'   the optional `lhs` an error message.
 #'
-#' Any is the most general assertion factory, it doesn't check anything unless
+#' `Any` is the most general assertion factory, it doesn't check anything unless
 #' provided additional conditions through `...`. Others use the base `is.<type>` function
 #' if available, or check that the object is of the relevant type with `typeof`
 #' for atomic types, or check that the class of the checked value contains
 #' the relevant class.
+#'
+#' `Dots` should only be used to check the dots using `check_arg` on `list(...)`
+#' or `substitute(...())`, which will
+#' be the case when it's called respectively with `function(... = ? Dots())`
+#' and `function(... = ?~ Dots())`
 #'
 #' @param length length of the object
 #' @param nrow number of rows
@@ -52,6 +57,7 @@
 #' @usage Data.frame(nrow, ncol, each, null_ok = FALSE, ...)
 #' @usage Date(length, null_ok = FALSE, ...)
 #' @usage Time(length, null_ok = FALSE, ...)
+#' @usage Dots(length, each, ...)
 #'
 #' @export
 #' @rdname assertion_factories
@@ -306,9 +312,9 @@ List <- as_assertion_factory(function(value, length, each, data_frame_ok = TRUE,
     for (i in seq_along(value)) {
       tryCatch(each(value[[i]]), error = function(e) {
         if(nms[[i]] == "") {
-          stop(sprintf("column %s %s",i , e$message), call. = FALSE)
+          stop(sprintf("element %s %s",i , e$message), call. = FALSE)
         } else {
-          stop(sprintf('column %s ("%s") %s',i , nms[[i]], e$message), call. = FALSE)
+          stop(sprintf('element %s ("%s") %s',i , nms[[i]], e$message), call. = FALSE)
         }
       })
     }
@@ -455,9 +461,9 @@ Pairlist <- as_assertion_factory(function(value, length, each, null_ok = FALSE) 
     for (i in seq_along(value)) {
       tryCatch(each(value[[i]]), error = function(e) {
         if(nms[[i]] == "") {
-          stop(sprintf("column %s %s",i , e$message), call. = FALSE)
+          stop(sprintf("element %s %s",i , e$message), call. = FALSE)
         } else {
-          stop(sprintf('column %s ("%s") %s',i , nms[[i]], e$message), call. = FALSE)
+          stop(sprintf('element %s ("%s") %s',i , nms[[i]], e$message), call. = FALSE)
         }
       })
     }
@@ -767,6 +773,37 @@ Time <- as_assertion_factory(function(value, length, null_ok = FALSE) {
         x_arg = "length(value)",
         y_arg = "expected"))
     stop(e, call. = FALSE)
+  }
+  value
+})
+
+#' @export
+#' @rdname assertion_factories
+Dots <- as_assertion_factory(function(value, length, each) {
+  if(!missing(length) && length(value) != length) {
+    length <- as.integer(length)
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
+  }
+
+  if(!missing(each)) {
+    nms <- allNames(value)
+    for (i in seq_along(value)) {
+      tryCatch(each(value[[i]]), error = function(e) {
+        if(nms[[i]] == "") {
+          stop(sprintf("element %s %s",i , e$message), call. = FALSE)
+        } else {
+          stop(sprintf('element %s ("%s") %s',i , nms[[i]], e$message), call. = FALSE)
+        }
+      })
+    }
   }
   value
 })
