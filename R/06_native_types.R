@@ -406,7 +406,7 @@ Environment <- as_assertion_factory(function(value, null_ok = FALSE) {
 #' @rdname assertion_factories
 Symbol <- as_assertion_factory(function(value, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
-  if(is.symbol(value)) {
+  if(!is.symbol(value)) {
     e <- sprintf(
       "%s\n%s",
       "type mismatch",
