@@ -115,9 +115,11 @@ declare <- function(x, assertion, value, const = FALSE) {
         fun_call <- sys.call(-1)
         declare_call <- deparse1(declare_call)
       }
-      fun_call <- deparse1(fun_call)
 
-      e <- sprintf("In `%s` at `%s`:\n%s", fun_call, declare_call, e)
+      if(!is.null(fun_call)) {
+        fun_call <- deparse1(fun_call)
+        e <- sprintf("In `%s` at `%s`:\n%s", fun_call, declare_call, e)
+      }
       stop(e, call. = FALSE)
     }
   } else {
