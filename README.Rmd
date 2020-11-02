@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 # typed
 
-*{typed}* implements static typing in R, it has 3 main features:
+*{typed}* implements typing in R, it has 3 main features:
 
 * set variable types in a script or the body of a function
 * set argument types in a function definition
@@ -229,6 +229,24 @@ add
 
 We see that it is translated into a `check_arg` call containing a `.bind = TRUE`
 argument.
+
+I we want to restrict the quoted expression rather than the value of an argument,
+we can use `?~` :
+
+```{r}
+identity_sym_only <- ? function (x= ?~ Symbol()) {
+  x
+}
+
+a <- 1
+identity_sym_only(a)
+identity_sym_only(a + a)
+
+identity_sym_only
+```
+
+We see that it is translated into a `check_arg` call containing a call to `substitute`
+as the first argument. The `~` is kept in the attributes of the function.
 
 ## Set function return type
 

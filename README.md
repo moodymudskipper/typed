@@ -286,6 +286,38 @@ add
 We see that it is translated into a `check_arg` call containing a `.bind
 = TRUE` argument.
 
+I we want to restrict the quoted expression rather than the value of an
+argument, we can use `?~` :
+
+``` r
+identity_sym_only <- ? function (x= ?~ Symbol()) {
+  x
+}
+
+a <- 1
+identity_sym_only(a)
+#> Error: In `identity_sym_only(a)` at `check_arg(x, ~Symbol())`:
+#> wrong argument to function, impossible de trouver la fonction ".assertion"
+identity_sym_only(a + a)
+#> Error: In `identity_sym_only(a + a)` at `check_arg(x, ~Symbol())`:
+#> wrong argument to function, impossible de trouver la fonction ".assertion"
+
+identity_sym_only
+#> # typed function
+#> function (x) 
+#> {
+#>     check_arg(x, ~Symbol())
+#>     x
+#> }
+#> <bytecode: 0x000000001bcb8d08>
+#> # Arg types:
+#> # x: ~Symbol()
+```
+
+We see that it is translated into a `check_arg` call containing a call
+to `substitute` as the first argument. The `~` is kept in the attributes
+of the function.
+
 ## Set function return type
 
 To set a return type we use `?` before the function definition as in the

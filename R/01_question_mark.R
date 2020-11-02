@@ -123,15 +123,21 @@ allNames <- function (x) {
         is.call(x) && identical(x[[1]], quote(`+`))
       })
 
-      annotations[bind_lgl] <- lapply(annotations[bind_lgl], `[[`, 2)
+      lazy_lgl <- sapply(annotations, function(x) {
+        is.call(x) && identical(x[[1]], quote(`~`))
+      })
 
-      arg_assertion_factory_calls <- Map(function(x, y, bind) {
+      annotations[bind_lgl | lazy_lgl] <- lapply(annotations[bind_lgl | lazy_lgl], `[[`, 2)
+
+      arg_assertion_factory_calls <- Map(function(x, y, bind, lazy) {
         if (bind) {
           bquote(check_arg(.(as.symbol(x)), .(y), .bind = TRUE))
+        } else if (lazy) {
+          bquote(check_arg(substitute(.(as.symbol(x))), .(y)))
         } else {
           bquote(check_arg(.(as.symbol(x)), .(y)))
         }
-      }, nms[annotated_fmls_lgl], annotations, bind_lgl)
+      }, nms[annotated_fmls_lgl], annotations, bind_lgl, lazy_lgl)
 
 
       fmls[annotated_fmls_lgl] <- lapply(fmls[annotated_fmls_lgl], function(x)
