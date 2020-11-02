@@ -36,7 +36,7 @@ Double(length, null_ok = FALSE, ...)
 
 Character(length, null_ok = FALSE, ...)
 
-List(length, data_frame_ok, null_ok = FALSE, ...)
+List(length, each, data_frame_ok, null_ok = FALSE, ...)
 
 Null(...)
 
@@ -50,7 +50,7 @@ Environment(null_ok = FALSE, ...)
 
 Symbol(null_ok = FALSE, ...)
 
-Pairlist(length, null_ok = FALSE, ...)
+Pairlist(length, each, null_ok = FALSE, ...)
 
 Language(null_ok = FALSE, ...)
 
@@ -64,7 +64,7 @@ Matrix(nrow, ncol, null_ok = FALSE, ...)
 
 Array(dim, null_ok = FALSE, ...)
 
-Data.frame(nrow, ncol, null_ok = FALSE, ...)
+Data.frame(nrow, ncol, each, null_ok = FALSE, ...)
 
 Date(length, null_ok = FALSE, ...)
 
@@ -80,7 +80,7 @@ Character(length, null_ok = FALSE, ...)
 
 Raw(length, null_ok = FALSE, ...)
 
-List(length, data_frame_ok = TRUE, null_ok = FALSE, ...)
+List(length, each, data_frame_ok = TRUE, null_ok = FALSE, ...)
 
 Null(...)
 
@@ -94,7 +94,7 @@ Environment(null_ok = FALSE, ...)
 
 Symbol(null_ok = FALSE, ...)
 
-Pairlist(length, null_ok = FALSE, ...)
+Pairlist(length, each, null_ok = FALSE, ...)
 
 Language(null_ok = FALSE, ...)
 
@@ -104,7 +104,7 @@ Function(null_ok = FALSE, ...)
 
 Factor(length, levels, null_ok = FALSE, ...)
 
-Data.frame(nrow, ncol, null_ok = FALSE, ...)
+Data.frame(nrow, ncol, each, null_ok = FALSE, ...)
 
 Matrix(nrow, ncol, null_ok = FALSE, ...)
 
@@ -121,6 +121,8 @@ Time(length, null_ok = FALSE, ...)
 any further check.}
 
 \item{...}{additional conditions, see details.}
+
+\item{each}{assertion that every item must satisfy}
 
 \item{data_frame_ok}{whether data frames are to be considered as lists}
 

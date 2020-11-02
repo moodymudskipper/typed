@@ -22,6 +22,7 @@
 #' @param length length of the object
 #' @param nrow number of rows
 #' @param ncol number of columns
+#' @param each assertion that every item must satisfy
 #' @param dim dimensions
 #' @param levels factor levels
 #' @param data_frame_ok whether data frames are to be considered as lists
@@ -34,21 +35,21 @@
 #' @usage Integer(length, null_ok = FALSE, ...)
 #' @usage Double(length, null_ok = FALSE, ...)
 #' @usage Character(length, null_ok = FALSE, ...)
-#' @usage List(length, data_frame_ok, null_ok = FALSE, ...)
+#' @usage List(length, each, data_frame_ok, null_ok = FALSE, ...)
 #' @usage Null(...)
 #' @usage Closure(null_ok = FALSE, ...)
 #' @usage Special(null_ok = FALSE, ...)
 #' @usage Builtin(null_ok = FALSE, ...)
 #' @usage Environment(null_ok = FALSE, ...)
 #' @usage Symbol(null_ok = FALSE, ...)
-#' @usage Pairlist(length, null_ok = FALSE, ...)
+#' @usage Pairlist(length, each, null_ok = FALSE, ...)
 #' @usage Language(null_ok = FALSE, ...)
 #' @usage Expression(length, null_ok = FALSE, ...)
 #' @usage Function(null_ok = FALSE, ...)
 #' @usage Factor(length, levels, null_ok = FALSE, ...)
 #' @usage Matrix(nrow, ncol, null_ok = FALSE, ...)
 #' @usage Array(dim, null_ok = FALSE, ...)
-#' @usage Data.frame(nrow, ncol, null_ok = FALSE, ...)
+#' @usage Data.frame(nrow, ncol, each, null_ok = FALSE, ...)
 #' @usage Date(length, null_ok = FALSE, ...)
 #' @usage Time(length, null_ok = FALSE, ...)
 #'
@@ -274,7 +275,7 @@ Raw <- as_assertion_factory(function(value, length, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-List <- as_assertion_factory(function(value, length, data_frame_ok = TRUE, null_ok = FALSE) {
+List <- as_assertion_factory(function(value, length, each, data_frame_ok = TRUE, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
   if(!is.list(value)) {
     e <- sprintf(
@@ -299,6 +300,20 @@ List <- as_assertion_factory(function(value, length, data_frame_ok = TRUE, null_
         y_arg = "expected"))
     stop(e, call. = FALSE)
   }
+
+  if(!missing(each)) {
+    nms <- allNames(value)
+    for (i in seq_along(value)) {
+      tryCatch(each(value[[i]]), error = function(e) {
+        if(nms[[i]] == "") {
+          stop(sprintf("column %s %s",i , e$message), call. = FALSE)
+        } else {
+          stop(sprintf('column %s ("%s") %s',i , nms[[i]], e$message), call. = FALSE)
+        }
+      })
+    }
+  }
+
   if(!data_frame_ok && is.data.frame(value)) {
     e <- sprintf(
       "%s\n%s",
@@ -422,7 +437,7 @@ Symbol <- as_assertion_factory(function(value, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-Pairlist <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+Pairlist <- as_assertion_factory(function(value, length, each, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
   if(!is.pairlist(value)) {
     e <- sprintf(
@@ -434,6 +449,18 @@ Pairlist <- as_assertion_factory(function(value, length, null_ok = FALSE) {
         x_arg = "typeof(value)",
         y_arg = "expected"))
     stop(e, call. = FALSE)
+  }
+  if(!missing(each)) {
+    nms <- allNames(value)
+    for (i in seq_along(value)) {
+      tryCatch(each(value[[i]]), error = function(e) {
+        if(nms[[i]] == "") {
+          stop(sprintf("column %s %s",i , e$message), call. = FALSE)
+        } else {
+          stop(sprintf('column %s ("%s") %s',i , nms[[i]], e$message), call. = FALSE)
+        }
+      })
+    }
   }
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
@@ -561,7 +588,7 @@ Factor <- as_assertion_factory(function(value, length, levels, null_ok = FALSE) 
 
 #' @export
 #' @rdname assertion_factories
-Data.frame <- as_assertion_factory(function(value, nrow, ncol, null_ok = FALSE) {
+Data.frame <- as_assertion_factory(function(value, nrow, ncol, each, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
   if(!is.data.frame(value)) {
     e <- sprintf(
@@ -597,6 +624,15 @@ Data.frame <- as_assertion_factory(function(value, nrow, ncol, null_ok = FALSE) 
         x_arg = "ncol(value)",
         y_arg = "expected"))
     stop(e, call. = FALSE)
+  }
+
+  if(!missing(each)) {
+    nms <- allNames(value)
+    for (i in seq_along(value)) {
+      tryCatch(each(value[[i]]), error = function(e) {
+          stop(sprintf('column %s ("%s") %s',i , nms[[i]], e$message), call. = FALSE)
+        })
+    }
   }
   value
 })
