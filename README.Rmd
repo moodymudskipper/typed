@@ -20,18 +20,19 @@ knitr::opts_chunk$set(
 
 # typed
 
-*{typed}* implements typing in R, it has 3 main features:
+*{typed}* implements a type system for R, it has 3 main features:
 
-* set variable types in a script or the body of a function
+* set variable types in a script or the body of a function, so they can't be
+  assigned illegal values
 * set argument types in a function definition
 * set return type of a function
 
 The user can define their own types, or leverage assertions from
 other packages.
 
-Under the hood we use active bindings, so once a variable is restricted to
-a type, or by any other condition, it cannot be modified in a way that would
-not respect these restrictions.
+Under the hood variable types use active bindings, so once a variable is restricted
+by an assertion, it cannot be modified in a way that would
+not satisfy it.
 
 ## Installation
 
@@ -144,10 +145,12 @@ Useful arguments might be for instance, `anyDuplicated = 0L`, `names = NULL`,
 `attributes = NULL`... Any available function can be used.
 
 That makes assertion factories very flexible! If it is still not flexible enough, one
-can provide conditions using formulas.
+can provide conditions using formulas in the `...`.
+Be careful to skip all named arguments by adding comas, or name the formula args
+`...`.
 
 ```{r}
-fruit <- Character(1, "`value` is not a fruit!" ~ . %in% c("apple", "pear", "cherry"))
+fruit <- Character(1, ... = "`value` is not a fruit!" ~ . %in% c("apple", "pear", "cherry"))
 
 fruit ? x <- "potatoe"
 ```
@@ -216,7 +219,7 @@ Note that we started the definition with a `?`, and that we gave a default to
 have no default value. If you forget it you'll have an error "unexpected `?` in ...".
 
 This created the following function, by adding checks at the top of the
-function.
+body
 
 ```{r}
 add
@@ -277,11 +280,11 @@ To set a return type we use `?` before the function definition as in the previou
 but we type an assertion on the left hand side.
 
 ```{r}
-add_or_substract <- Double() ? function (x, y, substract = FALSE) {
-  if(substract) return(x - y)
+add_or_subtract <- Double() ? function (x, y, subtract = FALSE) {
+  if(subtract) return(x - y)
   x + y
 }
-add_or_substract
+add_or_subtract
 ```
 
 We see that the returned values have been wrapped inside `check_output` calls.
@@ -294,35 +297,39 @@ It is documented as usual,except that you'll need to make sure to add the `@name
 We declare types for the return value, for all arguments, and we declare a string `msg`.
 
 ```{r}
-#' add_or_substract
+#' add_or_subtract
 #'
 #' @param x double of length 1
 #' @param y double of length 1
-#' @param substract whether to substract instead of adding
+#' @param subtract whether to subtract instead of adding
 #' @export
-#' @name add_or_substract
-add_or_substract <- 
+#' @name add_or_subtract
+add_or_subtract <- 
   Double(1) ? function (
     x= ? Double(1), 
     y= ? Double(1), 
-    substract = FALSE ? Logical(1, anyNA = FALSE)
+    subtract = FALSE ? Logical(1, anyNA = FALSE)
     ) {
     Character(1) ? msg
-    msg <- "Working hard"
-    message(msg)
-    if(substract) return(x - y)
+    if(subtract) {
+      msg <- "subtracting"
+      message(msg)
+      return(x - y)
+    }
+      msg <- "adding"
+      message(msg)
     x + y
   }
 ```
 
-The created function will be the following, we see that `Character(1) ? msg <- "Working hard"`
+The created function will be the following, we see that `Character(1) ? msg
 was changed into a `declare` call too, this is both for efficiency and readability.
-Unfamiliar users might be intimidated by `?` and calls to `?` don't print nicely,
-`declare` calls however are very explicit.
+Unfamiliar users might be intimidated by `?` and calls to `?` don't print nicely.
 
 ```{r}
-add_or_substract
+add_or_subtract
 ```
+
 Note that your package would import *{typed}* but `?` won't be exposed to the user,
 they will see it in the code but will be able to use `?` just as before. In fact
 the most common standard use `?mean` still works even when *{typed}* is attached.
@@ -330,4 +337,17 @@ the most common standard use `?mean` still works even when *{typed}* is attached
 ## Aknowledgements
 
 This is inspired in good part by Jim Hester and Gabor Csardi's work and many
-great efforts on static typing, assertions, or annotations in R.
+great efforts on static typing, assertions, or annotations in R, in particular: 
+
+* Gabor Csardy's *{argufy}*
+* Richie Cotton's *{assertive}*
+* Tony Fishettti's *{assertr*}
+* Hadley Wickham's *{assertthat}*
+* Michel Lang's *{checkmate}*
+* Joe Thorley's *{checkr}*
+* Joe Thorley's *{chk}*
+* Aviral Goel's *{contractr}*
+* Stefan Bache's *{ensurer}*
+* Brian Lee Yung Rowe's *{lambda.r}*
+* Kun Ren's *{rtype}*
+* Jim Hester's *{types}*
