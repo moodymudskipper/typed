@@ -7,7 +7,7 @@ status](https://travis-ci.com/moodymudskipper/typed.svg?branch=iteration2)](http
 coverage](https://codecov.io/gh/moodymudskipper/typed/branch/master/graph/badge.svg)](https://codecov.io/gh/moodymudskipper/typed?branch=master)
 <!-- badges: end -->
 
-# typed
+# typed <img src='man/figures/logo.png' align="right" height="139" />
 
 *{typed}* implements a type system for R, it has 3 main features:
 
@@ -326,7 +326,7 @@ identity_sym_only
 #>     check_arg(substitute(x), Symbol())
 #>     x
 #> }
-#> <bytecode: 0x000000001d1aa600>
+#> <bytecode: 0x000000001d1a98a8>
 #> # Arg types:
 #> # x: ~Symbol()
 ```
