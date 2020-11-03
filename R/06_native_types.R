@@ -88,7 +88,9 @@
 #' }
 #'
 Any <- as_assertion_factory(function(value, length, null_ok = FALSE) {
-  if(null_ok && is.null(value)) return(NULL)
+  if(is.null(value)) {
+    if (null_ok) return(NULL) else stop("`value` can't be NULL", call. = FALSE)
+  }
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
