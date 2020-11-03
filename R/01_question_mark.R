@@ -114,7 +114,7 @@ allNames <- function (x) {
     args_are_annotated <- any(annotated_fmls_lgl)
     if(args_are_annotated) {
 
-      annotations <-
+      annotations <- annotations_attr <-
         lapply(fmls[annotated_fmls_lgl], function(x) x[[length(x)]])
 
       bind_lgl <- sapply(annotations, function(x) {
@@ -125,6 +125,8 @@ allNames <- function (x) {
         is.call(x) && identical(x[[1]], quote(`~`))
       })
 
+
+      annotations_attr[bind_lgl] <- lapply(annotations_attr[bind_lgl], `[[`, 2)
       annotations[bind_lgl | lazy_lgl] <- lapply(annotations[bind_lgl | lazy_lgl], `[[`, 2)
 
       arg_assertion_factory_calls <- Map(function(x, y, bind, lazy) {
@@ -215,7 +217,7 @@ allNames <- function (x) {
     ## build function from formals, body, and type attributes
     f <- as.function(c(fmls, body), envir =  pf)
     if(args_are_annotated)
-      attr(f, "arg_types")   <- annotations
+      attr(f, "arg_types")   <- annotations_attr
     attr(f, "return_type") <- return_assertion_factory
     class(f) <- c("typed", "function")
     if(lhs_is_assignment) {
