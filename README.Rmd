@@ -39,7 +39,7 @@ not satisfy it.
 Install with:
 
 ``` r
-remotes::install_github("moodymudskipper/typed@iteration3")
+remotes::install_github("moodymudskipper/typed")
 ```
 
 And attach with : 
@@ -93,7 +93,7 @@ declare("y", Integer(3), 1:3)
 y
 ```
 
-### assertion factories and assertions
+### Assertion factories and assertions
 
 `Integer` and `Character` are function factories (functions that return functions),
 thus `Integer(3)` and `Character()` are functions.

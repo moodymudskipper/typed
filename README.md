@@ -28,7 +28,7 @@ not satisfy it.
 Install with:
 
 ``` r
-remotes::install_github("moodymudskipper/typed@iteration3")
+remotes::install_github("moodymudskipper/typed")
 ```
 
 And attach with :
@@ -96,7 +96,7 @@ y
 #> [1] 1 2 3
 ```
 
-### assertion factories and assertions
+### Assertion factories and assertions
 
 `Integer` and `Character` are function factories (functions that return
 functions), thus `Integer(3)` and `Character()` are functions.
@@ -326,7 +326,7 @@ identity_sym_only
 #>     check_arg(substitute(x), Symbol())
 #>     x
 #> }
-#> <bytecode: 0x000000001d18a8e8>
+#> <bytecode: 0x000000001d19a590>
 #> # Arg types:
 #> # x: ~Symbol()
 ```
