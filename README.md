@@ -3,6 +3,8 @@
 
 [![Travis build
 status](https://travis-ci.com/moodymudskipper/typed.svg?branch=iteration2)](https://travis-ci.com/moodymudskipper/typed)
+[![Codecov test
+coverage](https://codecov.io/gh/moodymudskipper/typed/branch/master/graph/badge.svg)](https://codecov.io/gh/moodymudskipper/typed?branch=master)
 <!-- badges: end -->
 
 # typed
@@ -137,9 +139,12 @@ The package contains many assertion factories (see
 
 ### Custom assertions
 
-As we’ve seen with `Integer(3)`, `Data.frame(ncol = 5)`, passing
-arguments to a assertion factory restricts the type. For instance
-`Integer` has arguments `length` and `...`, in the dots we can use
+As we’ve seen with `Integer(3)`, passing arguments to a assertion
+factory restricts the type.
+
+For instance `Integer` has arguments `length` `null_ok` and `...`, we
+already used `length`, `null_ok` is convenient to allow a default `NULL`
+value in addition to the `"integer"` type. In the dots we can use
 arguments named as functions and with the value of the expected result.
 
 ``` r
@@ -162,6 +167,23 @@ fruit <- Character(1, "`value` is not a fruit!" ~ . %in% c("apple", "pear", "che
 fruit ? x <- "potatoe"
 #> Error: In `eval(expr, envir, enclos)` at `fruit ? x <- "potatoe"`:
 #> type 'x' incorrect dans 'x && y'
+```
+
+The arguments can differ between assertion factories, for instance
+`Data.frame` has `nrow`, `ncol`, `each`, `null_ok` and `...`
+
+``` r
+Data.frame() ? x <- iris
+Data.frame(ncol = 2) ? x <- iris
+#> Error: In `eval(expr, envir, enclos)` at `Data.frame(ncol = 2) ? x <- iris`:
+#> Column number mismatch
+#> `ncol(value)`: 5
+#>    `expected`: 2
+Data.frame(each = Double()) ? x <- iris
+#> Error: In `eval(expr, envir, enclos)` at `Data.frame(each = Double()) ? x <- iris`:
+#> column 5 ("Species") type mismatch
+#> `typeof(value)`: "integer"
+#> `expected`:      "double"
 ```
 
 ### Leverage assertions from other packages, build your own assertion factories
@@ -310,7 +332,7 @@ identity_sym_only
 #>     check_arg(substitute(x), Symbol())
 #>     x
 #> }
-#> <bytecode: 0x000000001bca2b28>
+#> <bytecode: 0x000000001cecf768>
 #> # Arg types:
 #> # x: Symbol()
 ```

@@ -17,3 +17,6 @@ URL: https://github.com/moodymudskipper/typed
 BugReports: https://github.com/moodymudskipper/typed/issues
 Imports: 
     waldo
+Suggests: 
+    testthat,
+    covr
