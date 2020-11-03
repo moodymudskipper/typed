@@ -86,7 +86,7 @@ declare <- function(x, assertion, value, const = FALSE) {
   } else {
     ## is assertion a assertion_ factory ?
     assertion_quoted <- substitute(assertion)
-    if("assertion_ factory" %in% class(assertion)) {
+    if(inherits(assertion, "assertion_factory")) {
       ## overwrite it with a call to itself with no arg
       # this is so we can use `Integer` in place of `Integer()` for instance
       assertion <- assertion()
@@ -105,12 +105,7 @@ declare <- function(x, assertion, value, const = FALSE) {
       if (is.call(sc4) && identical(sc4[[1]], quote(`?`))) {
         declare_call <- sc4
         fun_call <- sys.call(-5)
-        if(length(declare_call) == 3) {
-          declare_call <- paste(deparse1(declare_call[[2]]),"?", deparse1(declare_call[[3]]))
-        } else {
-          # not sure if we ever go there, that's an error on a `? x <- value` call
-          declare_call <- paste("?", deparse1(declare_call[[3]]))
-        }
+        declare_call <- paste(deparse1(declare_call[[2]]),"?", deparse1(declare_call[[3]]))
       } else {
         fun_call <- sys.call(-1)
         declare_call <- deparse1(declare_call)
