@@ -2,7 +2,11 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- badges: start -->
+[![Travis build status](https://travis-ci.com/moodymudskipper/typed.svg?branch=iteration2)](https://travis-ci.com/moodymudskipper/typed)
+[![Codecov test coverage](https://codecov.io/gh/moodymudskipper/typed/branch/master/graph/badge.svg)](https://codecov.io/gh/moodymudskipper/typed?branch=master)
+<!-- badges: end -->
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -16,27 +20,26 @@ knitr::opts_chunk$set(
 
 # typed
 
-Experiment on static typing in R. Largely untested!
+*{typed}* implements a type system for R, it has 3 main features:
 
-We use the question mark operator to support static typing in R.
-
-3 features are proposed :
-
-We use it for 3 different things here :
-
-* set variable types in a script or the body of a function
-* set argument typesin a function definition
+* set variable types in a script or the body of a function, so they can't be
+  assigned illegal values
+* set argument types in a function definition
 * set return type of a function
 
-We detail those below.
+The user can define their own types, or leverage assertions from
+other packages.
 
+Under the hood variable types use active bindings, so once a variable is restricted
+by an assertion, it cannot be modified in a way that would
+not satisfy it.
 
 ## Installation
 
 Install with:
 
 ``` r
-remotes::install_github("moodymudskipper/typed")
+remotes::install_github("moodymudskipper/typed@iteration3")
 ```
 
 And attach with : 
@@ -46,134 +49,305 @@ And attach with :
 library(typed, warn.conflicts = FALSE) 
 ```
 
-## set variable type
+## Set variable type
 
-We can set a variable type explicitly or implicitly. The following are equivalent.
+### Question mark notation and `declare`
 
-```{r, eval = FALSE}
-# implicit
-? x <- 1
-```
-
-```{r, eval = FALSE}
-# explicit
-numeric ? x <- 1
-```
-
-```{r, eval = FALSE}
-# explicit without assignment on declaration
-numeric ? x
-x <- 1
-```
-
-Let's test it
+Here are examples on how we would set types 
 
 ```{r}
-numeric ? x
-x
-x <- 1
-x
+Character() ? x # restrict x to "character" type
 x <- "a"
+x
+
+Integer(3) ? y <- 1:3 # restrict y to "integer" type of length 3
+y
 ```
 
-To assess if assignments are allowed we compare `vctrs::vec_ptype(assigne_value)`
-to the prototype given on the left hand side, which we can give as a function
-or value. in the latter for instance `vctrs::vec_ptype(1)` and `numeric()` return
-the same thing so the assignment is allowed.
-
-Using *{vctrs}* allows us more flexibility than working with `class()` or `type_of()`.
+We cannot assign values of the wrong type to `x` and `y` anymore.
 
 ```{r}
-library(vctrs)
-new_date ? my_date <- "2020-10-16"
-new_date ? my_date <- as.Date("2020-10-16")
+x <- 2
 
-val <- new_list_of(list(1, 2), numeric())
-val
-new_list_of(list(), numeric()) ? new_val <- list(1, 2)
-new_list_of(list(), numeric()) ? new_val <- val
+y <- 4:5
+
+y[1] <- 10
 ```
 
-We can also define constants:
+But the right type will work.
 
 ```{r}
-character ? chr1 <- const(1) 
-character ? chr1 <- const("a") 
-chr1
-chr1 <- "b"
+x <- c("b", "c")
+
+y <- c(1L, 10L, 100L)
 ```
 
-## set argument type
+`declare` is a strict equivalent, slightly more efficient, which looks like `base::assign`.
+
+```{r}
+declare("x", Character())
+x <- "a"
+x
+
+declare("y", Integer(3), 1:3)
+y
+```
+
+### assertion factories and assertions
+
+`Integer` and `Character` are function factories (functions that return functions),
+thus `Integer(3)` and `Character()` are functions.
+
+The latter functions operate checks on a value and in case of success 
+return this value, generally unmodified. For instance :
+
+```{r}
+Integer(3)(1:2)
+
+Character()(3)
+```
+
+We call `Integer(3)` and `Character()` assertions, and we call
+`Integer` and `Character` assertion factories.
+
+The package contains many assertion factories (see `?assertion_factories`), 
+the main ones are: 
+
+* `Any` (No default restriction)
+* `Logical`
+* `Integer`
+* `Double`
+* `Character`
+* `List`
+* `Environment`
+* `Factor`
+* `Matrix`
+* `Data.frame`
+* `Date`
+* `Time` (POSIXct)
+
+### Custom assertions
+
+As we've seen with `Integer(3)`, passing arguments to a
+assertion factory restricts the type.
+
+For instance `Integer` has arguments `length` `null_ok` and
+`...`, we already used `length`, `null_ok` is convenient to allow a default `NULL`
+value in addition to the `"integer"` type.
+In the dots we can use arguments named as functions and with the value of
+the expected result.
+
+```{r}
+Integer(anyNA = FALSE) ? x <- c(1L, 2L, NA)
+```
+
+Useful arguments might be for instance, `anyDuplicated = 0L`, `names = NULL`, 
+`attributes = NULL`... Any available function can be used.
+
+That makes assertion factories very flexible! If it is still not flexible enough, one
+can provide conditions using formulas in the `...`.
+Be careful to skip all named arguments by adding comas, or name the formula args
+`...`.
+
+```{r}
+fruit <- Character(1, ... = "`value` is not a fruit!" ~ . %in% c("apple", "pear", "cherry"))
+
+fruit ? x <- "potatoe"
+```
+
+The arguments can differ between assertion factories, for instance `Data.frame`
+has `nrow`, `ncol`, `each`, `null_ok` and `...`
+
+```{r}
+Data.frame() ? x <- iris
+Data.frame(ncol = 2) ? x <- iris
+Data.frame(each = Double()) ? x <- iris
+```
+
+### Leverage assertions from other packages, build your own assertion factories
+
+Some great packages provide assertions, and they can be used with `typed`
+provided that they take the object as a first input and return the object
+if no failure. Richie Cotton's *{assertive}* and Michel Lang's *{checkmate}* 
+both qualify.
+
+```{r}
+library(assertive)
+assert_is_monotonic_increasing ? z
+z <- 3:1
+```
+
+If we want to use more than the first argument, we should create an assertion factory :
+
+```{r}
+Monotonic_incr <- as_assertion_factory(assert_is_monotonic_increasing)
+Monotonic_incr(strictly = TRUE) ? z
+z <- c(1, 1, 2)
+```
+
+`as_assertion_factory` can be used to create your own assertion factories from scratch too,
+in fact
+[it's used to build the native assertion factories of this package](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_assertion_factories.R)
+.
+
+### Constants
+
+To define a constant, we just surround the variable by parentheses (think of 
+them as a protection)
+
+```{r}
+Double() ? (x) <- 1
+x <- 2
+
+? (y) <- 1
+y <- 2
+```
+
+## Set argument type
 
 We can set argument types this way : 
 
 
 ```{r}
-? add <- function (x = ?numeric, y = 1 ?numeric) {
+add <- ? function (x= ? Double(), y= 1 ? Double()) {
   x + y
 }
 ```
 
 Note that we started the definition with a `?`, and that we gave a default to
-`y`, but not `x`
+`y`, but not `x`. Note also the `=` sign next to `x`, necessary even when we
+have no default value. If you forget it you'll have an error "unexpected `?` in ...".
 
-This created the following function :
+This created the following function, by adding checks at the top of the
+body
 
 ```{r}
 add
 ```
 
-You can see a call to `assert_types()`, it ensures arguments passed have
-the right type, and that they won't be overridden by a different type.
-
-Let's test it.
+Let's test it by providing a right and wrong type.
 
 ```{r}
 add(2, 3)
-add(2)
-add("a")
+add(2, 3L)
 ```
 
-Let's create a function that tried to modify `y` and assign the wrong type
+
+If we want to restrict `x` and `y`  to the type "integer" in the rest of
+the body of the function we can use the `?+` notation :
 
 ```{r}
-? add_wrong <- function (x = ?numeric, y = 1 ?numeric) {
-  y <- as.character(y)
+add <- ? function (x= ?+ Double(), y= 1 ?+ Double()) {
   x + y
 }
-add_wrong(2)
+
+add
 ```
 
-## set function return type
+We see that it is translated into a `check_arg` call containing a `.bind = TRUE`
+argument.
 
-Setting a function return type is similar to setting variable types, but the function
-should only return an object named `res`, which cannot ever have another type than
-the one we set.
-
-Putting it all together we have :
+I we want to restrict the quoted expression rather than the value of an argument,
+we can use `?~` :
 
 ```{r}
-numeric ? add10 <- function (x = ?numeric) {
-  ? y <- 10
-  res <- x + y
-  res
+identity_sym_only <- ? function (x= ?~ Symbol()) {
+  x
 }
-add10
-add10(20)
+
+a <- 1
+identity_sym_only(a)
+identity_sym_only(a + a)
+
+identity_sym_only
 ```
 
+We see that it is translated into a `check_arg` call containing a call to `substitute`
+as the first argument. The `~` is kept in the attributes of the function.
 
-## Notes
+We can also check the `...`, for instance use `function(... = ? Integer())` to check
+that only integers are passed to the dots, and use `function(... = ?~ Symbol())`
+to check that all quoted values passed to `...` are symbols.
 
-* This is inspired in good part by Jim Hester and Gabor Csardi's work.
-* The magic comes from the fact that apparent variables are made into active
-  bindings, using a variation of the last example of `?bindenv`
-* Your package would import *{typed}* but `?` won't be exposed to the user,
-they will see it in the code but will be able to use `?` just as before.
-* It might be slow
-* We use `vctrs::vec_ptype` on the given prototype and the object to ensure their
-  compatible, it's not always satisfactory. expressions or functions ar not
-  supported, the prototype of a factor necessarily contains the levels, the prototype
-  of a dataframe necessarily contains the column names. I'd like to be more flexible (suggestions welcome).
-* In particular, setting length as part of the type would be great, so we could
-  define scalars for instance.
+The special assertion factory `Dots` can also be used, in that case the checks will
+apply to `list(...)` rather than to each element individually, for instance `function(... = ? Dots(2))`
+makes sure the dots were fed 2 values. In a similar fashion `function(... = ?~ Dots(2))` can be
+used to apply checks to the list of quoted argument passed to `...`.
+
+## Set function return type
+
+To set a return type we use `?` before the function definition as in the previous section, 
+but we type an assertion on the left hand side.
+
+```{r}
+add_or_subtract <- Double() ? function (x, y, subtract = FALSE) {
+  if(subtract) return(x - y)
+  x + y
+}
+add_or_subtract
+```
+
+We see that the returned values have been wrapped inside `check_output` calls.
+
+## Putting it all together, write packages using {typed}
+
+Let's define our function for our package and document it with *{roxygen2}*.
+It is documented as usual,except that you'll need to make sure to add the `@name` tag.
+
+We declare types for the return value, for all arguments, and we declare a string `msg`.
+
+```{r}
+#' add_or_subtract
+#'
+#' @param x double of length 1
+#' @param y double of length 1
+#' @param subtract whether to subtract instead of adding
+#' @export
+#' @name add_or_subtract
+add_or_subtract <- 
+  Double(1) ? function (
+    x= ? Double(1), 
+    y= ? Double(1), 
+    subtract = FALSE ? Logical(1, anyNA = FALSE)
+    ) {
+    Character(1) ? msg
+    if(subtract) {
+      msg <- "subtracting"
+      message(msg)
+      return(x - y)
+    }
+      msg <- "adding"
+      message(msg)
+    x + y
+  }
+```
+
+The created function will be the following, we see that `Character(1) ? msg
+was changed into a `declare` call too, this is both for efficiency and readability.
+Unfamiliar users might be intimidated by `?` and calls to `?` don't print nicely.
+
+```{r}
+add_or_subtract
+```
+
+Note that your package would import *{typed}* but `?` won't be exposed to the user,
+they will see it in the code but will be able to use `?` just as before. In fact
+the most common standard use `?mean` still works even when *{typed}* is attached.
+
+## Aknowledgements
+
+This is inspired in good part by Jim Hester and Gabor Csardi's work and many
+great efforts on static typing, assertions, or annotations in R, in particular: 
+
+* Gabor Csardy's *{argufy}*
+* Richie Cotton's *{assertive}*
+* Tony Fishettti's *{assertr*}
+* Hadley Wickham's *{assertthat}*
+* Michel Lang's *{checkmate}*
+* Joe Thorley's *{checkr}*
+* Joe Thorley's *{chk}*
+* Aviral Goel's *{contractr}*
+* Stefan Bache's *{ensurer}*
+* Brian Lee Yung Rowe's *{lambda.r}*
+* Kun Ren's *{rtype}*
+* Jim Hester's *{types}*
