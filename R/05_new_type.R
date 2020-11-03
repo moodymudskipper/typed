@@ -137,5 +137,5 @@ infer_implicit_assignment_call <- function(value) {
 get_assertion <- function(x) {
   x <- as.character(substitute(x))
   fun <- activeBindingFunction(x, parent.frame())
-  body(fun)[[c(2, 3, 2, 3, 1)]]
+  body(fun)[[c(2, 3, 2, 3, 2, 1)]]
 }
