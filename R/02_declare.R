@@ -111,7 +111,11 @@ declare <- function(x, assertion, value, const = FALSE) {
         declare_call <- deparse1(declare_call)
       }
 
-      if(!is.null(fun_call)) {
+      # if we use reprex or knitr the call stack is edited, we account for it
+      is_eval_call <-
+        is.call(fun_call) && identical(fun_call[[1]], quote(eval)) # nocov
+
+      if(!is.null(fun_call) && !is_eval_call) {
         fun_call <- deparse1(fun_call)
         e <- sprintf("In `%s` at `%s`:\n%s", fun_call, declare_call, e)
       }
@@ -134,7 +138,9 @@ declare <- function(x, assertion, value, const = FALSE) {
         if (!missing(assigned_value)) {
           e <- paste0("Can't assign to a constant")
           fun_call <- sys.call(-1)
-          if(!is.null(fun_call)) {
+          is_eval_call <-
+            is.call(fun_call) && identical(fun_call[[1]], quote(eval)) # nocov
+          if(!is.null(fun_call) && !is_eval_call) {
             fun_call <- deparse1(fun_call)
             e <- sprintf("In `%s` at `%s <- ...`:\n%s", fun_call, var_nm, e)
           }
@@ -155,7 +161,9 @@ declare <- function(x, assertion, value, const = FALSE) {
           if(inherits(val, "try-error")) {
             e <- attr(val, "condition")$message
             fun_call <- sys.call(-1)
-            if(!is.null(fun_call)) {
+            is_eval_call <-
+              is.call(fun_call) && identical(fun_call[[1]], quote(eval)) # nocov
+            if(!is.null(fun_call) && !is_eval_call) {
               fun_call <- deparse1(fun_call)
               e <- sprintf("In `%s` at `%s <- ...`:\n%s", fun_call, var_nm, e)
             }
