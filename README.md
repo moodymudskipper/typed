@@ -64,7 +64,7 @@ x <- 2
 #> `expected`:      "character"
 
 y <- 4:5
-#> Error: type mismatch
+#> Error: length mismatch
 #> `length(value)`: 2
 #>      `expected`: 3
 
@@ -106,7 +106,7 @@ return this value, generally unmodified. For instance :
 
 ``` r
 Integer(3)(1:2)
-#> Error: type mismatch
+#> Error: length mismatch
 #> `length(value)`: 2
 #>      `expected`: 3
 
@@ -326,7 +326,7 @@ identity_sym_only
 #>     check_arg(substitute(x), Symbol())
 #>     x
 #> }
-#> <bytecode: 0x000000001d19a590>
+#> <bytecode: 0x000000001d1aa600>
 #> # Arg types:
 #> # x: ~Symbol()
 ```

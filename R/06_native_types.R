@@ -153,7 +153,7 @@ Integer <- as_assertion_factory(function(value, length, null_ok = FALSE) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
-      "type mismatch",
+      "length mismatch",
       waldo::compare(
         length(value),
         length,
@@ -183,7 +183,7 @@ Double <- as_assertion_factory(function(value, length, null_ok = FALSE) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
-      "type mismatch",
+      "length mismatch",
       waldo::compare(
         length(value),
         length,
@@ -238,7 +238,7 @@ Character <- as_assertion_factory(function(value, length, null_ok = FALSE) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
-      "type mismatch",
+      "length mismatch",
       waldo::compare(
         length(value),
         length,
@@ -268,7 +268,7 @@ Raw <- as_assertion_factory(function(value, length, null_ok = FALSE) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
-      "type mismatch",
+      "length mismatch",
       waldo::compare(
         length(value),
         length,
@@ -298,7 +298,7 @@ List <- as_assertion_factory(function(value, length, each, data_frame_ok = TRUE,
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
-      "type mismatch",
+      "length mismatch",
       waldo::compare(
         length(value),
         length,
@@ -474,7 +474,7 @@ Pairlist <- as_assertion_factory(function(value, length, each, null_ok = TRUE) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
-      "type mismatch",
+      "length mismatch",
       waldo::compare(
         length(value),
         length,
@@ -522,7 +522,7 @@ Expression <- as_assertion_factory(function(value, length, null_ok = FALSE) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
-      "type mismatch",
+      "length mismatch",
       waldo::compare(
         length(value),
         length,
@@ -572,7 +572,7 @@ Factor <- as_assertion_factory(function(value, length, levels, null_ok = FALSE) 
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
-      "type mismatch",
+      "length mismatch",
       waldo::compare(
         length(value),
         length,
@@ -737,7 +737,7 @@ Date <- as_assertion_factory(function(value, length, null_ok = FALSE) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
-      "type mismatch",
+      "length mismatch",
       waldo::compare(
         length(value),
         length,
@@ -768,7 +768,7 @@ Time <- as_assertion_factory(function(value, length, null_ok = FALSE) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
-      "type mismatch",
+      "length mismatch",
       waldo::compare(
         length(value),
         length,
@@ -786,7 +786,7 @@ Dots <- as_assertion_factory(function(value, length, each) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
-      "type mismatch",
+      "length mismatch",
       waldo::compare(
         length(value),
         length,

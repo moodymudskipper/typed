@@ -111,7 +111,7 @@
 <span class="co">#&gt; `expected`:      "character"</span>
 
 <span class="no">y</span> <span class="kw">&lt;-</span> <span class="fl">4</span>:<span class="fl">5</span>
-<span class="co">#&gt; Error: type mismatch</span>
+<span class="co">#&gt; Error: length mismatch</span>
 <span class="co">#&gt; `length(value)`: 2</span>
 <span class="co">#&gt;      `expected`: 3</span>
 
@@ -139,7 +139,7 @@
 <p><code>Integer</code> and <code>Character</code> are function factories (functions that return functions), thus <code><a href="reference/assertion_factories.html">Integer(3)</a></code> and <code><a href="reference/assertion_factories.html">Character()</a></code> are functions.</p>
 <p>The latter functions operate checks on a value and in case of success return this value, generally unmodified. For instance :</p>
 <div class="sourceCode" id="cb7"><pre class="r"><span class="fu"><a href="reference/assertion_factories.html">Integer</a></span>(<span class="fl">3</span>)(<span class="fl">1</span>:<span class="fl">2</span>)
-<span class="co">#&gt; Error: type mismatch</span>
+<span class="co">#&gt; Error: length mismatch</span>
 <span class="co">#&gt; `length(value)`: 2</span>
 <span class="co">#&gt;      `expected`: 3</span>
 
@@ -293,7 +293,7 @@
 <span class="co">#&gt;     check_arg(substitute(x), Symbol())</span>
 <span class="co">#&gt;     x</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000001d19a590&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000001d1aa600&gt;</span>
 <span class="co">#&gt; # Arg types:</span>
 <span class="co">#&gt; # x: ~Symbol()</span></pre></div>
 <p>We see that it is translated into a <code>check_arg</code> call containing a call to <code>substitute</code> as the first argument. The <code>~</code> is kept in the attributes of the function.</p>
