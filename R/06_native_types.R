@@ -40,6 +40,7 @@
 #' @usage Integer(length, null_ok = FALSE, ...)
 #' @usage Double(length, null_ok = FALSE, ...)
 #' @usage Character(length, null_ok = FALSE, ...)
+#' @usage Raw(length, null_ok = FALSE, ...)
 #' @usage List(length, each, data_frame_ok, null_ok = FALSE, ...)
 #' @usage Null(...)
 #' @usage Closure(null_ok = FALSE, ...)
