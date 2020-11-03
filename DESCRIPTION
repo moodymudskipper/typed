@@ -1,12 +1,12 @@
 Package: typed
-Title: Static Typing for R
+Title: Type System for R, Supporting Variable Types, Argument Types and Return Types
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Antoine",
            family = "Fabri",
            role = c("aut", "cre"),
            email = "antoine.fabri@gmail.com")
-Description: Static Typing for R.
+Description: Type system for R, supporting variable types, argument types and return types.
 License: GPL-3
 Encoding: UTF-8
 Language: en
