@@ -583,7 +583,7 @@ Factor <- as_assertion_factory(function(value, length, levels, null_ok = FALSE) 
         y_arg = "expected"))
     stop(e, call. = FALSE)
   }
-  if(!missing(levels) && identical(levels(value), levels)) {
+  if(!missing(levels) && !identical(levels(value), levels)) {
     e <- sprintf(
       "%s\n%s",
       "type mismatch",
