@@ -178,8 +178,8 @@ allNames <- function (x) {
     if(lhs_is_assignment <- is.call(lhs) && identical(lhs[[1]], quote(`<-`))) {
       return_assertion_factory <- lhs[[3]]
     } else if(lhs_is_qm <- is.call(lhs) && identical(lhs[[1]], quote(`?`))) {
-      if(!is.call(lhs[[3]]) || !identical(lhs[[c(3,1)]], quote(`<-`)))
-        stop("wrong syntax")
+      # if(!is.call(lhs[[3]]) || !identical(lhs[[c(3,1)]], quote(`<-`)))
+      #   stop("wrong syntax")
       return_assertion_factory <- lhs[[c(3, 3)]]
     } else {
       return_assertion_factory <- lhs
