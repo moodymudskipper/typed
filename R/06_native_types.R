@@ -48,7 +48,7 @@
 #' @usage Builtin(null_ok = FALSE, ...)
 #' @usage Environment(null_ok = FALSE, ...)
 #' @usage Symbol(null_ok = FALSE, ...)
-#' @usage Pairlist(length, each, null_ok = FALSE, ...)
+#' @usage Pairlist(length, each, null_ok = TRUE, ...)
 #' @usage Language(null_ok = FALSE, ...)
 #' @usage Expression(length, null_ok = FALSE, ...)
 #' @usage Function(null_ok = FALSE, ...)
@@ -88,7 +88,7 @@
 #' Integer(2) ? x <- 1L
 #' }
 #'
-Any <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+Any <- as_assertion_factory(function(value, length, null_ok = TRUE) {
   if(is.null(value)) {
     if (null_ok) return(NULL) else stop("`value` can't be NULL", call. = FALSE)
   }
@@ -446,8 +446,10 @@ Symbol <- as_assertion_factory(function(value, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-Pairlist <- as_assertion_factory(function(value, length, each, null_ok = FALSE) {
-  if(null_ok && is.null(value)) return(NULL)
+Pairlist <- as_assertion_factory(function(value, length, each, null_ok = TRUE) {
+  if(is.null(value)) {
+    if (null_ok) return(NULL) else stop("`value` can't be NULL", call. = FALSE)
+  }
   if(!is.pairlist(value)) {
     e <- sprintf(
       "%s\n%s",
