@@ -27,7 +27,7 @@
 \alias{Dots}
 \title{Assertion factories of package 'typed'}
 \usage{
-Any(length, null_ok = FALSE, ...)
+Any(length, ...)
 
 Logical(length, null_ok = FALSE, ...)
 
@@ -36,6 +36,8 @@ Integer(length, null_ok = FALSE, ...)
 Double(length, null_ok = FALSE, ...)
 
 Character(length, null_ok = FALSE, ...)
+
+Raw(length, null_ok = FALSE, ...)
 
 List(length, each, data_frame_ok, null_ok = FALSE, ...)
 
@@ -51,7 +53,7 @@ Environment(null_ok = FALSE, ...)
 
 Symbol(null_ok = FALSE, ...)
 
-Pairlist(length, each, null_ok = FALSE, ...)
+Pairlist(length, each, null_ok = TRUE, ...)
 
 Language(null_ok = FALSE, ...)
 
@@ -97,7 +99,7 @@ Environment(null_ok = FALSE, ...)
 
 Symbol(null_ok = FALSE, ...)
 
-Pairlist(length, each, null_ok = FALSE, ...)
+Pairlist(length, each, null_ok = TRUE, ...)
 
 Language(null_ok = FALSE, ...)
 
@@ -122,10 +124,10 @@ Dots(length, each, ...)
 \arguments{
 \item{length}{length of the object}
 
+\item{...}{additional conditions, see details.}
+
 \item{null_ok}{whether \code{NULL} values should be accepted, and not subjected to
 any further check.}
-
-\item{...}{additional conditions, see details.}
 
 \item{each}{assertion that every item must satisfy}
 

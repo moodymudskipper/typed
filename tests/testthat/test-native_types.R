@@ -4,9 +4,6 @@ test_that("`Any` works", {
 
   expect_equal(Any(1)(1), 1)
   expect_error(Any(2)(1))
-
-  expect_equal(Any(null_ok = TRUE)(NULL), NULL)
-  expect_error(Any(null_ok = FALSE)(NULL))
 })
 
 test_that("`Logical` works", {

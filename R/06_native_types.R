@@ -35,7 +35,7 @@
 #'   any further check.
 #' @param ... additional conditions, see details.
 #'
-#' @usage Any(length, null_ok = FALSE, ...)
+#' @usage Any(length, ...)
 #' @usage Logical(length, null_ok = FALSE, ...)
 #' @usage Integer(length, null_ok = FALSE, ...)
 #' @usage Double(length, null_ok = FALSE, ...)
@@ -88,10 +88,7 @@
 #' Integer(2) ? x <- 1L
 #' }
 #'
-Any <- as_assertion_factory(function(value, length, null_ok = TRUE) {
-  if(is.null(value)) {
-    if (null_ok) return(NULL) else stop("`value` can't be NULL", call. = FALSE)
-  }
+Any <- as_assertion_factory(function(value, length) {
   if(!missing(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
