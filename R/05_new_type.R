@@ -45,7 +45,7 @@ process_assertion_factory_dots <- function(...) {
   exprs <- vector("list", length(args))
   for (i in seq_along(args)) {
     ## is the ith argument named ?
-    if(nms[[i]] != "") {
+    if(!nms[[i]] %in% c("", "...")) {
       exprs[[i]] <- bquote(
         if(!identical(.(as.name(nms[[i]]))(value), .(args[[i]]))) {
           stop(sprintf(
