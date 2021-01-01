@@ -5,6 +5,7 @@ test_that("question mark works", {
   expect_equal(Double() ? x, NULL)
   expect_equal(Double() ? x <- 1, 1)
   expect_equal(Double() ? (x) <- 1, 1)
+  expect_equal((Double() ? x = 1), 1)
 
   # regular help
   expect_error(?mean, NA)

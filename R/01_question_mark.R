@@ -59,7 +59,7 @@ allNames <- function (x) {
         if(unary_qm_lgl) {
           rhs <- x[[2]]
           ## is the rhs an assignment ?
-          if(is.call(rhs) && identical(rhs[[1]], quote(`<-`))) {
+          if(is_assign_stmt(rhs)) {
             ## is it a constant, using syntax `? (x) <- value` ?
             if(is.call(rhs[[2]]) && identical(rhs[[c(2,1)]], quote(`(`))) {
               call <- call(
@@ -80,7 +80,7 @@ allNames <- function (x) {
         rhs <- x[[3]]
 
         ## is the rhs an assignment ?
-        if(is.call(rhs) && identical(rhs[[1]], quote(`<-`))) {
+        if(is_assign_stmt(rhs)) {
           ## is it a constant, using syntax `assertion ? (x) <- value` ?
           if(is.call(rhs[[2]]) && identical(rhs[[c(2,1)]], quote(`(`))) {
             call <- call(
@@ -177,10 +177,10 @@ allNames <- function (x) {
     # EDIT BODY TO INSERT CALLS TO `check_output` MATCHING ANNOTATED FUNCTION
 
     ## is the lhs a call to `<-`
-    if(lhs_is_assignment <- is.call(lhs) && identical(lhs[[1]], quote(`<-`))) {
+    if(lhs_is_assignment <- is_assign_stmt(lhs)) {
       return_assertion_factory <- lhs[[3]]
     } else if(lhs_is_qm <- is.call(lhs) && identical(lhs[[1]], quote(`?`))) {
-      # if(!is.call(lhs[[3]]) || !identical(lhs[[c(3,1)]], quote(`<-`)))
+      # if(!is_assign_stmt(lhs[[3]]))
       #   stop("wrong syntax")
       return_assertion_factory <- lhs[[c(3, 3)]]
     } else {
@@ -259,7 +259,7 @@ allNames <- function (x) {
   ## do we set the variable type implicitly (no lhs to `?`)
   if(unary_qm_lgl) {
     ## is the rhs an assignment ?
-    if(is.call(rhs) && identical(rhs[[1]], quote(`<-`))) {
+    if(is_assign_stmt(rhs)) {
       ## is it a constant, using syntax `? (x) <- value` ?
       if(is.call(rhs[[2]]) && identical(rhs[[c(2,1)]], quote(`(`))) {
         call <- call(
@@ -278,7 +278,7 @@ allNames <- function (x) {
   }
 
   ## is the rhs an assignment ?
-  if(is.call(rhs) && identical(rhs[[1]], quote(`<-`))) {
+  if(is_assign_stmt(rhs)) {
     ## is it a constant, using syntax `assertion ? (x) <- value` ?
     if(is.call(rhs[[2]]) && identical(rhs[[c(2,1)]], quote(`(`))) {
       call <- call(
@@ -292,4 +292,8 @@ allNames <- function (x) {
 
   call <- call("declare", as.character(rhs), lhs)
   return(eval.parent(call))
+}
+
+is_assign_stmt <- function (expr) {
+  is.call(expr) && (identical(expr[[1]], quote(`<-`)) || identical(expr[[1]], quote(`=`)))
 }
