@@ -146,7 +146,7 @@ Useful arguments might be for instance, `anyDuplicated = 0L`, `names = NULL`,
 
 That makes assertion factories very flexible! If it is still not flexible enough, one
 can provide conditions using formulas in the `...`.
-Be careful to skip all named arguments by adding comas, or name the formula args
+Be careful to skip all named arguments by adding comas, or name the formula arguments
 `...`.
 
 ```{r}
@@ -334,7 +334,7 @@ Note that your package would import *{typed}* but `?` won't be exposed to the us
 they will see it in the code but will be able to use `?` just as before. In fact
 the most common standard use `?mean` still works even when *{typed}* is attached.
 
-## Aknowledgements
+## Acknowledgements
 
 This is inspired in good part by Jim Hester and Gabor Csardi's work and many
 great efforts on static typing, assertions, or annotations in R, in particular: 
