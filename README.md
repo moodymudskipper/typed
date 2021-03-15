@@ -158,7 +158,7 @@ NULL`, `attributes = NULL`… Any available function can be used.
 That makes assertion factories very flexible\! If it is still not
 flexible enough, one can provide conditions using formulas in the `...`.
 Be careful to skip all named arguments by adding comas, or name the
-formula args `...`.
+formula arguments `...`.
 
 ``` r
 fruit <- Character(1, ... = "`value` is not a fruit!" ~ . %in% c("apple", "pear", "cherry"))
@@ -216,7 +216,7 @@ z <- c(1, 1, 2)
 `as_assertion_factory` can be used to create your own assertion
 factories from scratch too, in fact [it’s used to build the native
 assertion factories of this
-package](https://github.com/moodymudskipper/typed/blob/iteration2/R/06_assertion_factories.R)
+package](https://github.com/moodymudskipper/typed/blob/master/R/06_native_types.R)
 .
 
 ### Constants
@@ -326,7 +326,7 @@ identity_sym_only
 #>     check_arg(substitute(x), Symbol())
 #>     x
 #> }
-#> <bytecode: 0x000000001d1a98a8>
+#> <bytecode: 0x000000001cfe6008>
 #> # Arg types:
 #> # x: ~Symbol()
 ```
@@ -407,9 +407,9 @@ add_or_subtract <-
 ```
 
 The created function will be the following, we see that `Character(1) ?
-msg was changed into a`declare`call too, this is both for efficiency and
-readability. Unfamiliar users might be intimidated by`?`and calls to`?\`
-don’t print nicely.
+msg` was changed into a `declare` call too, this is both for efficiency
+and readability. Unfamiliar users might be intimidated by `?` and calls
+to `?` don’t print nicely.
 
 ``` r
 add_or_subtract
@@ -441,7 +441,7 @@ to the user, they will see it in the code but will be able to use `?`
 just as before. In fact the most common standard use `?mean` still works
 even when *{typed}* is attached.
 
-## Aknowledgements
+## Acknowledgements
 
 This is inspired in good part by Jim Hester and Gabor Csardi’s work and
 many great efforts on static typing, assertions, or annotations in R, in
