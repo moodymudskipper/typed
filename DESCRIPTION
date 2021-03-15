@@ -1,6 +1,6 @@
 Package: typed
 Title: Type System for R, Supporting Variable Types, Argument Types and Return Types
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     person(given = "Antoine",
            family = "Fabri",
