@@ -322,7 +322,7 @@ add_or_subtract <-
   }
 ```
 
-The created function will be the following, we see that `Character(1) ? msg
+The created function will be the following, we see that `Character(1) ? msg`
 was changed into a `declare` call too, this is both for efficiency and readability.
 Unfamiliar users might be intimidated by `?` and calls to `?` don't print nicely.
 
