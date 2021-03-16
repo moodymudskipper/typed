@@ -6,7 +6,7 @@ Authors@R:
            family = "Fabri",
            role = c("aut", "cre"),
            email = "antoine.fabri@gmail.com")
-Description: 'typed' implements a type system for R. It supports setting variable types in a script or the body of a function, so variables can't be assigned illegal values. Moreover it supports setting argument and return types for functions.
+Description: A type system for R. It supports setting variable types in a script or the body of a function, so variables can't be assigned illegal values. Moreover it supports setting argument and return types for functions.
 License: GPL-3
 Encoding: UTF-8
 Language: en

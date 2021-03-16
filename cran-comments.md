@@ -13,3 +13,14 @@
 
 The broken URL in the README was fixed.
 The package description was rewritten to include more details.
+
+## Answering comments from Uwe Ligges 2021-03-16
+
+The description was updated and doesn't start with the package's name.
+
+> Also: Is there some reference about the method you can add in the
+> Description field in the form Authors (year) <doi:.....>?
+
+No there's no doi, the package is not based on any published article, it takes 
+inspiration from previous work credited at the end of the README but the bulk of 
+the work is original and all the work lives in the package only at the moment.
