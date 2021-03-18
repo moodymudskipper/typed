@@ -1,6 +1,7 @@
 #' Build a new type
 #'
 #' @param f a function
+#' @return a function with class `assertion_factory`
 #'
 #' @export
 as_assertion_factory <- function(f) {
@@ -37,6 +38,7 @@ as_assertion_factory <- function(f) {
 #' This needs to be exported, but shouldn't be called by the user
 #'
 #' @param ... dots
+#' @return a `{` expression
 #' @export
 process_assertion_factory_dots <- function(...) {
   args <- list(...)
@@ -130,10 +132,6 @@ infer_implicit_assignment_call <- function(value) {
   call("Any", class = cl)
 }
 
-
-#' Fetch assertion from active binding function
-#'
-#' @param x obect
 get_assertion <- function(x) {
   x <- as.character(substitute(x))
   fun <- activeBindingFunction(x, parent.frame())
