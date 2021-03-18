@@ -194,8 +194,6 @@ allNames <- function (x) {
     if(lhs_is_assignment <- is_assign_stmt(lhs)) {
       return_assertion_factory <- lhs[[3]]
     } else if(lhs_is_qm <- is.call(lhs) && identical(lhs[[1]], quote(`?`))) {
-      # if(!is_assign_stmt(lhs[[3]]))
-      #   stop("wrong syntax")
       return_assertion_factory <- lhs[[c(3, 3)]]
     } else {
       return_assertion_factory <- lhs
@@ -227,7 +225,6 @@ allNames <- function (x) {
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # BUILD FUNCTION
 
-
     ## build function from formals, body, and type attributes
     f <- as.function(c(fmls, body), envir =  pf)
     if(args_are_annotated)
@@ -250,25 +247,6 @@ allNames <- function (x) {
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # `?` TO MAP TO `declare`
-
-  ## is rhs a return call ?
-  # if(is.call(rhs) && identical(rhs[[1]], quote(`return`))) {
-  #   assertion_call <- as.call(c(lhs, rhs[[2]]))
-  #   value <- try(eval.parent(assertion_call), silent = TRUE)
-  #   if(inherits(value, "try-error")) {
-  #     e <- attr(value, "condition")$message
-  #     fun_call <- sys.call(-1)
-  #     if(!is.null(fun_call)) {
-  #       fun_call <- deparse1(fun_call)
-  #       return_call <- sys.call()
-  #       return_call <- paste(
-  #         deparse1(return_call[[2]]), "?", deparse1(return_call[[3]]))
-  #       e <- sprintf("In `%s` at `%s`:\nwrong return value, %s", fun_call, return_call, e)
-  #     }
-  #     stop(e, call. = FALSE)
-  #   }
-  #   eval_bare(call("return", assertion_call), pf)
-  # }
 
   ## do we set the variable type implicitly (no lhs to `?`)
   if(unary_qm_lgl) {
