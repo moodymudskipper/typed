@@ -9,6 +9,9 @@ process_assertion_factory_dots(...)
 \arguments{
 \item{...}{dots}
 }
+\value{
+a \verb{\{} expression
+}
 \description{
 This needs to be exported, but shouldn't be called by the user
 }

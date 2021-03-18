@@ -61,6 +61,7 @@
 #' @usage Dots(length, each, ...)
 #'
 #' @export
+#' @return A function, and more specifically, an assertion as defined above.
 #' @rdname assertion_factories
 #' @examples
 #'

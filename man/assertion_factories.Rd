@@ -141,6 +141,9 @@ any further check.}
 
 \item{dim}{dimensions}
 }
+\value{
+A function, and more specifically, an assertion as defined above.
+}
 \description{
 These functions are assertion factories, they produce assertions,
 which take an object, check conditions, and

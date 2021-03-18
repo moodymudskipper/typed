@@ -9,6 +9,9 @@ as_assertion_factory(f)
 \arguments{
 \item{f}{a function}
 }
+\value{
+a function with class \code{assertion_factory}
+}
 \description{
 Build a new type
 }
