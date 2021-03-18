@@ -43,12 +43,12 @@ allNames <- function (x) {
 #'
 #' By default the arguments are only checked at the top, and might be assigned later
 #' in the function's body values that don't satisfy the assertion, to avoid this
-#' we can use the syntax `arg = default_value ? +assertion` or `arg = ? +assertion`.
+#' we can type `arg = default_value ? +assertion` or `arg = ? +assertion`.
 #'
 #' Note that forgetting the `?` before `function` is an easy mistake to do!
 #'
 #' If we'd rather check the quoted argument rather than the argument's value,
-#' we can add a `~` right after `?`, i.e. `arg = default_value ? ~assertion` or
+#' we can type `arg = default_value ? ~assertion` or
 #' `arg = ? ~assertion`. A possible use case might be `arg = ? ~ Symbol()`.
 #'
 #' Dots can be checked too, `... = ? assertion` will make sure that every argument
@@ -69,7 +69,7 @@ allNames <- function (x) {
 #' @importFrom utils help
 #' @return
 #' `declare` (and `?` when it maps to `declare`) returns `value` invisibly, it is called for side effects.
-#' `assertion ? function(<args>) {<body>}` returns a typed function.
+#' `assertion ? function(<args>) {<body>}` returns a typed function, of class `c("typed", "function")`.
 #' `fun <- assertion ? function(<args>) {<body>}` returns a typed function and
 #' binds it to `fun` in the local environment.
 #'

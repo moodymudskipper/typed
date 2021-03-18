@@ -24,7 +24,7 @@ declare(x, assertion, value, const = FALSE)
 }
 \value{
 \code{declare} (and \verb{?} when it maps to \code{declare}) returns \code{value} invisibly, it is called for side effects.
-\verb{assertion ? function(<args>) \{<body>\}} returns a typed function.
+\verb{assertion ? function(<args>) \{<body>\}} returns a typed function, of class \code{c("typed", "function")}.
 \verb{fun <- assertion ? function(<args>) \{<body>\}} returns a typed function and
 binds it to \code{fun} in the local environment.
 }
@@ -67,12 +67,12 @@ syntax, we can set argument types by providing arguments as \code{arg = default_
 
 By default the arguments are only checked at the top, and might be assigned later
 in the function's body values that don't satisfy the assertion, to avoid this
-we can use the syntax \code{arg = default_value ? +assertion} or \code{arg = ? +assertion}.
+we can type \code{arg = default_value ? +assertion} or \code{arg = ? +assertion}.
 
 Note that forgetting the \verb{?} before \code{function} is an easy mistake to do!
 
 If we'd rather check the quoted argument rather than the argument's value,
-we can add a \code{~} right after \verb{?}, i.e. \code{arg = default_value ? ~assertion} or
+we can type \code{arg = default_value ? ~assertion} or
 \code{arg = ? ~assertion}. A possible use case might be \code{arg = ? ~ Symbol()}.
 
 Dots can be checked too, \code{... = ? assertion} will make sure that every argument
