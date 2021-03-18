@@ -33,8 +33,8 @@ allNames <- function (x) {
 #'
 #' As a side effect The assigned value, returned invisibly.
 #' @examples
-#' numeric ? function (x= ?numeric) {
-#'   numeric ? y <- 2
+#' Integer() ? function (x= ? Integer()) {
+#'   Integer() ? y <- 2L
 #'   res <- x + y
 #'   res
 #' }
