@@ -67,7 +67,7 @@ allNames <- function (x) {
 #'
 #' @export
 #' @importFrom utils help
-#' @value
+#' @return
 #' `declare` (and `?` when it maps to `declare`) returns `value` invisibly, it is called for side effects.
 #' `assertion ? function(<args>) {<body>}` returns a typed function.
 #' `fun <- assertion ? function(<args>) {<body>}` returns a typed function and

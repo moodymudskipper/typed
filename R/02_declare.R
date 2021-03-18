@@ -3,7 +3,7 @@
 #' @param ... additional arguments passed to assertion
 #'
 #' @export
-#' @value `.output`if it satisfies the assertion, fails otherwise.
+#' @return `.output`if it satisfies the assertion, fails otherwise.
 #' @rdname check_arg
 check_output <- function(.output, .assertion, ...) {
   val <- try(.assertion(.output, ...), silent = TRUE)
@@ -30,7 +30,7 @@ check_output <- function(.output, .assertion, ...) {
 #' @param ... additional arguments passed to assertion
 #' @param .bind whether to actively bind the argument so it cannot be modified
 #'   unless it satisfies the assertion
-#' @value returns `NULL` invisibly, called for side effects.
+#' @return returns `NULL` invisibly, called for side effects.
 #' @export
 check_arg <- function(.arg, .assertion, ..., .bind = FALSE) {
   if(.bind) {
@@ -84,7 +84,6 @@ check_arg <- function(.arg, .assertion, ..., .bind = FALSE) {
 #' @param const whether to declare `x` as a constant
 #'
 #' @export
-#' @rdname static_typing
 declare <- function(x, assertion, value, const = FALSE) {
   pf<- parent.frame()
 

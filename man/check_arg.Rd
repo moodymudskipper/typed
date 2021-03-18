@@ -21,6 +21,11 @@ check_arg(.arg, .assertion, ..., .bind = FALSE)
 \item{.bind}{whether to actively bind the argument so it cannot be modified
 unless it satisfies the assertion}
 }
+\value{
+\code{.output}if it satisfies the assertion, fails otherwise.
+
+returns \code{NULL} invisibly, called for side effects.
+}
 \description{
 These functions are not designed to be used directly, we advise to use the
 syntaxes described in \code{?declare} instead. \code{check_arg} checks that arguments
