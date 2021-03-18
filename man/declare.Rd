@@ -27,17 +27,6 @@ declare(x, assertion, value, const = FALSE)
 \verb{assertion ? function(<args>) \{<body>\}} returns a typed function.
 \verb{fun <- assertion ? function(<args>) \{<body>\}} returns a typed function and
 binds it to \code{fun} in the local environment.
-
-\code{assertion ? var <- val} returns \code{val} invisibly
-and defines an active binding for \code{var} in the local environment so that the return
-value of \code{var} is \code{val}, this return value can be modified  by \code{var <- new_val} if the assertion is verified.
-\code{assertion ? var} is similar to the latter but the default return value for \code{var} will be \code{NULL}.
-\code{assertion ? (var) <- val} returns \code{val} invisibly
-and defines an active binding for \code{var} in the local environment so that the return
-value of \code{var} is \code{val} and can't be modified by assigning to \code{var}, making
-\code{var} act as a constant.
-
-As a side effect The assigned value, returned invisibly.
 }
 \description{
 Use \verb{?} to set a function's return type, argument types, or variable types
