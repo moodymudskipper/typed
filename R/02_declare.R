@@ -3,7 +3,8 @@
 #' @param ... additional arguments passed to assertion
 #'
 #' @export
-#' @rdname static_typing
+#' @value `.output`if it satisfies the assertion, fails otherwise.
+#' @rdname check_arg
 check_output <- function(.output, .assertion, ...) {
   val <- try(.assertion(.output, ...), silent = TRUE)
   if(inherits(val, "try-error")) {
@@ -16,14 +17,21 @@ check_output <- function(.output, .assertion, ...) {
   .output
 }
 
+#' Check Argument Types and Return Type
+#'
+#' These functions are not designed to be used directly, we advise to use the
+#' syntaxes described in `?declare` instead. `check_arg` checks that arguments
+#' satisfy an assertion, and if relevant make them into active bindings to make sure they
+#' always satisy it. `check_output` checks that the value, presumably a return
+#' value, satisfies an assertion,
+#'
 #' @param .arg function argument
 #' @param .assertion an assertion
 #' @param ... additional arguments passed to assertion
 #' @param .bind whether to actively bind the argument so it cannot be modified
 #'   unless it satisfies the assertion
-#'
+#' @value returns `NULL` invisibly, called for side effects.
 #' @export
-#' @rdname static_typing
 check_arg <- function(.arg, .assertion, ..., .bind = FALSE) {
   if(.bind) {
     var_nm <- as.character(substitute(.arg))
