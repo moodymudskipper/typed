@@ -18,6 +18,20 @@ allNames <- function (x) {
 #'
 #' @export
 #' @importFrom utils help
+#' @value
+#' `assertion ? function(<args>) {<body>}` returns a typed function.
+#' `fun <- assertion ? function(<args>) {<body>}` returns a typed function and
+#' binds it to `fun` in the local environment.
+#' `assertion ? var <- val` returns `val` invisibly
+#' and defines an active binding for `var` in the local environment so that the return
+#' value of `var` is `val`, this return value can be modified  by `var <- new_val` if the assertion is verified.
+#' `assertion ? var` is similar to the latter but the default return value for `var` will be `NULL`.
+#' `assertion ? (var) <- val` returns `val` invisibly
+#' and defines an active binding for `var` in the local environment so that the return
+#' value of `var` is `val` and can't be modified by assigning to `var`, making
+#' `var` act as a constant.
+#'
+#' As a side effect The assigned value, returned invisibly.
 #' @examples
 #' numeric ? function (x= ?numeric) {
 #'   numeric ? y <- 2
