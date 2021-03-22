@@ -36,7 +36,13 @@ not satisfy it.
 
 ## Installation
 
-Install with:
+Install CRAN version with:
+
+``` r
+install.packages("typed")
+```
+
+or development version with :
 
 ``` r
 remotes::install_github("moodymudskipper/typed")
