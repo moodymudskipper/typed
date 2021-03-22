@@ -1,6 +1,6 @@
 Package: typed
 Title: Support Types for Variables, Arguments, and Return Values
-Version: 0.0.1
+Version: 0.0.1.9000
 Authors@R: 
     person(given = "Antoine",
            family = "Fabri",
