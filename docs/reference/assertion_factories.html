@@ -83,7 +83,7 @@ documented on this page)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">typed</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.9000</span>
       </span>
     </div>
 
@@ -267,6 +267,9 @@ any further check.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A function, and more specifically, an assertion as defined above.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Additional conditions can be provided :</p><ul>
@@ -293,7 +296,7 @@ and <code>function(... = ?~ Dots())</code></p>
 <span class='co'># fails</span>
 <span class='fu'>Integer</span>() ? <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>
 <span class='co'># equivalent to</span>
-<span class='fu'><a href='static_typing.html'>declare</a></span>(<span class='st'>"x"</span>, <span class='fu'>Integer</span>(), <span class='kw'>value</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='fu'><a href='declare.html'>declare</a></span>(<span class='st'>"x"</span>, <span class='fu'>Integer</span>(), <span class='kw'>value</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='fu'>Integer</span>(<span class='fl'>2</span>) ? <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fl'>1L</span>
 
@@ -308,7 +311,7 @@ and <code>function(... = ?~ Dots())</code></p>
 <span class='co'># We can also use it directly to test assertions</span>
 <span class='fu'>Integer</span>() ? <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>
 <span class='co'># equivalent to</span>
-<span class='fu'><a href='static_typing.html'>declare</a></span>(<span class='st'>"x"</span>, <span class='fu'>Integer</span>(), <span class='kw'>value</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='fu'><a href='declare.html'>declare</a></span>(<span class='st'>"x"</span>, <span class='fu'>Integer</span>(), <span class='kw'>value</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='fu'>Integer</span>(<span class='fl'>2</span>) ? <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fl'>1L</span>
 }</div></pre>

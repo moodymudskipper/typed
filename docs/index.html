@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Type System for R, Supporting Variable Types, Argument Types and Return Types • typed</title>
+<title>Support Types for Variables, Arguments, and Return Values • typed</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
@@ -17,8 +17,8 @@
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="Type System for R, Supporting Variable Types, Argument Types and Return Types">
-<meta property="og:description" content="Type system for R, supporting variable types, argument types and return types.">
+<script src="pkgdown.js"></script><meta property="og:title" content="Support Types for Variables, Arguments, and Return Values">
+<meta property="og:description" content="A type system for R. It supports setting variable types in a script or the body of a function, so variables can't be assigned illegal values. Moreover it supports setting argument and return types for functions.">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">typed</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.9000</span>
       </span>
     </div>
 
@@ -132,12 +132,12 @@
 
 <span class="no">y</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1L</span>, <span class="fl">10L</span>, <span class="fl">100L</span>)</pre></div>
 <p><code>declare</code> is a strict equivalent, slightly more efficient, which looks like <code><a href="https://rdrr.io/r/base/assign.html">base::assign</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="r"><span class="fu"><a href="reference/static_typing.html">declare</a></span>(<span class="st">"x"</span>, <span class="fu"><a href="reference/assertion_factories.html">Character</a></span>())
+<div class="sourceCode" id="cb6"><pre class="r"><span class="fu"><a href="reference/declare.html">declare</a></span>(<span class="st">"x"</span>, <span class="fu"><a href="reference/assertion_factories.html">Character</a></span>())
 <span class="no">x</span> <span class="kw">&lt;-</span> <span class="st">"a"</span>
 <span class="no">x</span>
 <span class="co">#&gt; [1] "a"</span>
 
-<span class="fu"><a href="reference/static_typing.html">declare</a></span>(<span class="st">"y"</span>, <span class="fu"><a href="reference/assertion_factories.html">Integer</a></span>(<span class="fl">3</span>), <span class="fl">1</span>:<span class="fl">3</span>)
+<span class="fu"><a href="reference/declare.html">declare</a></span>(<span class="st">"y"</span>, <span class="fu"><a href="reference/assertion_factories.html">Integer</a></span>(<span class="fl">3</span>), <span class="fl">1</span>:<span class="fl">3</span>)
 <span class="no">y</span>
 <span class="co">#&gt; [1] 1 2 3</span></pre></div>
 </div>
@@ -184,7 +184,7 @@
 <span class="co">#&gt; `anyNA(value)`: TRUE </span>
 <span class="co">#&gt; `expected`:     FALSE</span></pre></div>
 <p>Useful arguments might be for instance, <code>anyDuplicated = 0L</code>, <code>names = NULL</code>, <code>attributes = NULL</code>… Any available function can be used.</p>
-<p>That makes assertion factories very flexible! If it is still not flexible enough, one can provide conditions using formulas in the <code>...</code>. Be careful to skip all named arguments by adding comas, or name the formula args <code>...</code>.</p>
+<p>That makes assertion factories very flexible! If it is still not flexible enough, one can provide conditions using formulas in the <code>...</code>. Be careful to skip all named arguments by adding comas, or name the formula arguments <code>...</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="r"><span class="no">fruit</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/assertion_factories.html">Character</a></span>(<span class="fl">1</span>, <span class="kw">...</span> <span class="kw">=</span> <span class="st">"`value` is not a fruit!"</span> ~ <span class="no">.</span> <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"apple"</span>, <span class="st">"pear"</span>, <span class="st">"cherry"</span>))
 
 <span class="no">fruit</span> ? <span class="no">x</span> <span class="kw">&lt;-</span> <span class="st">"potatoe"</span>
@@ -220,7 +220,7 @@
 <span class="co">#&gt; Error: is_monotonic_increasing : The values of value are not strictly monotonic increasing.</span>
 <span class="co">#&gt;   Position ValueBefore ValueAfter</span>
 <span class="co">#&gt; 1      1/2           1          1</span></pre></div>
-<p><code>as_assertion_factory</code> can be used to create your own assertion factories from scratch too, in fact <a href="https://github.com/moodymudskipper/typed/blob/iteration2/R/06_assertion_factories.R">it’s used to build the native assertion factories of this package</a> .</p>
+<p><code>as_assertion_factory</code> can be used to create your own assertion factories from scratch too, in fact <a href="https://github.com/moodymudskipper/typed/blob/master/R/06_native_types.R">it’s used to build the native assertion factories of this package</a> .</p>
 </div>
 <div id="constants" class="section level3">
 <h3 class="hasAnchor">
@@ -301,7 +301,7 @@
 <span class="co">#&gt;     check_arg(substitute(x), Symbol())</span>
 <span class="co">#&gt;     x</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000001d1a98a8&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000001cfe6008&gt;</span>
 <span class="co">#&gt; # Arg types:</span>
 <span class="co">#&gt; # x: ~Symbol()</span></pre></div>
 <p>We see that it is translated into a <code>check_arg</code> call containing a call to <code>substitute</code> as the first argument. The <code>~</code> is kept in the attributes of the function.</p>
@@ -355,7 +355,7 @@
       <span class="fu"><a href="https://rdrr.io/r/base/message.html">message</a></span>(<span class="no">msg</span>)
     <span class="no">x</span> + <span class="no">y</span>
   }</pre></div>
-<p>The created function will be the following, we see that <code>Character(1) ? msg was changed into a</code>declare<code>call too, this is both for efficiency and readability. Unfamiliar users might be intimidated by</code>?<code>and calls to</code>?` don’t print nicely.</p>
+<p>The created function will be the following, we see that <code>Character(1) ? msg</code> was changed into a <code>declare</code> call too, this is both for efficiency and readability. Unfamiliar users might be intimidated by <code>?</code> and calls to <code>?</code> don’t print nicely.</p>
 <div class="sourceCode" id="cb21"><pre class="r"><span class="no">add_or_subtract</span>
 <span class="co">#&gt; # typed function</span>
 <span class="co">#&gt; function (x, y, subtract = FALSE) </span>
@@ -380,9 +380,9 @@
 <span class="co">#&gt; # subtract: Logical(1, anyNA = FALSE)</span></pre></div>
 <p>Note that your package would import <em>{typed}</em> but <code>?</code> won’t be exposed to the user, they will see it in the code but will be able to use <code>?</code> just as before. In fact the most common standard use <code><a href="https://rdrr.io/r/base/mean.html">?mean</a></code> still works even when <em>{typed}</em> is attached.</p>
 </div>
-<div id="aknowledgements" class="section level2">
+<div id="acknowledgements" class="section level2">
 <h2 class="hasAnchor">
-<a href="#aknowledgements" class="anchor"></a>Aknowledgements</h2>
+<a href="#acknowledgements" class="anchor"></a>Acknowledgements</h2>
 <p>This is inspired in good part by Jim Hester and Gabor Csardi’s work and many great efforts on static typing, assertions, or annotations in R, in particular:</p>
 <ul>
 <li>Gabor Csardy’s <em>{argufy}</em>
@@ -418,6 +418,8 @@
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
+<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=typed">https://​cloud.r-project.org/​package=typed</a>
+</li>
 <li>Browse source code at <br><a href="https://github.com/moodymudskipper/typed/">https://​github.com/​moodymudskipper/​typed/​</a>
 </li>
 <li>Report a bug at <br><a href="https://github.com/moodymudskipper/typed/issues">https://​github.com/​moodymudskipper/​typed/​issues</a>
