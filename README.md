@@ -25,7 +25,13 @@ not satisfy it.
 
 ## Installation
 
-Install with:
+Install CRAN version with:
+
+``` r
+install.packages("typed")
+```
+
+or development version with :
 
 ``` r
 remotes::install_github("moodymudskipper/typed")
@@ -67,11 +73,6 @@ y <- 4:5
 #> Error: length mismatch
 #> `length(value)`: 2
 #>      `expected`: 3
-
-y[1] <- 10
-#> Error: type mismatch
-#> `typeof(value)`: "character"
-#> `expected`:      "integer"
 ```
 
 But the right type will work.
@@ -326,7 +327,7 @@ identity_sym_only
 #>     check_arg(substitute(x), Symbol())
 #>     x
 #> }
-#> <bytecode: 0x000000001cfe6008>
+#> <bytecode: 0x000000001cb34218>
 #> # Arg types:
 #> # x: ~Symbol()
 ```

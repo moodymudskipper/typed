@@ -90,10 +90,12 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>Install with:</p>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"moodymudskipper/typed"</span>)</pre></div>
+<p>Install CRAN version with:</p>
+<div class="sourceCode" id="cb1"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"typed"</span>)</pre></div>
+<p>or development version with :</p>
+<div class="sourceCode" id="cb2"><pre class="r"><span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"moodymudskipper/typed"</span>)</pre></div>
 <p>And attach with :</p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="co"># masking warning about overriding `?`</span>
+<div class="sourceCode" id="cb3"><pre class="r"><span class="co"># masking warning about overriding `?`</span>
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">typed</span>, <span class="kw">warn.conflicts</span> <span class="kw">=</span> <span class="fl">FALSE</span>)</pre></div>
 </div>
 <div id="set-variable-type" class="section level2">
@@ -104,7 +106,7 @@
 <a href="#question-mark-notation-and-declare" class="anchor"></a>Question mark notation and <code>declare</code>
 </h3>
 <p>Here are examples on how we would set types</p>
-<div class="sourceCode" id="cb3"><pre class="r"><span class="fu"><a href="reference/assertion_factories.html">Character</a></span>() ? <span class="no">x</span> <span class="co"># restrict x to "character" type</span>
+<div class="sourceCode" id="cb4"><pre class="r"><span class="fu"><a href="reference/assertion_factories.html">Character</a></span>() ? <span class="no">x</span> <span class="co"># restrict x to "character" type</span>
 <span class="no">x</span> <span class="kw">&lt;-</span> <span class="st">"a"</span>
 <span class="no">x</span>
 <span class="co">#&gt; [1] "a"</span>
@@ -113,7 +115,7 @@
 <span class="no">y</span>
 <span class="co">#&gt; [1] 1 2 3</span></pre></div>
 <p>We cannot assign values of the wrong type to <code>x</code> and <code>y</code> anymore.</p>
-<div class="sourceCode" id="cb4"><pre class="r"><span class="no">x</span> <span class="kw">&lt;-</span> <span class="fl">2</span>
+<div class="sourceCode" id="cb5"><pre class="r"><span class="no">x</span> <span class="kw">&lt;-</span> <span class="fl">2</span>
 <span class="co">#&gt; Error: type mismatch</span>
 <span class="co">#&gt; `typeof(value)`: "double"   </span>
 <span class="co">#&gt; `expected`:      "character"</span>
@@ -121,18 +123,13 @@
 <span class="no">y</span> <span class="kw">&lt;-</span> <span class="fl">4</span>:<span class="fl">5</span>
 <span class="co">#&gt; Error: length mismatch</span>
 <span class="co">#&gt; `length(value)`: 2</span>
-<span class="co">#&gt;      `expected`: 3</span>
-
-<span class="no">y</span>[<span class="fl">1</span>] <span class="kw">&lt;-</span> <span class="fl">10</span>
-<span class="co">#&gt; Error: type mismatch</span>
-<span class="co">#&gt; `typeof(value)`: "character"</span>
-<span class="co">#&gt; `expected`:      "integer"</span></pre></div>
+<span class="co">#&gt;      `expected`: 3</span></pre></div>
 <p>But the right type will work.</p>
-<div class="sourceCode" id="cb5"><pre class="r"><span class="no">x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"b"</span>, <span class="st">"c"</span>)
+<div class="sourceCode" id="cb6"><pre class="r"><span class="no">x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"b"</span>, <span class="st">"c"</span>)
 
 <span class="no">y</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1L</span>, <span class="fl">10L</span>, <span class="fl">100L</span>)</pre></div>
 <p><code>declare</code> is a strict equivalent, slightly more efficient, which looks like <code><a href="https://rdrr.io/r/base/assign.html">base::assign</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="r"><span class="fu"><a href="reference/declare.html">declare</a></span>(<span class="st">"x"</span>, <span class="fu"><a href="reference/assertion_factories.html">Character</a></span>())
+<div class="sourceCode" id="cb7"><pre class="r"><span class="fu"><a href="reference/declare.html">declare</a></span>(<span class="st">"x"</span>, <span class="fu"><a href="reference/assertion_factories.html">Character</a></span>())
 <span class="no">x</span> <span class="kw">&lt;-</span> <span class="st">"a"</span>
 <span class="no">x</span>
 <span class="co">#&gt; [1] "a"</span>
@@ -146,7 +143,7 @@
 <a href="#assertion-factories-and-assertions" class="anchor"></a>Assertion factories and assertions</h3>
 <p><code>Integer</code> and <code>Character</code> are function factories (functions that return functions), thus <code><a href="reference/assertion_factories.html">Integer(3)</a></code> and <code><a href="reference/assertion_factories.html">Character()</a></code> are functions.</p>
 <p>The latter functions operate checks on a value and in case of success return this value, generally unmodified. For instance :</p>
-<div class="sourceCode" id="cb7"><pre class="r"><span class="fu"><a href="reference/assertion_factories.html">Integer</a></span>(<span class="fl">3</span>)(<span class="fl">1</span>:<span class="fl">2</span>)
+<div class="sourceCode" id="cb8"><pre class="r"><span class="fu"><a href="reference/assertion_factories.html">Integer</a></span>(<span class="fl">3</span>)(<span class="fl">1</span>:<span class="fl">2</span>)
 <span class="co">#&gt; Error: length mismatch</span>
 <span class="co">#&gt; `length(value)`: 2</span>
 <span class="co">#&gt;      `expected`: 3</span>
@@ -179,20 +176,20 @@
 <a href="#custom-assertions" class="anchor"></a>Custom assertions</h3>
 <p>As we’ve seen with <code><a href="reference/assertion_factories.html">Integer(3)</a></code>, passing arguments to a assertion factory restricts the type.</p>
 <p>For instance <code>Integer</code> has arguments <code>length</code> <code>null_ok</code> and <code>...</code>, we already used <code>length</code>, <code>null_ok</code> is convenient to allow a default <code>NULL</code> value in addition to the <code>"integer"</code> type. In the dots we can use arguments named as functions and with the value of the expected result.</p>
-<div class="sourceCode" id="cb8"><pre class="r"><span class="fu"><a href="reference/assertion_factories.html">Integer</a></span>(<span class="kw">anyNA</span> <span class="kw">=</span> <span class="fl">FALSE</span>) ? <span class="no">x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1L</span>, <span class="fl">2L</span>, <span class="fl">NA</span>)
+<div class="sourceCode" id="cb9"><pre class="r"><span class="fu"><a href="reference/assertion_factories.html">Integer</a></span>(<span class="kw">anyNA</span> <span class="kw">=</span> <span class="fl">FALSE</span>) ? <span class="no">x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1L</span>, <span class="fl">2L</span>, <span class="fl">NA</span>)
 <span class="co">#&gt; Error: `anyNA` mismatch</span>
 <span class="co">#&gt; `anyNA(value)`: TRUE </span>
 <span class="co">#&gt; `expected`:     FALSE</span></pre></div>
 <p>Useful arguments might be for instance, <code>anyDuplicated = 0L</code>, <code>names = NULL</code>, <code>attributes = NULL</code>… Any available function can be used.</p>
 <p>That makes assertion factories very flexible! If it is still not flexible enough, one can provide conditions using formulas in the <code>...</code>. Be careful to skip all named arguments by adding comas, or name the formula arguments <code>...</code>.</p>
-<div class="sourceCode" id="cb9"><pre class="r"><span class="no">fruit</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/assertion_factories.html">Character</a></span>(<span class="fl">1</span>, <span class="kw">...</span> <span class="kw">=</span> <span class="st">"`value` is not a fruit!"</span> ~ <span class="no">.</span> <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"apple"</span>, <span class="st">"pear"</span>, <span class="st">"cherry"</span>))
+<div class="sourceCode" id="cb10"><pre class="r"><span class="no">fruit</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/assertion_factories.html">Character</a></span>(<span class="fl">1</span>, <span class="kw">...</span> <span class="kw">=</span> <span class="st">"`value` is not a fruit!"</span> ~ <span class="no">.</span> <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"apple"</span>, <span class="st">"pear"</span>, <span class="st">"cherry"</span>))
 
 <span class="no">fruit</span> ? <span class="no">x</span> <span class="kw">&lt;-</span> <span class="st">"potatoe"</span>
 <span class="co">#&gt; Error: `value` is not a fruit!</span>
 <span class="co">#&gt; `value %in% c("apple", "pear", "cherry")`: FALSE</span>
 <span class="co">#&gt; `expected`:                                TRUE</span></pre></div>
 <p>The arguments can differ between assertion factories, for instance <code>Data.frame</code> has <code>nrow</code>, <code>ncol</code>, <code>each</code>, <code>null_ok</code> and <code>...</code></p>
-<div class="sourceCode" id="cb10"><pre class="r"><span class="fu"><a href="reference/assertion_factories.html">Data.frame</a></span>() ? <span class="no">x</span> <span class="kw">&lt;-</span> <span class="no">iris</span>
+<div class="sourceCode" id="cb11"><pre class="r"><span class="fu"><a href="reference/assertion_factories.html">Data.frame</a></span>() ? <span class="no">x</span> <span class="kw">&lt;-</span> <span class="no">iris</span>
 <span class="fu"><a href="reference/assertion_factories.html">Data.frame</a></span>(<span class="kw">ncol</span> <span class="kw">=</span> <span class="fl">2</span>) ? <span class="no">x</span> <span class="kw">&lt;-</span> <span class="no">iris</span>
 <span class="co">#&gt; Error: Column number mismatch</span>
 <span class="co">#&gt; `ncol(value)`: 5</span>
@@ -206,7 +203,7 @@
 <h3 class="hasAnchor">
 <a href="#leverage-assertions-from-other-packages-build-your-own-assertion-factories" class="anchor"></a>Leverage assertions from other packages, build your own assertion factories</h3>
 <p>Some great packages provide assertions, and they can be used with <code>typed</code> provided that they take the object as a first input and return the object if no failure. Richie Cotton’s <em>{assertive}</em> and Michel Lang’s <em>{checkmate}</em> both qualify.</p>
-<div class="sourceCode" id="cb11"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">assertive</span>)
+<div class="sourceCode" id="cb12"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">assertive</span>)
 <span class="no">assert_is_monotonic_increasing</span> ? <span class="no">z</span>
 <span class="no">z</span> <span class="kw">&lt;-</span> <span class="fl">3</span>:<span class="fl">1</span>
 <span class="co">#&gt; Error: is_monotonic_increasing : The values of assigned_value are not monotonic increasing.</span>
@@ -214,7 +211,7 @@
 <span class="co">#&gt; 1      1/2           3          2</span>
 <span class="co">#&gt; 2      2/3           2          1</span></pre></div>
 <p>If we want to use more than the first argument, we should create an assertion factory :</p>
-<div class="sourceCode" id="cb12"><pre class="r"><span class="no">Monotonic_incr</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/as_assertion_factory.html">as_assertion_factory</a></span>(<span class="no">assert_is_monotonic_increasing</span>)
+<div class="sourceCode" id="cb13"><pre class="r"><span class="no">Monotonic_incr</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/as_assertion_factory.html">as_assertion_factory</a></span>(<span class="no">assert_is_monotonic_increasing</span>)
 <span class="fu">Monotonic_incr</span>(<span class="kw">strictly</span> <span class="kw">=</span> <span class="fl">TRUE</span>) ? <span class="no">z</span>
 <span class="no">z</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>)
 <span class="co">#&gt; Error: is_monotonic_increasing : The values of value are not strictly monotonic increasing.</span>
@@ -226,7 +223,7 @@
 <h3 class="hasAnchor">
 <a href="#constants" class="anchor"></a>Constants</h3>
 <p>To define a constant, we just surround the variable by parentheses (think of them as a protection)</p>
-<div class="sourceCode" id="cb13"><pre class="r"><span class="fu"><a href="reference/assertion_factories.html">Double</a></span>() ? (<span class="no">x</span>) <span class="kw">&lt;-</span> <span class="fl">1</span>
+<div class="sourceCode" id="cb14"><pre class="r"><span class="fu"><a href="reference/assertion_factories.html">Double</a></span>() ? (<span class="no">x</span>) <span class="kw">&lt;-</span> <span class="fl">1</span>
 <span class="no">x</span> <span class="kw">&lt;-</span> <span class="fl">2</span>
 <span class="co">#&gt; Error: Can't assign to a constant</span>
 
@@ -239,12 +236,12 @@
 <h2 class="hasAnchor">
 <a href="#set-argument-type" class="anchor"></a>Set argument type</h2>
 <p>We can set argument types this way :</p>
-<div class="sourceCode" id="cb14"><pre class="r"><span class="no">add</span> <span class="kw">&lt;-</span> ? <span class="kw">function</span> (<span class="no">x</span><span class="kw">=</span> ? <span class="fu"><a href="reference/assertion_factories.html">Double</a></span>(), <span class="no">y</span><span class="kw">=</span> <span class="fl">1</span> ? <span class="fu"><a href="reference/assertion_factories.html">Double</a></span>()) {
+<div class="sourceCode" id="cb15"><pre class="r"><span class="no">add</span> <span class="kw">&lt;-</span> ? <span class="kw">function</span> (<span class="no">x</span><span class="kw">=</span> ? <span class="fu"><a href="reference/assertion_factories.html">Double</a></span>(), <span class="no">y</span><span class="kw">=</span> <span class="fl">1</span> ? <span class="fu"><a href="reference/assertion_factories.html">Double</a></span>()) {
   <span class="no">x</span> + <span class="no">y</span>
 }</pre></div>
 <p>Note that we started the definition with a <code>?</code>, and that we gave a default to <code>y</code>, but not <code>x</code>. Note also the <code>=</code> sign next to <code>x</code>, necessary even when we have no default value. If you forget it you’ll have an error “unexpected <code>?</code> in …”.</p>
 <p>This created the following function, by adding checks at the top of the body</p>
-<div class="sourceCode" id="cb15"><pre class="r"><span class="no">add</span>
+<div class="sourceCode" id="cb16"><pre class="r"><span class="no">add</span>
 <span class="co">#&gt; # typed function</span>
 <span class="co">#&gt; function (x, y = 1) </span>
 <span class="co">#&gt; {</span>
@@ -256,7 +253,7 @@
 <span class="co">#&gt; # x: Double()</span>
 <span class="co">#&gt; # y: Double()</span></pre></div>
 <p>Let’s test it by providing a right and wrong type.</p>
-<div class="sourceCode" id="cb16"><pre class="r"><span class="fu">add</span>(<span class="fl">2</span>, <span class="fl">3</span>)
+<div class="sourceCode" id="cb17"><pre class="r"><span class="fu">add</span>(<span class="fl">2</span>, <span class="fl">3</span>)
 <span class="co">#&gt; [1] 5</span>
 <span class="fu">add</span>(<span class="fl">2</span>, <span class="fl">3L</span>)
 <span class="co">#&gt; Error: In `add(2, 3L)` at `check_arg(y, Double())`:</span>
@@ -264,7 +261,7 @@
 <span class="co">#&gt; `typeof(value)`: "integer"</span>
 <span class="co">#&gt; `expected`:      "double"</span></pre></div>
 <p>If we want to restrict <code>x</code> and <code>y</code> to the type “integer” in the rest of the body of the function we can use the <code>?+</code> notation :</p>
-<div class="sourceCode" id="cb17"><pre class="r"><span class="no">add</span> <span class="kw">&lt;-</span> ? <span class="kw">function</span> (<span class="no">x</span><span class="kw">=</span> ?+ <span class="fu"><a href="reference/assertion_factories.html">Double</a></span>(), <span class="no">y</span><span class="kw">=</span> <span class="fl">1</span> ?+ <span class="fu"><a href="reference/assertion_factories.html">Double</a></span>()) {
+<div class="sourceCode" id="cb18"><pre class="r"><span class="no">add</span> <span class="kw">&lt;-</span> ? <span class="kw">function</span> (<span class="no">x</span><span class="kw">=</span> ?+ <span class="fu"><a href="reference/assertion_factories.html">Double</a></span>(), <span class="no">y</span><span class="kw">=</span> <span class="fl">1</span> ?+ <span class="fu"><a href="reference/assertion_factories.html">Double</a></span>()) {
   <span class="no">x</span> + <span class="no">y</span>
 }
 
@@ -281,7 +278,7 @@
 <span class="co">#&gt; # y: Double()</span></pre></div>
 <p>We see that it is translated into a <code>check_arg</code> call containing a <code>.bind = TRUE</code> argument.</p>
 <p>I we want to restrict the quoted expression rather than the value of an argument, we can use <code>?~</code> :</p>
-<div class="sourceCode" id="cb18"><pre class="r"><span class="no">identity_sym_only</span> <span class="kw">&lt;-</span> ? <span class="kw">function</span> (<span class="no">x</span><span class="kw">=</span> ?~ <span class="fu"><a href="reference/assertion_factories.html">Symbol</a></span>()) {
+<div class="sourceCode" id="cb19"><pre class="r"><span class="no">identity_sym_only</span> <span class="kw">&lt;-</span> ? <span class="kw">function</span> (<span class="no">x</span><span class="kw">=</span> ?~ <span class="fu"><a href="reference/assertion_factories.html">Symbol</a></span>()) {
   <span class="no">x</span>
 }
 
@@ -301,7 +298,7 @@
 <span class="co">#&gt;     check_arg(substitute(x), Symbol())</span>
 <span class="co">#&gt;     x</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000001cfe6008&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x000000001cb34218&gt;</span>
 <span class="co">#&gt; # Arg types:</span>
 <span class="co">#&gt; # x: ~Symbol()</span></pre></div>
 <p>We see that it is translated into a <code>check_arg</code> call containing a call to <code>substitute</code> as the first argument. The <code>~</code> is kept in the attributes of the function.</p>
@@ -312,7 +309,7 @@
 <h2 class="hasAnchor">
 <a href="#set-function-return-type" class="anchor"></a>Set function return type</h2>
 <p>To set a return type we use <code>?</code> before the function definition as in the previous section, but we type an assertion on the left hand side.</p>
-<div class="sourceCode" id="cb19"><pre class="r"><span class="no">add_or_subtract</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/assertion_factories.html">Double</a></span>() ? <span class="kw">function</span> (<span class="no">x</span>, <span class="no">y</span>, <span class="no">subtract</span> <span class="kw">=</span> <span class="fl">FALSE</span>) {
+<div class="sourceCode" id="cb20"><pre class="r"><span class="no">add_or_subtract</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/assertion_factories.html">Double</a></span>() ? <span class="kw">function</span> (<span class="no">x</span>, <span class="no">y</span>, <span class="no">subtract</span> <span class="kw">=</span> <span class="fl">FALSE</span>) {
   <span class="kw">if</span>(<span class="no">subtract</span>) <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="no">x</span> - <span class="no">y</span>)
   <span class="no">x</span> + <span class="no">y</span>
 }
@@ -332,7 +329,7 @@
 <a href="#putting-it-all-together-write-packages-using-typed" class="anchor"></a>Putting it all together, write packages using {typed}</h2>
 <p>Let’s define our function for our package and document it with <em>{roxygen2}</em>. It is documented as usual,except that you’ll need to make sure to add the <code>@name</code> tag.</p>
 <p>We declare types for the return value, for all arguments, and we declare a string <code>msg</code>.</p>
-<div class="sourceCode" id="cb20"><pre class="r"><span class="co">#' add_or_subtract</span>
+<div class="sourceCode" id="cb21"><pre class="r"><span class="co">#' add_or_subtract</span>
 <span class="co">#'</span>
 <span class="co">#' @param x double of length 1</span>
 <span class="co">#' @param y double of length 1</span>
@@ -356,7 +353,7 @@
     <span class="no">x</span> + <span class="no">y</span>
   }</pre></div>
 <p>The created function will be the following, we see that <code>Character(1) ? msg</code> was changed into a <code>declare</code> call too, this is both for efficiency and readability. Unfamiliar users might be intimidated by <code>?</code> and calls to <code>?</code> don’t print nicely.</p>
-<div class="sourceCode" id="cb21"><pre class="r"><span class="no">add_or_subtract</span>
+<div class="sourceCode" id="cb22"><pre class="r"><span class="no">add_or_subtract</span>
 <span class="co">#&gt; # typed function</span>
 <span class="co">#&gt; function (x, y, subtract = FALSE) </span>
 <span class="co">#&gt; {</span>
