@@ -244,6 +244,9 @@ allNames <- function (x) {
     if(!unary_qm_lgl) {
       modify_return_calls <- function(x) {
         if(!is.call(x)) return(x)
+        if(identical(x[[1]], quote(`function`))) {
+          return(x)
+        }
         if(identical(x[[1]], quote(`return`))) {
           x[[2]] <- bquote(check_output(.(x[[2]]), .(return_assertion_factory)))
           return(x)
