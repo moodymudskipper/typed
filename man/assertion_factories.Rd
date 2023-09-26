@@ -183,7 +183,7 @@ Integer(2) ? x <- 1L
 
 # we can use additional conditions in `...`
 Integer(anyNA = FALSE) ? x <- c(1L, NA, 1L)
-Integer(anyDuplicated = FALSE) ? x <- c(1L, NA, 1L)
+Integer(anyDuplicated = 0L) ? x <- c(1L, NA, 1L)
 }
 
 Integer(2) ? x <- 11:12
