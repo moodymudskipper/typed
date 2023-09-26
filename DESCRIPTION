@@ -18,5 +18,6 @@ BugReports: https://github.com/moodymudskipper/typed/issues
 Imports: 
     waldo
 Suggests: 
-    testthat,
+    testthat (>= 3.0.0),
     covr
+Config/testthat/edition: 3

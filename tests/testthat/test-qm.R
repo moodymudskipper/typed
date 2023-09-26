@@ -49,6 +49,15 @@ test_that("question mark works", {
   )
 })
 
+test_that("Irrelevant return() calls are not wrapped", {
+  expect_error({
+    fun <- typed::Function() ? function() {
+      function() {
+        return()
+      }
+    }
+  }, NA)
+})
 # detach("package:typed");covr::report()
 
 # `?` <- typed::`?`
