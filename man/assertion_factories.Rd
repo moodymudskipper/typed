@@ -2,6 +2,7 @@
 % Please edit documentation in R/06_native_types.R
 \name{Any}
 \alias{Any}
+\alias{assertion_factories}
 \alias{Logical}
 \alias{Integer}
 \alias{Double}
