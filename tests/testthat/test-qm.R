@@ -57,6 +57,15 @@ test_that("Irrelevant return() calls are not wrapped", {
       }
     }
   }, NA)
+
+  expect_error({
+    fun <- typed::Integer() ? function() {
+      ret <- local({
+        return(1.0)
+      })
+      as.integer(10)
+    }
+  }, NA)
 })
 # detach("package:typed");covr::report()
 

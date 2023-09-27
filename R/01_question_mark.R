@@ -244,13 +244,15 @@ allNames <- function (x) {
     if(!unary_qm_lgl) {
       modify_return_calls <- function(x) {
         if(!is.call(x)) return(x)
-        if(identical(x[[1]], quote(`function`))) {
-          return(x)
-        }
         if(identical(x[[1]], quote(`return`))) {
           x[[2]] <- bquote(check_output(.(x[[2]]), .(return_assertion_factory)))
           return(x)
         }
+        control_flow <- c(quote(`if`), quote(`for`), quote(`while`), quote(`repeat`), quote(`{`))
+        if(!list(x[[1]]) %in% control_flow) {
+          return(x)
+        }
+
         x[] <- lapply(x, modify_return_calls)
         x
       }
