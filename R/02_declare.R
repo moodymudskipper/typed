@@ -183,6 +183,9 @@ declare <- function(x, assertion, value, const = FALSE) {
   }
 
   attr(f, "srcref") <- NULL # so it's not set to old definition
+  if (exists(x, pf)) {
+    rm(list =x, envir = pf)
+  }
   makeActiveBinding(x, f, pf)
 
   return(invisible(value))
