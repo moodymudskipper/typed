@@ -19,7 +19,7 @@ as_assertion_factory <- function(f) {
       )
 
     # the footer is made of additional assertions derived from `...`
-    footer <- process_assertion_factory_dots(...)
+    footer <- typed::process_assertion_factory_dots(...)
     if(is.null(footer)) {
       body <- call("{", header, quote(value))
     } else {
