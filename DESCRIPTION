@@ -16,6 +16,7 @@ RoxygenNote: 7.2.3
 URL: https://github.com/moodymudskipper/typed
 BugReports: https://github.com/moodymudskipper/typed/issues
 Imports: 
+    utils,
     waldo
 Suggests: 
     testthat (>= 3.0.0),
