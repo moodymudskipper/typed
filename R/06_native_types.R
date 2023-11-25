@@ -90,8 +90,8 @@
 #' Integer(2) ? x <- 1L
 #' }
 #'
-Any <- as_assertion_factory(function(value, length) {
-  if(!missing(length) && length(value) != length) {
+Any <- as_assertion_factory(function(value, length = NULL) {
+  if(!is.null(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
@@ -108,7 +108,7 @@ Any <- as_assertion_factory(function(value, length) {
 
 #' @export
 #' @rdname assertion_factories
-Logical <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+Logical <- as_assertion_factory(function(value, length = NULL, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
   if(!is.logical(value)) {
     e <- sprintf(
@@ -121,37 +121,7 @@ Logical <- as_assertion_factory(function(value, length, null_ok = FALSE) {
         y_arg = "expected"))
     stop(e, call. = FALSE)
   }
-  if(!missing(length) && length(value) != length) {
-    length <- as.integer(length)
-    e <- sprintf(
-      "%s\n%s",
-      "type mismatch",
-      waldo::compare(
-        length(value),
-        length,
-        x_arg = "length(value)",
-        y_arg = "expected"))
-    stop(e, call. = FALSE)
-  }
-  value
-})
-
-#' @export
-#' @rdname assertion_factories
-Integer <- as_assertion_factory(function(value, length, null_ok = FALSE) {
-  if(null_ok && is.null(value)) return(NULL)
-  if(!is.integer(value)) {
-    e <- sprintf(
-      "%s\n%s",
-      "type mismatch",
-      waldo::compare(
-        typeof(value),
-        "integer",
-        x_arg = "typeof(value)",
-        y_arg = "expected"))
-    stop(e, call. = FALSE)
-  }
-  if(!missing(length) && length(value) != length) {
+  if(!is.null(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
@@ -168,7 +138,37 @@ Integer <- as_assertion_factory(function(value, length, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-Double <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+Integer <- as_assertion_factory(function(value, length = NULL, null_ok = FALSE) {
+  if(null_ok && is.null(value)) return(NULL)
+  if(!is.integer(value)) {
+    e <- sprintf(
+      "%s\n%s",
+      "type mismatch",
+      waldo::compare(
+        typeof(value),
+        "integer",
+        x_arg = "typeof(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
+  }
+  if(!is.null(length) && length(value) != length) {
+    length <- as.integer(length)
+    e <- sprintf(
+      "%s\n%s",
+      "length mismatch",
+      waldo::compare(
+        length(value),
+        length,
+        x_arg = "length(value)",
+        y_arg = "expected"))
+    stop(e, call. = FALSE)
+  }
+  value
+})
+
+#' @export
+#' @rdname assertion_factories
+Double <- as_assertion_factory(function(value, length = NULL, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
   if(!is.double(value)) {
     e <- sprintf(
@@ -181,7 +181,7 @@ Double <- as_assertion_factory(function(value, length, null_ok = FALSE) {
         y_arg = "expected"))
     stop(e, call. = FALSE)
   }
-  if(!missing(length) && length(value) != length) {
+  if(!is.null(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
@@ -200,7 +200,7 @@ Double <- as_assertion_factory(function(value, length, null_ok = FALSE) {
 
 # #' @export
 # #' @rdname assertion_factories
-# Complex <- as_assertion_factory(function(value, length) {
+# Complex <- as_assertion_factory(function(value, length = NULL) {
 #   if(!is.complex(value)) {
 #     print(waldo::compare(
 #       "complex",
@@ -209,7 +209,7 @@ Double <- as_assertion_factory(function(value, length, null_ok = FALSE) {
 #       y_arg = "typeof(value)"))
 #     stop("type mismatch", call. = FALSE)
 #   }
-#   if(!missing(length) && length(value) != length) {
+#   if(!is.null(length) && length(value) != length) {
 #     length <- as.integer(length)
 #     print(waldo::compare(
 #       length,
@@ -223,7 +223,7 @@ Double <- as_assertion_factory(function(value, length, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-Character <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+Character <- as_assertion_factory(function(value, length = NULL, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
   if(!is.character(value)) {
     e <- sprintf(
@@ -236,7 +236,7 @@ Character <- as_assertion_factory(function(value, length, null_ok = FALSE) {
         y_arg = "expected"))
     stop(e, call. = FALSE)
   }
-  if(!missing(length) && length(value) != length) {
+  if(!is.null(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
@@ -253,7 +253,7 @@ Character <- as_assertion_factory(function(value, length, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-Raw <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+Raw <- as_assertion_factory(function(value, length = NULL, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
   if(!is.raw(value)) {
     e <- sprintf(
@@ -266,7 +266,7 @@ Raw <- as_assertion_factory(function(value, length, null_ok = FALSE) {
         y_arg = "expected"))
     stop(e, call. = FALSE)
   }
-  if(!missing(length) && length(value) != length) {
+  if(!is.null(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
@@ -283,7 +283,7 @@ Raw <- as_assertion_factory(function(value, length, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-List <- as_assertion_factory(function(value, length, each, data_frame_ok = TRUE, null_ok = FALSE) {
+List <- as_assertion_factory(function(value, length = NULL, each, data_frame_ok = TRUE, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
   if(!is.list(value)) {
     e <- sprintf(
@@ -296,7 +296,7 @@ List <- as_assertion_factory(function(value, length, each, data_frame_ok = TRUE,
         y_arg = "expected"))
     stop(e, call. = FALSE)
   }
-  if(!missing(length) && length(value) != length) {
+  if(!is.null(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
@@ -445,7 +445,7 @@ Symbol <- as_assertion_factory(function(value, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-Pairlist <- as_assertion_factory(function(value, length, each, null_ok = TRUE) {
+Pairlist <- as_assertion_factory(function(value, length = NULL, each, null_ok = TRUE) {
   if(is.null(value)) {
     if (null_ok) return(NULL) else stop("`value` can't be NULL", call. = FALSE)
   }
@@ -472,7 +472,7 @@ Pairlist <- as_assertion_factory(function(value, length, each, null_ok = TRUE) {
       })
     }
   }
-  if(!missing(length) && length(value) != length) {
+  if(!is.null(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
@@ -507,7 +507,7 @@ Language <- as_assertion_factory(function(value, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-Expression <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+Expression <- as_assertion_factory(function(value, length = NULL, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
   if(typeof(value) != "expression") {
     e <- sprintf(
@@ -520,7 +520,7 @@ Expression <- as_assertion_factory(function(value, length, null_ok = FALSE) {
         y_arg = "expected"))
     stop(e, call. = FALSE)
   }
-  if(!missing(length) && length(value) != length) {
+  if(!is.null(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
@@ -557,7 +557,7 @@ Function <- as_assertion_factory(function(value, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-Factor <- as_assertion_factory(function(value, length, levels, null_ok = FALSE) {
+Factor <- as_assertion_factory(function(value, length = NULL, levels, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
   if(!is.factor(value)) {
     e <- sprintf(
@@ -570,7 +570,7 @@ Factor <- as_assertion_factory(function(value, length, levels, null_ok = FALSE) 
         y_arg = "expected"))
     stop(e, call. = FALSE)
   }
-  if(!missing(length) && length(value) != length) {
+  if(!is.null(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
@@ -721,7 +721,7 @@ Array <- as_assertion_factory(function(value, dim, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-Date <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+Date <- as_assertion_factory(function(value, length = NULL, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
   if(!"Date" %in% class(value)) {
     e <- sprintf(
@@ -735,7 +735,7 @@ Date <- as_assertion_factory(function(value, length, null_ok = FALSE) {
     stop(e, call. = FALSE)
   }
 
-  if(!missing(length) && length(value) != length) {
+  if(!is.null(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
@@ -752,7 +752,7 @@ Date <- as_assertion_factory(function(value, length, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-Time <- as_assertion_factory(function(value, length, null_ok = FALSE) {
+Time <- as_assertion_factory(function(value, length = NULL, null_ok = FALSE) {
   if(null_ok && is.null(value)) return(NULL)
   if(!"POSIXct" %in% class(value)) {
     e <- sprintf(
@@ -766,7 +766,7 @@ Time <- as_assertion_factory(function(value, length, null_ok = FALSE) {
     stop(e, call. = FALSE)
   }
 
-  if(!missing(length) && length(value) != length) {
+  if(!is.null(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",
@@ -783,8 +783,8 @@ Time <- as_assertion_factory(function(value, length, null_ok = FALSE) {
 
 #' @export
 #' @rdname assertion_factories
-Dots <- as_assertion_factory(function(value, length, each) {
-  if(!missing(length) && length(value) != length) {
+Dots <- as_assertion_factory(function(value, length = NULL, each) {
+  if(!is.null(length) && length(value) != length) {
     length <- as.integer(length)
     e <- sprintf(
       "%s\n%s",

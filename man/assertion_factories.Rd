@@ -76,17 +76,17 @@ Time(length, null_ok = FALSE, ...)
 
 Dots(length, each, ...)
 
-Logical(length, null_ok = FALSE, ...)
+Logical(length = NULL, null_ok = FALSE, ...)
 
-Integer(length, null_ok = FALSE, ...)
+Integer(length = NULL, null_ok = FALSE, ...)
 
-Double(length, null_ok = FALSE, ...)
+Double(length = NULL, null_ok = FALSE, ...)
 
-Character(length, null_ok = FALSE, ...)
+Character(length = NULL, null_ok = FALSE, ...)
 
-Raw(length, null_ok = FALSE, ...)
+Raw(length = NULL, null_ok = FALSE, ...)
 
-List(length, each, data_frame_ok = TRUE, null_ok = FALSE, ...)
+List(length = NULL, each, data_frame_ok = TRUE, null_ok = FALSE, ...)
 
 Null(...)
 
@@ -100,15 +100,15 @@ Environment(null_ok = FALSE, ...)
 
 Symbol(null_ok = FALSE, ...)
 
-Pairlist(length, each, null_ok = TRUE, ...)
+Pairlist(length = NULL, each, null_ok = TRUE, ...)
 
 Language(null_ok = FALSE, ...)
 
-Expression(length, null_ok = FALSE, ...)
+Expression(length = NULL, null_ok = FALSE, ...)
 
 Function(null_ok = FALSE, ...)
 
-Factor(length, levels, null_ok = FALSE, ...)
+Factor(length = NULL, levels, null_ok = FALSE, ...)
 
 Data.frame(nrow, ncol, each, null_ok = FALSE, ...)
 
@@ -116,11 +116,11 @@ Matrix(nrow, ncol, null_ok = FALSE, ...)
 
 Array(dim, null_ok = FALSE, ...)
 
-Date(length, null_ok = FALSE, ...)
+Date(length = NULL, null_ok = FALSE, ...)
 
-Time(length, null_ok = FALSE, ...)
+Time(length = NULL, null_ok = FALSE, ...)
 
-Dots(length, each, ...)
+Dots(length = NULL, each, ...)
 }
 \arguments{
 \item{length}{length of the object}
