@@ -128,6 +128,7 @@ declare <- function(x, assertion, value, const = FALSE) {
       }
       stop(e, call. = FALSE)
     }
+    value <- val
   } else {
     # NULL is accepted as a first value even if it doesn't pass the check
     # this is because we're very flexible with types, the alternative would be
@@ -183,6 +184,9 @@ declare <- function(x, assertion, value, const = FALSE) {
   }
 
   attr(f, "srcref") <- NULL # so it's not set to old definition
+  if (exists(x, pf)) {
+    rm(list =x, envir = pf)
+  }
   makeActiveBinding(x, f, pf)
 
   return(invisible(value))

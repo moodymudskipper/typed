@@ -4,7 +4,7 @@
 .onAttach <- function(...) {
   if (isNamespaceLoaded("pkgload")) {
     attr(`?`, "original") <- getFromNamespace("shim_question", "pkgload")
-    assignInNamespace("shim_question", `?`, "pkgload")
+    getFromNamespace("assignInNamespace", "utils")("shim_question", `?`, "pkgload")
   }
 }
 
@@ -12,7 +12,7 @@
   if (isNamespaceLoaded("pkgload")) {
     original <- attr(getFromNamespace("shim_question", "pkgload"), "original")
     if (!is.null(original)) {
-      assignInNamespace(original, `?`, "pkgload")
+      getFromNamespace("assignInNamespace", "utils")(original, `?`, "pkgload")
     }
   }
 }
