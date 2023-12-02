@@ -38,29 +38,34 @@ check_arg <- function(.arg, .assertion, ..., .bind = FALSE) {
     assertion_quoted <- substitute(.assertion)
     pf <- parent.frame()
     dots <- eval(substitute(alist(...)))
-    f <- eval(substitute(local({
-      val <- .arg
-      # use long name`assigned_value` so trace is more intuitive
-      function(assigned_value) {
-        # browser()
-        if (!missing(assigned_value)) {
-          # we should catch this error and use `sys.call()` to enrich it
-          val <<- try(assertion_call, silent = TRUE)
-          if(inherits(val, "try-error")) {
-            e <- attr(val, "condition")$message
-            fun_call <- sys.call(-1)
-            if(!is.null(fun_call)) {
-              fun_call <- deparse1(fun_call)
-              e <- sprintf("In `%s` at `%s <- ...`:\n%s", fun_call, var_nm, e)
+    f <- eval(substitute(
+      local({
+        val <- ARG
+        # use long name`assigned_value` so trace is more intuitive
+        function(assigned_value) {
+          # browser()
+          if (!missing(assigned_value)) {
+            # we should catch this error and use `sys.call()` to enrich it
+            val <<- try(ASSERTION_CALL, silent = TRUE)
+            if (inherits(val, "try-error")) {
+              e <- attr(val, "condition")$message
+              fun_call <- sys.call(-1)
+              if(!is.null(fun_call)) {
+                fun_call <- deparse1(fun_call)
+                e <- sprintf("In `%s` at `%s <- ...`:\n%s", fun_call, VAR_NM, e)
+              }
+              stop(e, call. = FALSE)
             }
-            stop(e, call. = FALSE)
           }
+          val
         }
-        val
-      }
-    }), list (
-      assertion_call = as.call(c(assertion_quoted, quote(assigned_value), dots)),
-      var_nm = var_nm)))
+      }, envir = pf),
+      list(
+        ASSERTION_CALL = as.call(c(assertion_quoted, quote(assigned_value), dots)),
+        VAR_NM = var_nm,
+        ARG = .arg
+      )
+    ))
     attr(f, "srcref") <- NULL # so it's not set to old definition*
     rm(list = var_nm, envir = pf)
     makeActiveBinding(var_nm, f, pf)
@@ -85,7 +90,7 @@ check_arg <- function(.arg, .assertion, ..., .bind = FALSE) {
 #'
 #' @export
 declare <- function(x, assertion, value, const = FALSE) {
-  pf<- parent.frame()
+  pf <- parent.frame()
 
   if(missing(assertion)) {
     assertion_quoted <- infer_implicit_assignment_call(value)
@@ -139,48 +144,56 @@ declare <- function(x, assertion, value, const = FALSE) {
   if(const) {
     # we could use `lockBinding()` but we'd lose flexibility on the error message
     # so we use an active binding here as well
-    f <- eval(substitute(local({
-      nm <- x
-      val <- value
-      function(assigned_value) {
-        if (!missing(assigned_value)) {
-          e <- paste0("Can't assign to a constant")
-          fun_call <- sys.call(-1)
-          is_eval_call <-
-            is.call(fun_call) && identical(fun_call[[1]], quote(eval)) # nocov
-          if(!is.null(fun_call) && !is_eval_call) {
-            fun_call <- deparse1(fun_call)
-            e <- sprintf("In `%s` at `%s <- ...`:\n%s", fun_call, var_nm, e)
-          }
-          stop(e, call. = FALSE)
-        }
-        val
-      }
-    }), list (var_nm = x)))
-  } else {
-    f <- eval(substitute(local({
-      val <- value
-      # use long name`assigned_value` so trace is more intuitive
-      function(assigned_value) {
-        # browser()
-        if (!missing(assigned_value)) {
-          # we should catch this error and use `sys.call()` to enrich it
-          val <<- try(assertion(assigned_value), silent = TRUE)
-          if(inherits(val, "try-error")) {
-            e <- attr(val, "condition")$message
-            fun_call <- sys.call(-1)
-            is_eval_call <-
-              is.call(fun_call) && identical(fun_call[[1]], quote(eval)) # nocov
-            if(!is.null(fun_call) && !is_eval_call) {
-              fun_call <- deparse1(fun_call)
-              e <- sprintf("In `%s` at `%s <- ...`:\n%s", fun_call, var_nm, e)
+    f <- eval(substitute(
+      local(
+        {
+          val <- VALUE
+          function(assigned_value) {
+            if (!missing(assigned_value)) {
+              e <- paste0("Can't assign to a constant")
+              fun_call <- sys.call(-1)
+              is_eval_call <-
+                is.call(fun_call) && identical(fun_call[[1]], quote(eval)) # nocov
+              if(!is.null(fun_call) && !is_eval_call) {
+                fun_call <- deparse1(fun_call)
+                e <- sprintf("In `%s` at `%s <- ...`:\n%s", fun_call, VAR_NM, e)
+              }
+              stop(e, call. = FALSE)
             }
-            stop(e, call. = FALSE)
+            val
           }
-        }
-        val
-      }
-    }), list (assertion = assertion_quoted, var_nm = x)))
+        },
+        envir = pf),
+      list(VAR_NM = x, VALUE = value)
+    ))
+  } else {
+    f <- eval(
+      substitute(
+        local({
+          val <- VALUE
+          # use long name`assigned_value` so trace is more intuitive
+          function(assigned_value) {
+            if (!missing(assigned_value)) {
+              # we should catch this error and use `sys.call()` to enrich it
+              val <<- try(ASSERTION(assigned_value), silent = TRUE)
+              if(inherits(val, "try-error")) {
+                e <- attr(val, "condition")$message
+                fun_call <- sys.call(-1)
+                is_eval_call <-
+                  is.call(fun_call) && identical(fun_call[[1]], quote(eval)) # nocov
+                if(!is.null(fun_call) && !is_eval_call) {
+                  fun_call <- deparse1(fun_call)
+                  e <- sprintf("In `%s` at `%s <- ...`:\n%s", fun_call, VAR_NM, e)
+                }
+                stop(e, call. = FALSE)
+              }
+            }
+            val
+          }
+        }, envir = pf),
+        list (ASSERTION = assertion_quoted, VAR_NM = x, VALUE = value)
+      )
+    )
   }
 
   attr(f, "srcref") <- NULL # so it's not set to old definition
