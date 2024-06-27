@@ -1,33 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/as_assertion_factory.html</loc>
-  </url>
-  <url>
-    <loc>/reference/assertion_factories.html</loc>
-  </url>
-  <url>
-    <loc>/reference/check_arg.html</loc>
-  </url>
-  <url>
-    <loc>/reference/declare.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/process_assertion_factory_dots.html</loc>
-  </url>
-  <url>
-    <loc>/reference/typed-package.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/reference/as_assertion_factory.html</loc></url>
+<url><loc>/reference/assertion_factories.html</loc></url>
+<url><loc>/reference/check_arg.html</loc></url>
+<url><loc>/reference/declare.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/process_assertion_factory_dots.html</loc></url>
+<url><loc>/reference/typed-package.html</loc></url>
 </urlset>
+
