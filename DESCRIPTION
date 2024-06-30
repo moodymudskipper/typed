@@ -12,7 +12,7 @@ Encoding: UTF-8
 Language: en
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 URL: https://github.com/moodymudskipper/typed
 BugReports: https://github.com/moodymudskipper/typed/issues
 Imports: 
