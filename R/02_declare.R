@@ -91,6 +91,7 @@ check_arg <- function(.arg, .assertion, ..., .bind = FALSE) {
 #' @export
 declare <- function(x, assertion, value, const = FALSE) {
   pf <- parent.frame()
+  f_env <- new.env(parent = pf)
 
   if(missing(assertion)) {
     assertion_quoted <- infer_implicit_assignment_call(value)
@@ -163,7 +164,7 @@ declare <- function(x, assertion, value, const = FALSE) {
             val
           }
         },
-        envir = pf),
+        envir = f_env),
       list(VAR_NM = x, VALUE = value)
     ))
   } else {
@@ -190,7 +191,7 @@ declare <- function(x, assertion, value, const = FALSE) {
             }
             val
           }
-        }, envir = pf),
+        }, envir = f_env),
         list (ASSERTION = assertion_quoted, VAR_NM = x, VALUE = value)
       )
     )

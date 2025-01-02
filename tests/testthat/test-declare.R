@@ -39,3 +39,12 @@ test_that("declare works", {
   expect_equal(Double() ? x <- 1, 1)
   expect_error(Double() ? x <- 1L)
 })
+
+test_that("values are declared in separate environments", {
+  typed::Integer() ? a
+  typed::Integer() ? b
+
+  a <- 1L
+  b <- 2L
+  expect_equal(a, 1L)
+})
