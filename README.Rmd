@@ -343,15 +343,16 @@ the most common standard use `?mean` still works even when *{typed}* is attached
 This is inspired in good part by Jim Hester and Gabor Csardi's work and many
 great efforts on static typing, assertions, or annotations in R, in particular: 
 
-* Gabor Csardy's *{argufy}*
-* Richie Cotton's *{assertive}*
-* Tony Fishettti's *{assertr*}
-* Hadley Wickham's *{assertthat}*
-* Michel Lang's *{checkmate}*
-* Joe Thorley's *{checkr}*
-* Joe Thorley's *{chk}*
-* Aviral Goel's *{contractr}*
-* Stefan Bache's *{ensurer}*
-* Brian Lee Yung Rowe's *{lambda.r}*
-* Kun Ren's *{rtype}*
-* Jim Hester's *{types}*
+* Gabor Csardy's [*argufy*](https://github.com/gaborcsardi/argufy)
+* Richie Cotton's [*assertive*](https://bitbucket.org/richierocks/assertive/)
+* Tony Fishettti's [*assertr*](https://github.com/tonyfischetti/assertr)
+* Hadley Wickham's [*assertthat*](https://github.com/hadley/assertthat)
+* Michel Lang's [*checkmate*](https://github.com/mllg/checkmate)
+* Joe Thorley's [*checkr*](https://github.com/poissonconsulting/checkr)
+* Joe Thorley's [*chk*](https://github.com/poissonconsulting/chk/)
+* Aviral Goel's [*contractr*](https://github.com/aviralg/contractr)
+* Stefan Bache's [*ensurer*](https://github.com/smbache/ensurer)
+* Brian Lee Yung Rowe's [*lambda.r*](https://github.com/zatonovo/lambda.r)
+* Kun Ren's [*rtype*](https://github.com/renkun-ken/rtype)
+* Duncan Temple Lang's [*TypeInfo*](https://bioconductor.org/packages/TypeInfo/)
+* Jim Hester's [*types*](https://github.com/jimhester/types)
