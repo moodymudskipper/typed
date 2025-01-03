@@ -6,10 +6,13 @@
 #' @return Returns `NULL` invisibly, called for side effects
 #' @export
 use_typed <- function() {
+  rlang::check_installed("usethis")
+  rlang::check_installed("desc")
+
   usethis::use_package("typed")
   pkg_doc_path <- sprintf(
     "R/%s-package.R",
-    usethis:::proj_desc()$get_field("Package")
+    desc::desc(usethis::proj_get())$get_field("Package")
   )
   if (!file.exists(pkg_doc_path)) usethis::use_package_doc(open = FALSE)
   usethis::use_import_from("typed", getNamespaceExports("typed"), load = FALSE)
