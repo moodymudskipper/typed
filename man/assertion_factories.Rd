@@ -76,58 +76,51 @@ Time(length = NULL, null_ok = FALSE, ...)
 
 Dots(length = NULL, each, ...)
 
-Logical(length = NULL, null_ok = FALSE, ..., .extend = NULL)
+Logical(length = NULL, null_ok = FALSE, ...)
 
-Integer(length = NULL, null_ok = FALSE, ..., .extend = NULL)
+Integer(length = NULL, null_ok = FALSE, ...)
 
-Double(length = NULL, null_ok = FALSE, ..., .extend = NULL)
+Double(length = NULL, null_ok = FALSE, ...)
 
-Character(length = NULL, null_ok = FALSE, ..., .extend = NULL)
+Character(length = NULL, null_ok = FALSE, ...)
 
-Raw(length = NULL, null_ok = FALSE, ..., .extend = NULL)
+Raw(length = NULL, null_ok = FALSE, ...)
 
-List(
-  length = NULL,
-  each,
-  data_frame_ok = TRUE,
-  null_ok = FALSE,
-  ...,
-  .extend = NULL
-)
+List(length = NULL, each, data_frame_ok = TRUE, null_ok = FALSE, ...)
 
-Null(..., .extend = NULL)
+Null(...)
 
-Closure(null_ok = FALSE, ..., .extend = NULL)
+Closure(null_ok = FALSE, ...)
 
-Special(null_ok = FALSE, ..., .extend = NULL)
+Special(null_ok = FALSE, ...)
 
-Builtin(null_ok = FALSE, ..., .extend = NULL)
+Builtin(null_ok = FALSE, ...)
 
-Environment(null_ok = FALSE, ..., .extend = NULL)
+Environment(null_ok = FALSE, ...)
 
-Symbol(null_ok = FALSE, ..., .extend = NULL)
+Symbol(null_ok = FALSE, ...)
 
-Pairlist(length = NULL, each, null_ok = TRUE, ..., .extend = NULL)
+Pairlist(length = NULL, each, null_ok = TRUE, ...)
 
-Language(null_ok = FALSE, ..., .extend = NULL)
+Language(null_ok = FALSE, ...)
 
-Expression(length = NULL, null_ok = FALSE, ..., .extend = NULL)
+Expression(length = NULL, null_ok = FALSE, ...)
 
-Function(null_ok = FALSE, ..., .extend = NULL)
+Function(null_ok = FALSE, ...)
 
-Factor(length = NULL, levels, null_ok = FALSE, ..., .extend = NULL)
+Factor(length = NULL, levels, null_ok = FALSE, ...)
 
-Data.frame(nrow, ncol, each, null_ok = FALSE, ..., .extend = NULL)
+Data.frame(nrow, ncol, each, null_ok = FALSE, ...)
 
-Matrix(nrow, ncol, null_ok = FALSE, ..., .extend = NULL)
+Matrix(nrow, ncol, null_ok = FALSE, ...)
 
-Array(dim, null_ok = FALSE, ..., .extend = NULL)
+Array(dim, null_ok = FALSE, ...)
 
-Date(length = NULL, null_ok = FALSE, ..., .extend = NULL)
+Date(length = NULL, null_ok = FALSE, ...)
 
-Time(length = NULL, null_ok = FALSE, ..., .extend = NULL)
+Time(length = NULL, null_ok = FALSE, ...)
 
-Dots(length = NULL, each, ..., .extend = NULL)
+Dots(length = NULL, each, ...)
 }
 \arguments{
 \item{length}{length of the object}
