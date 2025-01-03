@@ -1,5 +1,7 @@
 #' Assertion factories of package 'typed'
 #'
+#' @description
+#'
 #' These functions are assertion factories, they produce assertions,
 #' which take an object, check conditions, and
 #' returns the input, usually unmodified (never modified with the functions
@@ -19,10 +21,7 @@
 #' for atomic types, or check that the class of the checked value contains
 #' the relevant class.
 #'
-#' `Dots` should only be used to check the dots using `check_arg` on `list(...)`
-#' or `substitute(...())`, which will
-#' be the case when it's called respectively with `function(... = ? Dots())`
-#' and `function(... = ?~ Dots())`
+#' See advanced examples at the bottom, including uses of `Symbol()` and `Dots()`.
 #'
 #' @param length length of the object
 #' @param nrow number of rows
@@ -35,35 +34,35 @@
 #'   any further check.
 #' @param ... additional conditions, see details.
 #'
-#' @usage Any(length, ...)
-#' @usage Logical(length, null_ok = FALSE, ...)
-#' @usage Integer(length, null_ok = FALSE, ...)
-#' @usage Double(length, null_ok = FALSE, ...)
-#' @usage Character(length, null_ok = FALSE, ...)
-#' @usage Raw(length, null_ok = FALSE, ...)
-#' @usage List(length, each, data_frame_ok, null_ok = FALSE, ...)
+#' @usage Any(length = NULL, ...)
+#' @usage Logical(length = NULL, null_ok = FALSE, ...)
+#' @usage Integer(length = NULL, null_ok = FALSE, ...)
+#' @usage Double(length = NULL, null_ok = FALSE, ...)
+#' @usage Character(length = NULL, null_ok = FALSE, ...)
+#' @usage Raw(length = NULL, null_ok = FALSE, ...)
+#' @usage List(length = NULL, each, data_frame_ok, null_ok = FALSE, ...)
 #' @usage Null(...)
 #' @usage Closure(null_ok = FALSE, ...)
 #' @usage Special(null_ok = FALSE, ...)
 #' @usage Builtin(null_ok = FALSE, ...)
 #' @usage Environment(null_ok = FALSE, ...)
 #' @usage Symbol(null_ok = FALSE, ...)
-#' @usage Pairlist(length, each, null_ok = TRUE, ...)
+#' @usage Pairlist(length = NULL, each, null_ok = TRUE, ...)
 #' @usage Language(null_ok = FALSE, ...)
-#' @usage Expression(length, null_ok = FALSE, ...)
+#' @usage Expression(length = NULL, null_ok = FALSE, ...)
 #' @usage Function(null_ok = FALSE, ...)
-#' @usage Factor(length, levels, null_ok = FALSE, ...)
+#' @usage Factor(length = NULL, levels, null_ok = FALSE, ...)
 #' @usage Matrix(nrow, ncol, null_ok = FALSE, ...)
 #' @usage Array(dim, null_ok = FALSE, ...)
 #' @usage Data.frame(nrow, ncol, each, null_ok = FALSE, ...)
-#' @usage Date(length, null_ok = FALSE, ...)
-#' @usage Time(length, null_ok = FALSE, ...)
-#' @usage Dots(length, each, ...)
+#' @usage Date(length = NULL, null_ok = FALSE, ...)
+#' @usage Time(length = NULL, null_ok = FALSE, ...)
+#' @usage Dots(length = NULL, each, ...)
 #'
 #' @export
 #' @return A function, and more specifically, an assertion as defined above.
+#' @name assertion_factories
 #' @rdname assertion_factories
-#' @aliases assertion_factories
 #' @examples
 #'
 #' \dontrun{
@@ -88,6 +87,49 @@
 #' declare("x", Integer(), value = 1)
 #'
 #' Integer(2) ? x <- 1L
+#' }
+#'
+#' \dontrun{
+#' # I we want to restrict the quoted expression rather than the value of an
+#' # argument, we can use `?~` :
+#' identity_sym_only <- ? function (x= ?~ Symbol()) {
+#'   x
+#' }
+#'
+#' a <- 1
+#' identity_sym_only(a)
+#' identity_sym_only(a + a)
+#'
+#' identity_sym_only
+#' }
+#'
+#' #' \dontrun{
+#' integer_list <- ? function (...= ? Integer()) {
+#'   list(...)
+#' }
+#'
+#' integer_list(1L, 2L, "a")
+#'
+#' integer_pair <- ? function (...= ? Dots(2, each = Integer())) {
+#'   list(...)
+#' }
+#'
+#' integer_pair(1L, 2L, 3L)
+#' integer_pair(1L, "a", "a")
+#'
+#' x <- 1
+#' y <- 2
+#' symbol_list1 <- ? function (...= ? Dots(2, Symbol())) {
+#'   list(...)
+#' }
+#' symbol_list1(quote(x), quote(y))
+#' symbol_list1(x, y)
+#'
+#' symbol_list2 <- ? function (...= ?~ Dots(2, Symbol())) {
+#'   list(...)
+#' }
+#' symbol_list2(x, x + y)
+#' symbol_list2(x, y)
 #' }
 #'
 Any <- as_assertion_factory(function(value, length = NULL) {

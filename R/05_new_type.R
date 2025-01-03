@@ -8,7 +8,7 @@ as_assertion_factory <- function(f) {
   # create a function with arguments being the additional args to f and dots
   f_call <- as.call(c(quote(f), quote(value), sapply(names(formals(f)[-1]), as.name)))
 
-  res <- as.function(c(formals(f)[-1],alist(...=), bquote({
+  res <- as.function(c(formals(f)[-1],alist(...=, .extend = NULL), bquote({
     f_call <- substitute(.(f_call))
     # remove if empty
     f_call <- Filter(function(value) !identical(value, quote(expr=)), f_call)
@@ -20,10 +20,18 @@ as_assertion_factory <- function(f) {
 
     # the footer is made of additional assertions derived from `...`
     footer <- typed::process_assertion_factory_dots(...)
+
+    footer2 <- substitute(
+      for (assertion in .EXTEND) {
+        assertion(value)
+      },
+      list(.EXTEND = .extend)
+    )
+
     if(is.null(footer)) {
-      body <- call("{", header, quote(value))
+      body <- call("{", header, footer2, quote(value))
     } else {
-      body <- call("{", header, footer, quote(value))
+      body <- call("{", header, footer, footer2, quote(value))
     }
     as.function(c(alist(value=), body), envir = parent.frame())
   })))
