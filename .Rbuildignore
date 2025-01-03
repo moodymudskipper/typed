@@ -9,3 +9,5 @@
 ^cran-comments\.md$
 ^CRAN-RELEASE$
 ^\.github$
+^doc$
+^Meta$

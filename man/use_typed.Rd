@@ -10,6 +10,6 @@ use_typed()
 Returns \code{NULL} invisibly, called for side effects
 }
 \description{
-This sets up your package so you can use type, by editing the DESCRIPTION file
+This sets up your package so you can use 'typed', by editing the DESCRIPTION file
 and editing or creating 'R/your.pkg-package.R'
 }
