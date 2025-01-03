@@ -1,16 +1,16 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
-<url><loc>/404.html</loc></url>
-<url><loc>/articles/index.html</loc></url>
-<url><loc>/articles/typed-in-packages.html</loc></url>
-<url><loc>/authors.html</loc></url>
-<url><loc>/index.html</loc></url>
-<url><loc>/reference/as_assertion_factory.html</loc></url>
-<url><loc>/reference/assertion_factories.html</loc></url>
-<url><loc>/reference/check_arg.html</loc></url>
-<url><loc>/reference/declare.html</loc></url>
-<url><loc>/reference/index.html</loc></url>
-<url><loc>/reference/process_assertion_factory_dots.html</loc></url>
-<url><loc>/reference/typed-package.html</loc></url>
-<url><loc>/reference/use_typed.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/404.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/articles/index.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/articles/typed-in-packages.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/authors.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/index.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/reference/as_assertion_factory.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/reference/assertion_factories.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/reference/check_arg.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/reference/declare.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/reference/index.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/reference/process_assertion_factory_dots.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/reference/typed-package.html</loc></url>
+<url><loc>https://moodymudskipper.github.io/typed/reference/use_typed.html</loc></url>
 </urlset>
 
