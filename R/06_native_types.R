@@ -103,7 +103,7 @@
 #' identity_sym_only
 #' }
 #'
-#' #' \dontrun{
+#' \dontrun{
 #' integer_list <- ? function (...= ? Integer()) {
 #'   list(...)
 #' }
