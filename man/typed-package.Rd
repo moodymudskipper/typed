@@ -14,6 +14,7 @@ A type system for R. It supports setting variable types in a script or the body 
 Useful links:
 \itemize{
   \item \url{https://github.com/moodymudskipper/typed}
+  \item \url{https://moodymudskipper.github.io/typed/}
   \item Report bugs at \url{https://github.com/moodymudskipper/typed/issues}
 }
 
