@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   typed-in-packages: typed-in-packages.html
-last_built: 2025-04-24T07:56Z
+last_built: 2025-04-24T08:00Z
 urls:
   reference: https://moodymudskipper.github.io/typed/reference
   article: https://moodymudskipper.github.io/typed/articles
