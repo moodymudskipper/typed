@@ -1,9 +1,9 @@
 pandoc: 3.1.11
-pkgdown: 2.1.1
-pkgdown_sha: ~
+pkgdown: 2.1.1.9000
+pkgdown_sha: 2f04495db2502e7a621ffcb38d823c30a952b84a
 articles:
   typed-in-packages: typed-in-packages.html
-last_built: 2025-04-27T10:52Z
+last_built: 2025-04-27T10:53Z
 urls:
   reference: https://moodymudskipper.github.io/typed/reference
   article: https://moodymudskipper.github.io/typed/articles
