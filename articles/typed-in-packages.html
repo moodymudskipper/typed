@@ -159,7 +159,8 @@ constraints</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu">Fruit</span><span class="op">(</span><span class="op">)</span> <span class="op">?</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="st">"potatoe"</span></span>
-<span><span class="co">#&gt; Error: `value` is not a fruit!</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `value` is not a fruit!</span></span>
 <span><span class="co">#&gt; `value %in% c("apple", "pear", "cherry")`: <span style="color: #00BB00;">FALSE</span></span></span>
 <span><span class="co">#&gt; `expected`:                                <span style="color: #00BB00;">TRUE</span></span></span></code></pre></div>
 <p>The type <code><a href="../reference/assertion_factories.html">Any()</a></code> is the most general, but in many case
@@ -167,7 +168,8 @@ it’s a good idea to start from a more restricted type so you get its own
 checks for free.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Fruit</span><span class="op">(</span><span class="op">)</span> <span class="op">?</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fl">1L</span></span>
-<span><span class="co">#&gt; Error: type mismatch</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> type mismatch</span></span>
 <span><span class="co">#&gt; `typeof(value)`: <span style="color: #00BB00;">"integer"</span>  </span></span>
 <span><span class="co">#&gt; `expected`:      <span style="color: #00BB00;">"character"</span></span></span></code></pre></div>
 <p>Here’s a case where starting from <code><a href="../reference/assertion_factories.html">Any()</a></code> makes sense
@@ -180,10 +182,11 @@ checks for free.</p>
 <span><span class="fu">Ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">?</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span><span class="co">#&gt; Warning: `is.ggplot()` was deprecated in ggplot2 3.5.2.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `is_ggplot()` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
-<span><span class="co">#&gt; Error: Expected a ggplot object</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Expected a ggplot object</span></span>
 <span><span class="co">#&gt; `ggplot2::is.ggplot(value)`: <span style="color: #00BB00;">FALSE</span></span></span>
 <span><span class="co">#&gt; `expected`:                  <span style="color: #00BB00;">TRUE</span></span></span></code></pre></div>
 <p>A custom type might also just be a restriction on an existing type
@@ -197,7 +200,8 @@ forwarding them:</p>
 <span>  <span class="fu"><a href="../reference/assertion_factories.html">Integer</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">1</span>, null_ok <span class="op">=</span> <span class="va">null_ok</span>, <span class="va">...</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="fu">ScalarInteger1</span><span class="op">(</span><span class="op">)</span> <span class="op">?</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">2L</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: length mismatch</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> length mismatch</span></span>
 <span><span class="co">#&gt; `length(value)`: <span style="color: #00BB00;">2</span></span></span>
 <span><span class="co">#&gt;      `expected`: <span style="color: #00BB00;">1</span></span></span></code></pre></div>
 <p>Here we remove all flexibility:</p>
@@ -206,7 +210,8 @@ forwarding them:</p>
 <span>  <span class="fu"><a href="../reference/assertion_factories.html">Integer</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="fu">ScalarInteger2</span><span class="op">(</span><span class="op">)</span> <span class="op">?</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">2L</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: length mismatch</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> length mismatch</span></span>
 <span><span class="co">#&gt; `length(value)`: <span style="color: #00BB00;">2</span></span></span>
 <span><span class="co">#&gt;      `expected`: <span style="color: #00BB00;">1</span></span></span></code></pre></div>
 </div>
@@ -229,7 +234,8 @@ forwarding them:</p>
 <span><span class="va">Ggplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_assertion_factory.html">as_assertion_factory</a></span><span class="op">(</span><span class="va">check_is_ggplot</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">Ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">?</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span><span class="co">#&gt; Error: Class mismatch</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Class mismatch</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> Expected a ggplot object</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> Got an object of class &lt;numeric&gt;</span></span></code></pre></div>
 <p>Another example, to impose a data type based on a prototype:</p>
@@ -237,7 +243,8 @@ forwarding them:</p>
 <code class="sourceCode R"><span><span class="va">check_cars</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">vctrs</span><span class="fu">::</span><span class="fu"><a href="https://vctrs.r-lib.org/reference/vec_assert.html" class="external-link">vec_assert</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">cars</span><span class="op">)</span></span>
 <span><span class="va">Cars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_assertion_factory.html">as_assertion_factory</a></span><span class="op">(</span><span class="va">check_cars</span><span class="op">)</span></span>
 <span><span class="fu">Cars</span><span class="op">(</span><span class="op">)</span> <span class="op">?</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">iris</span></span>
-<span><span class="co">#&gt; Error: `x` must be a vector with type:</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `x` must be a vector with type:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   &lt;data.frame&lt;</span></span>
 <span><span class="co">#&gt;     speed: double</span></span>
@@ -258,7 +265,8 @@ forwarding them:</p>
 <code class="sourceCode R"><span><span class="va">check_valid_ptype</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">ptype</span><span class="op">)</span> <span class="fu">vctrs</span><span class="fu">::</span><span class="fu"><a href="https://vctrs.r-lib.org/reference/vec_assert.html" class="external-link">vec_assert</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">ptype</span><span class="op">)</span></span>
 <span><span class="va">Ptype</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_assertion_factory.html">as_assertion_factory</a></span><span class="op">(</span><span class="va">check_valid_ptype</span><span class="op">)</span></span>
 <span><span class="fu">Ptype</span><span class="op">(</span><span class="va">cars</span><span class="op">)</span> <span class="op">?</span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">iris</span></span>
-<span><span class="co">#&gt; Error: `x` must be a vector with type:</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `x` must be a vector with type:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   &lt;data.frame&lt;</span></span>
 <span><span class="co">#&gt;     speed: double</span></span>

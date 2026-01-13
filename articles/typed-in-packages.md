@@ -103,7 +103,8 @@ Fruit <- function() {
 }
 
 Fruit() ? x <- "potatoe"
-#> Error: `value` is not a fruit!
+#> Error:
+#> ! `value` is not a fruit!
 #> `value %in% c("apple", "pear", "cherry")`: FALSE
 #> `expected`:                                TRUE
 ```
@@ -115,7 +116,8 @@ more restricted type so you get its own checks for free.
 
 ``` r
 Fruit() ? x <- 1L
-#> Error: type mismatch
+#> Error:
+#> ! type mismatch
 #> `typeof(value)`: "integer"  
 #> `expected`:      "character"
 ```
@@ -132,10 +134,11 @@ Ggplot <- function() {
 Ggplot() ? x <- 1
 #> Warning: `is.ggplot()` was deprecated in ggplot2 3.5.2.
 #> ℹ Please use `is_ggplot()` instead.
-#> This warning is displayed once every 8 hours.
+#> This warning is displayed once per session.
 #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 #> generated.
-#> Error: Expected a ggplot object
+#> Error:
+#> ! Expected a ggplot object
 #> `ggplot2::is.ggplot(value)`: FALSE
 #> `expected`:                  TRUE
 ```
@@ -154,7 +157,8 @@ ScalarInteger1 <- function(null_ok = FALSE, ...) {
   Integer(length = 1, null_ok = null_ok, ...)
 }
 ScalarInteger1() ? x <- c(1L, 2L)
-#> Error: length mismatch
+#> Error:
+#> ! length mismatch
 #> `length(value)`: 2
 #>      `expected`: 1
 ```
@@ -166,7 +170,8 @@ ScalarInteger2 <- function() {
   Integer(length = 1)
 }
 ScalarInteger2() ? x <- c(1L, 2L)
-#> Error: length mismatch
+#> Error:
+#> ! length mismatch
 #> `length(value)`: 2
 #>      `expected`: 1
 ```
@@ -191,7 +196,8 @@ check_is_ggplot <- function(x) {
 Ggplot <- as_assertion_factory(check_is_ggplot)
 
 Ggplot() ? x <- 1
-#> Error: Class mismatch
+#> Error:
+#> ! Class mismatch
 #> ℹ Expected a ggplot object
 #> ✖ Got an object of class <numeric>
 ```
@@ -202,7 +208,8 @@ Another example, to impose a data type based on a prototype:
 check_cars <- function(x) vctrs::vec_assert(x, cars)
 Cars <- as_assertion_factory(check_cars)
 Cars() ? x <- iris
-#> Error: `x` must be a vector with type:
+#> Error:
+#> ! `x` must be a vector with type:
 #> 
 #>   <data.frame<
 #>     speed: double
@@ -226,7 +233,8 @@ Or if we want to be more general:
 check_valid_ptype <- function(x, ptype) vctrs::vec_assert(x, ptype)
 Ptype <- as_assertion_factory(check_valid_ptype)
 Ptype(cars) ? x <- iris
-#> Error: `x` must be a vector with type:
+#> Error:
+#> ! `x` must be a vector with type:
 #> 
 #>   <data.frame<
 #>     speed: double
