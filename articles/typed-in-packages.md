@@ -1,6 +1,7 @@
 # Using {typed} in packages
 
 ``` r
+
 library(typed, warn.conflicts = FALSE)
 ```
 
@@ -13,6 +14,7 @@ Call this to set up your package so you can use ‘typed’, by editing the
 DESCRIPTION file and editing or creating ‘R/your.pkg-package.R’
 
 ``` r
+
 typed::use_typed()
 devtools::document() # to actually import from the generated roxygen2 comments
 ```
@@ -26,6 +28,7 @@ The use of roxygen2 tags is standard, except that you’ll need to make
 sure to add the `@name` tag.
 
 ``` r
+
 #' add_or_subtract
 #'
 #' @param x double of length 1
@@ -53,6 +56,7 @@ add_or_subtract <- Double(1) ? function (
 The created function will be the following:
 
 ``` r
+
 add_or_subtract
 #> # typed function
 #> function (x, y, subtract = FALSE) 
@@ -94,6 +98,7 @@ A way to define custom types is to wrap existing ones and add
 constraints
 
 ``` r
+
 Fruit <- function() {
   Character(
     length = 1, 
@@ -115,6 +120,7 @@ is the most general, but in many case it’s a good idea to start from a
 more restricted type so you get its own checks for free.
 
 ``` r
+
 Fruit() ? x <- 1L
 #> Error:
 #> ! type mismatch
@@ -127,6 +133,7 @@ Here’s a case where starting from
 makes sense :
 
 ``` r
+
 Ggplot <- function() {
   Any(... = "Expected a ggplot object" ~ ggplot2::is.ggplot(value))
 }
@@ -153,6 +160,7 @@ Here we restrict the length but keep other args flexible by forwarding
 them:
 
 ``` r
+
 ScalarInteger1 <- function(null_ok = FALSE, ...) {
   Integer(length = 1, null_ok = null_ok, ...)
 }
@@ -166,6 +174,7 @@ ScalarInteger1() ? x <- c(1L, 2L)
 Here we remove all flexibility:
 
 ``` r
+
 ScalarInteger2 <- function() {
   Integer(length = 1)
 }
@@ -183,6 +192,7 @@ We can define a check function and use
 on it.
 
 ``` r
+
 check_is_ggplot <- function(x) {
   if(!ggplot2::is.ggplot(x)) {
     msg <- "Class mismatch"
@@ -205,6 +215,7 @@ Ggplot() ? x <- 1
 Another example, to impose a data type based on a prototype:
 
 ``` r
+
 check_cars <- function(x) vctrs::vec_assert(x, cars)
 Cars <- as_assertion_factory(check_cars)
 Cars() ? x <- iris
@@ -230,6 +241,7 @@ Cars() ? x <- iris
 Or if we want to be more general:
 
 ``` r
+
 check_valid_ptype <- function(x, ptype) vctrs::vec_assert(x, ptype)
 Ptype <- as_assertion_factory(check_valid_ptype)
 Ptype(cars) ? x <- iris

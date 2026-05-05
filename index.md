@@ -19,18 +19,21 @@ not satisfy it.
 Install CRAN version with:
 
 ``` r
+
 install.packages("typed")
 ```
 
 or development version with :
 
 ``` r
+
 remotes::install_github("moodymudskipper/typed")
 ```
 
 And attach with :
 
 ``` r
+
 # masking warning about overriding `?`
 library(typed, warn.conflicts = FALSE) 
 ```
@@ -42,6 +45,7 @@ library(typed, warn.conflicts = FALSE)
 Here are examples on how we would set types
 
 ``` r
+
 Character() ? x # restrict x to "character" type
 x <- "a"
 x
@@ -55,6 +59,7 @@ y
 We cannot assign values of the wrong type to `x` and `y` anymore.
 
 ``` r
+
 x <- 2
 #> Error: type mismatch
 #> `typeof(value)`: "double"   
@@ -69,6 +74,7 @@ y <- 4:5
 But the right type will work.
 
 ``` r
+
 x <- c("b", "c")
 
 y <- c(1L, 10L, 100L)
@@ -78,6 +84,7 @@ y <- c(1L, 10L, 100L)
 like [`base::assign`](https://rdrr.io/r/base/assign.html).
 
 ``` r
+
 declare("x", Character())
 x <- "a"
 x
@@ -99,6 +106,7 @@ The latter functions operate checks on a value and in case of success
 return this value, generally unmodified. For instance :
 
 ``` r
+
 Integer(3)(1:2)
 #> Error: length mismatch
 #> `length(value)`: 2
@@ -146,6 +154,7 @@ The arguments can differ between assertion factories, for instance
 `Data.frame` has `nrow`, `ncol`, `each`, `null_ok` and `...`
 
 ``` r
+
 Data.frame() ? x <- iris
 Data.frame(ncol = 2) ? x <- iris
 #> Error: Column number mismatch
@@ -161,6 +170,7 @@ In the dots we can use arguments named as functions and with the value
 of the expected result.
 
 ``` r
+
 # Integer has no anyNA arg but we can still use it because a function named
 # this way exists
 Integer(anyNA = FALSE) ? x <- c(1L, 2L, NA)
@@ -178,6 +188,7 @@ functional factories to add a custom restriction, this is usually better
 done by defining a wrapper.
 
 ``` r
+
 Character(1, ... = "`value` is not a fruit!" ~ . %in% c("apple", "pear", "cherry")) ? 
   x <- "potatoe"
 #> Error: `value` is not a fruit!
@@ -193,6 +204,7 @@ To define a constant, we just surround the variable by parentheses
 (think of them as a protection)
 
 ``` r
+
 Double() ? (x) <- 1
 x <- 2
 #> Error: Can't assign to a constant
@@ -208,6 +220,7 @@ y <- 2
 We can set argument types this way :
 
 ``` r
+
 add <- ? function (x= ? Double(), y= 1 ? Double()) {
   x + y
 }
@@ -222,6 +235,7 @@ This created the following function, by adding checks at the top of the
 body
 
 ``` r
+
 add
 #> # typed function
 #> function (x, y = 1) 
@@ -238,6 +252,7 @@ add
 Let’s test it by providing a right and wrong type.
 
 ``` r
+
 add(2, 3)
 #> [1] 5
 add(2, 3L)
@@ -252,6 +267,7 @@ the body, so they cannot be overwritten by character for instance,we can
 use the `?+` notation :
 
 ``` r
+
 add <- ? function (x= ?+ Double(), y= 1 ?+ Double()) {
   x + y
 }
@@ -278,6 +294,7 @@ To set a return type we use `?` before the function definition as in the
 previous section, but we type an assertion on the left hand side.
 
 ``` r
+
 add_or_subtract <- Double() ? function (x, y, subtract = FALSE) {
   if(subtract) return(x - y)
   x + y

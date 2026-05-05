@@ -166,6 +166,7 @@ A function, and more specifically, an assertion as defined above.
 ## Examples
 
 ``` r
+
 if (FALSE) { # \dontrun{
 # fails
 Integer() ? x <- 1
