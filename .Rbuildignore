@@ -11,3 +11,4 @@
 ^\.github$
 ^doc$
 ^Meta$
+^\.ccache$
