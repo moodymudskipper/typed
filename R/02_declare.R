@@ -46,9 +46,9 @@ check_arg <- function(.arg, .assertion, ..., .bind = FALSE) {
           # browser()
           if (!missing(assigned_value)) {
             # we should catch this error and use `sys.call()` to enrich it
-            val <<- try(ASSERTION_CALL, silent = TRUE)
-            if (inherits(val, "try-error")) {
-              e <- attr(val, "condition")$message
+            val_temp <- try(ASSERTION_CALL, silent = TRUE)
+            if (inherits(val_temp, "try-error")) {
+              e <- attr(val_temp, "condition")$message
               fun_call <- sys.call(-1)
               if(!is.null(fun_call)) {
                 fun_call <- deparse1(fun_call)
@@ -56,6 +56,7 @@ check_arg <- function(.arg, .assertion, ..., .bind = FALSE) {
               }
               stop(e, call. = FALSE)
             }
+            val <<- val_temp
           }
           val
         }
@@ -176,9 +177,9 @@ declare <- function(x, assertion, value, const = FALSE) {
           function(assigned_value) {
             if (!missing(assigned_value)) {
               # we should catch this error and use `sys.call()` to enrich it
-              val <<- try(ASSERTION(assigned_value), silent = TRUE)
-              if(inherits(val, "try-error")) {
-                e <- attr(val, "condition")$message
+              val_temp <- try(ASSERTION(assigned_value), silent = TRUE)
+              if(inherits(val_temp, "try-error")) {
+                e <- attr(val_temp, "condition")$message
                 fun_call <- sys.call(-1)
                 is_eval_call <-
                   is.call(fun_call) && identical(fun_call[[1]], quote(eval)) # nocov
@@ -188,6 +189,7 @@ declare <- function(x, assertion, value, const = FALSE) {
                 }
                 stop(e, call. = FALSE)
               }
+              val <<- val_temp
             }
             val
           }
