@@ -32,6 +32,8 @@ export(check_output)
 export(declare)
 export(process_assertion_factory_dots)
 export(use_typed)
-importFrom(utils,assignInNamespace)
-importFrom(utils,getFromNamespace)
-importFrom(utils,help)
+importFrom(utils,
+  assignInNamespace,
+  getFromNamespace,
+  help
+)
