@@ -234,7 +234,7 @@ Cars() ? x <- iris
 #>     Sepal.Width : double
 #>     Petal.Length: double
 #>     Petal.Width : double
-#>     Species     : factor<fb977>
+#>     Species     : factor<0e2e0>
 #>   >>
 ```
 
@@ -260,7 +260,7 @@ Ptype(cars) ? x <- iris
 #>     Sepal.Width : double
 #>     Petal.Length: double
 #>     Petal.Width : double
-#>     Species     : factor<fb977>
+#>     Species     : factor<0e2e0>
 #>   >>
 ```
 
