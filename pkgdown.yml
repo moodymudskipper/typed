@@ -3,7 +3,7 @@ pkgdown: 2.2.1.9000
 pkgdown_sha: 179cfaee3d4e17eaa9e7d7c700b1269dc62e4d46
 articles:
   typed-in-packages: typed-in-packages.html
-last_built: 2026-08-05T19:38Z
+last_built: 2026-08-05T20:08Z
 urls:
   reference: https://moodymudskipper.github.io/typed/reference
   article: https://moodymudskipper.github.io/typed/articles
