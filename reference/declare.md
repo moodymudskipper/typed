@@ -117,7 +117,7 @@ Integer() ? function (x= ? Integer()) {
 #>     res <- x + y
 #>     check_output(res, Integer())
 #> }
-#> <environment: 0x5c67751e4e88>
+#> <environment: 0x60e81636bac8>
 #> # Return type: Integer()
 #> # Arg types:
 #> # x: Integer()
