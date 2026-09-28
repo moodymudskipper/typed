@@ -65,12 +65,14 @@ We cannot assign values of the wrong type to `x` and `y` anymore.
 
 ``` r
 x <- 2
-#> Error: type mismatch
+#> Error:
+#> ! type mismatch
 #> `typeof(value)`: "double"   
 #> `expected`:      "character"
 
 y <- 4:5
-#> Error: length mismatch
+#> Error:
+#> ! length mismatch
 #> `length(value)`: 2
 #>      `expected`: 3
 ```
@@ -107,12 +109,14 @@ return this value, generally unmodified. For instance :
 
 ``` r
 Integer(3)(1:2)
-#> Error: length mismatch
+#> Error:
+#> ! length mismatch
 #> `length(value)`: 2
 #>      `expected`: 3
 
 Character()(3)
-#> Error: type mismatch
+#> Error:
+#> ! type mismatch
 #> `typeof(value)`: "double"   
 #> `expected`:      "character"
 ```
@@ -153,11 +157,13 @@ The arguments can differ between assertion factories, for instance
 ``` r
 Data.frame() ? x <- iris
 Data.frame(ncol = 2) ? x <- iris
-#> Error: Column number mismatch
+#> Error:
+#> ! Column number mismatch
 #> `ncol(value)`: 5
 #>    `expected`: 2
 Data.frame(each = Double()) ? x <- iris
-#> Error: column 5 ("Species") type mismatch
+#> Error:
+#> ! column 5 ("Species") type mismatch
 #> `typeof(value)`: "integer"
 #> `expected`:      "double"
 ```
@@ -169,7 +175,8 @@ of the expected result.
 # Integer has no anyNA arg but we can still use it because a function named
 # this way exists
 Integer(anyNA = FALSE) ? x <- c(1L, 2L, NA)
-#> Error: `anyNA` mismatch
+#> Error:
+#> ! `anyNA` mismatch
 #> `anyNA(value)`: TRUE 
 #> `expected`:     FALSE
 ```
@@ -185,7 +192,8 @@ done by defining a wrapper.
 ``` r
 Character(1, ... = "`value` is not a fruit!" ~ . %in% c("apple", "pear", "cherry")) ? 
   x <- "potatoe"
-#> Error: `value` is not a fruit!
+#> Error:
+#> ! `value` is not a fruit!
 #> `value %in% c("apple", "pear", "cherry")`: FALSE
 #> `expected`:                                TRUE
 ```
@@ -200,12 +208,14 @@ To define a constant, we just surround the variable by parentheses
 ``` r
 Double() ? (x) <- 1
 x <- 2
-#> Error: Can't assign to a constant
+#> Error:
+#> ! Can't assign to a constant
 
 # defining a type is optional
 ? (y) <- 1
 y <- 2
-#> Error: Can't assign to a constant
+#> Error:
+#> ! Can't assign to a constant
 ```
 
 ### Set a function’s argument type
@@ -246,7 +256,8 @@ Let’s test it by providing a right and wrong type.
 add(2, 3)
 #> [1] 5
 add(2, 3L)
-#> Error: In `add(2, 3L)` at `check_arg(y, Double())`:
+#> Error:
+#> ! In `add(2, 3L)` at `check_arg(y, Double())`:
 #> wrong argument to function, type mismatch
 #> `typeof(value)`: "integer"
 #> `expected`:      "double"
